@@ -1,0 +1,33 @@
+{
+	"Create Dividuo Component": {
+		"prefix": "cdc",
+		"body": [
+			"import { Text } from 'react-native';",
+			"import * as S from './styles'\n",
+			"export default function $1() {",
+			"\treturn (",
+			"\t\t<S.Container>",
+			"\t\t\t<Text>$1 Component</Text>",
+			"\t\t</S.Container>",
+			"\t);",
+			"}"
+		],
+		"description": "Create Dividuo Component"
+	},
+	"Create Dividuo Styles": {
+		"prefix": "cds",
+		"body": [
+			"import styled from \"styled-components/native\";\n",
+
+			"export const Container = styled.View`"
+			"\tdisplay: flex;",
+			"\tflex: 1;",
+			"\talign-items: center;"
+			"\tjustify-content: center;"
+			"\twidth: 100%;",
+			"\tpadding: 15px;",
+			"`"
+		],
+		"description": "Create Dividuo Styles"
+	},
+}
