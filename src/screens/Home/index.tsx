@@ -1,35 +1,15 @@
-import { Alert, Text, View, FlatList,  TouchableOpacity} from 'react-native';
-import * as S from './styles'
-import {  } from 'react-native-gesture-handler';
-import DebtService from '../../services/Debt';
-import UserService from '../../services/User';
 import { useEffect, useState } from 'react';
+import { Alert, Text, View, FlatList,  TouchableOpacity} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { Debt, DebtCategory } from '../../@types/Debt';
-import * as Utils from '../../Utils';
+import DebtService from '../../services/Debt';
+import UserService from '../../services/User';
+import * as Utils from '../../utils';
+import * as S from './styles'
 
-export default function Home() {
+export default function Home({ navigation }) {
     const [debts, setdebts] = useState<Debt[]>([]);
     
-    const createDebt = async () => {
-        let debt: Debt =  {
-            description: 'Débito teste',
-            category: DebtCategory.coletivo,
-            value: 100.53,
-            dueDate: firestore.FieldValue.serverTimestamp(),
-            createDate: firestore.FieldValue.serverTimestamp(),
-            active: false,
-            paymentHistory: []
-        }
-        await DebtService.CreateDebt(debt)
-        .then((res) => {
-            Alert.alert('OK', 'criado com sucesso')
-        })
-        .catch((err) => {
-            Alert.alert('NOK', 'erro ao criar')
-        })
-    }
-
     useEffect(() => {
         const subscribe = 
             firestore()
@@ -78,16 +58,24 @@ export default function Home() {
             </TouchableOpacity>
             <TouchableOpacity
                 onPress={async () => {
-                    createDebt()
+                    navigation.navigate('CreateDebit')
                 }}
             >
                 <Text>Criar Débito</Text>
             </TouchableOpacity>
-            <FlatList
-                data={debts}
-                renderItem={({item}) => debtItem(item)}
-                keyExtractor={item => item.id || item.description}
-            />
+            <View className='flex flex-row'>
+                <FlatList
+                    data={debts}
+                    renderItem={({item}) => debtItem(item)}
+                    keyExtractor={item => item.id || item.description}
+                />
+
+                <FlatList
+                    data={debts}
+                    renderItem={({item}) => debtItem(item)}
+                    keyExtractor={item => item.id || item.description}
+                />
+                </View>
         </S.Container>
     );
 }

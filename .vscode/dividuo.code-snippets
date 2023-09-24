@@ -4,7 +4,7 @@
 		"body": [
 			"import { Text } from 'react-native';",
 			"import * as S from './styles'\n",
-			"export default function $1() {",
+			"export default function $1({ navigation }) {",
 			"\treturn (",
 			"\t\t<S.Container>",
 			"\t\t\t<Text>$1 Component</Text>",
@@ -30,4 +30,27 @@
 		],
 		"description": "Create Dividuo Styles"
 	},
+	"Export css class": {
+		"prefix": "ec",
+		"body": [
+			"export const $1 = styled.$2`"
+			"\t",
+			"`"
+		],
+		"description": "Export css class"
+	},
 }
+}
+
+
+
+
+export const Container = styled.View`
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 15px;
+    background-color: #00AB8C;
+`

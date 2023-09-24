@@ -1,5 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack'
 import Login from '../screens/Login'
+import SignUp from '../screens/SIgnUp'
 
 const { Navigator, Screen } = createStackNavigator()
 
@@ -10,6 +11,11 @@ export default function NonAuthStack() {
                 headerShown: false  
             }}
                 name='Login' component={Login}
+            />
+            <Screen options={{
+                headerShown: false  
+            }}
+                name='SignUp' component={SignUp}
             />
         </Navigator>
     )

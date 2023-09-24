@@ -7,10 +7,10 @@ export interface Debt {
     valuePaid?: number
     valueRemaning?: number
     dueDate: any
-    createDate: any,   
+    createDate: any
     active: boolean
-    receiver?: string
-    debtor?: string
+    receiverID?: string
+    debtorID?: string
     paymentHistory: PaymentHistory[]
 }
 
@@ -20,6 +20,7 @@ export enum DebtCategory {
 }
 
 interface PaymentHistory {
+    debtID: string
     payDate: any
     payValue: number
 }
