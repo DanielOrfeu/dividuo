@@ -1,28 +1,39 @@
-import { Text, TouchableOpacity } from 'react-native';
-import * as S from './styles'
+import { Text, TouchableOpacity, View } from 'react-native';
 
 export default function SelecUseType({ navigation }) {
     return (
-        <S.Container>
-            <Text>Selecione o tipo de uso</Text>
-            <TouchableOpacity 
-                onPress={() => {
-                    navigation.navigate('Home')
-                }}
+        <View 
+            className='flex-1 items-center justify-center w-full p-8 bg-primary'
+        >
+            <Text className='text-3xl text-white font-bold p-2'>Selecione o tipo de uso</Text>
+            <View
+                className='flex-1 gap-16 justify-center'
             >
-                <Text>
-                    Individual
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-                onPress={() => {
-                    navigation.navigate('Home')
-                }}
-            >
-                <Text>
-                    Coletivo
-                </Text>
-            </TouchableOpacity>
-        </S.Container>
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Home')
+                    }}
+                >
+                    <View
+                        className='bg-white rounded-xl items-center justify-center p-4'
+                    >
+                        <Text className='text-xl font-bold p-2 text-primary'>Coletivo</Text>
+                        <Text className='text-sm font-medium p-2 text-center text-primary'>No modo individual, você cria e gerencia todos os débitos a receber e a pagar. Adicione pessoas aos seus débitos para melhor organização.</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => {
+                        navigation.navigate('Home')
+                    }}
+                >
+                    <View
+                        className='bg-white rounded-xl items-center justify-center p-4'
+                    >
+                        <Text className='text-xl font-bold p-2 text-primary'>Individual</Text>
+                        <Text className='text-sm font-medium p-2 text-center text-primary'>No modo coletivo, você tem as funcionalidades do modo individual com o acréscimo de vincular outras pessoas cadastradas no aplicativo, podendo ambas pessoas editarem os débitos em tempo real.</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        </View>
     );
 }
