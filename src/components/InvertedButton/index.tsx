@@ -8,18 +8,18 @@ interface OwnProps {
 
 type Props = OwnProps
 
-export default function Button(props: Props) {
-    const className = `bg-${props.disabled ? 'gray-500' : 'primary'} rounded-xl p-3 w-full justify-center items-center`
+export default function InvertedButton(props: Props) {
+    const className = ``
+
     return (
             <TouchableOpacity
-                disabled={props.disabled}
                 onPress={() => {
                     props.onPress()
                 }}
-                className={className}
+                className='bg-white rounded-xl p-3 w-full justify-center items-center border-2 border-primary'
             >
                 <Text
-                    className='text-white font-bold'
+                    className='text-primary font-bold'
                 >
                     {props.text}
                 </Text>
