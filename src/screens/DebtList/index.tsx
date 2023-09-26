@@ -6,16 +6,20 @@ import DebtService from '../../services/Debt';
 import UserService from '../../services/User';
 import * as Utils from '../../utils';
 import * as S from './styles'
+import { useCategoryStore } from '../../store/CategoryStore';
 
 export default function Home({ navigation }) {
+    const [category] = useCategoryStore((state) => [
+        state.category
+    ])
     const [debts, setdebts] = useState<Debt[]>([]);
     
     useEffect(() => {
+        Alert.alert('oi', category.toString())
         const subscribe = 
             firestore()
             .collection('Debts')
             .onSnapshot(querySnapshot => {
-
                 const data = querySnapshot.docs.map((d) => {
                     return {
                         id: d.id,

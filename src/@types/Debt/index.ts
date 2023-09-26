@@ -15,8 +15,8 @@ export interface Debt {
 }
 
 export enum DebtCategory {
-    individual = 0,
-    coletivo = 1
+    individual,
+    coletivo
 }
 
 interface PaymentHistory {

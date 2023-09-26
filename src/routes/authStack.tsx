@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import Home from '../screens/Home'
-import SelectUseType from '../screens/SelectUseType'
+import DebtList from '../screens/DebtList'
+import SelectCategory from '../screens/SelectCategory'
 import CreateDebit from '../screens/CreateDebit'
 
 const { Navigator, Screen } = createStackNavigator()
@@ -9,17 +9,17 @@ export default function AuthStack() {
     return (
         <Navigator>
             <Screen options={{
-                headerShown: false  
+                headerShown: false
             }}
-                name='SelectUseType' component={SelectUseType}
+                name='SelectCategory' component={SelectCategory}
             />
             <Screen options={{
-                headerShown: false  
+                headerShown: false
             }}
-                name='Home' component={Home}
+                name='DebtList' component={DebtList}
             />
             <Screen options={{
-                headerShown: false  
+                headerShown: false
             }}
                 name='CreateDebit' component={CreateDebit}
             />
