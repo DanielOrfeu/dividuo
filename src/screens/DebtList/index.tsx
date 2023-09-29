@@ -15,7 +15,6 @@ export default function Home({ navigation }) {
     const [debts, setdebts] = useState<Debt[]>([]);
     
     useEffect(() => {
-        Alert.alert('oi', category.toString())
         const subscribe = 
             firestore()
             .collection('Debts')

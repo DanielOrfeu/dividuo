@@ -6,8 +6,8 @@ export interface Debt {
     value: number
     valuePaid?: number
     valueRemaning?: number
-    dueDate: any
-    createDate: any
+    dueDate: string
+    createDate: string
     active: boolean
     receiverID?: string
     debtorID?: string
@@ -21,6 +21,6 @@ export enum DebtCategory {
 
 interface PaymentHistory {
     debtID: string
-    payDate: any
+    payDate: string
     payValue: number
 }
