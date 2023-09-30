@@ -1,5 +1,4 @@
 import { Alert, Text, View, Image, TouchableOpacity } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
 import { Debt } from '../../@types/Debt';
 import DebtService from '../../services/Debt';
 import React, { useEffect, useState } from 'react';
@@ -9,10 +8,11 @@ import Input from '../../components/Input';
 import DatepickerInput from '../../components/DatepickerInput';
 import Button from '../../components/Button';
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import { AuthErrorTypes } from '../../@types/Firebase';
 
 
 
-export default function CreateDebit() {
+export default function CreateDebit({ navigation }) {
     const [user] = useUserStore((state) => [
         state.user
     ])
@@ -22,8 +22,6 @@ export default function CreateDebit() {
     const [description, setdescription] = useState<string>('')
     const [value, setvalue] = useState<number>()
     const [dueDate, setdueDate] = useState<Date>()
-    const [debtorID, setdebtorID] = useState<string>(user.uid)
-    const [receiverID, setreceiverID] = useState<string>('')
     const [personType, setpersonType] = useState<string>('debtorID')
 
 
@@ -38,15 +36,16 @@ export default function CreateDebit() {
             paymentHistory: []
         }
 
-        console.log(debt)
+        debt[personType] = user.uid
 
-    //     await DebtService.CreateDebt(debt)
-    //     .then((res) => {
-    //         Alert.alert('OK', 'criado com sucesso')
-    //     })
-    //     .catch((err) => {
-    //         Alert.alert('NOK', 'erro ao criar')
-    //     })
+        await DebtService.CreateDebt(debt)
+        .then((res) => {
+            Alert.alert('Sucesso!', 'Débito criado com sucesso')
+            navigation.goBack()
+        })
+        .catch((err) => {
+            Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
+        })
     }
     useEffect(() => {
         console.log(personType)
@@ -67,10 +66,10 @@ export default function CreateDebit() {
             />
             <Input
                 placeholder='Valor do débito'
-                value={value ? `R$ ${value}`.replace('.',',') : null}
+                value={value ? `R$ ${value.toFixed(2)}`.replace('.',',') : null}
                 numeric
                 onChangeText={(txt) => {
-                    let val = +txt.replace(/[^0-9]/g, '')/100
+                    let val = (+txt.replace(/[^0-9]/g, '')/100)
                     setvalue(val)
                 }}
             />

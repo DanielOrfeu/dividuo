@@ -11,7 +11,7 @@ export default function NonAuthStack() {
                 headerShown: false  
             }}
                 name='Login' component={Login}
-            />
+            /> 
             <Screen options={{
                 headerShown: false  
             }}

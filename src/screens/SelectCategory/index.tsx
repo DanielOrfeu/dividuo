@@ -12,7 +12,7 @@ export default function SelectCategory({ navigation }) {
         <View 
             className='flex-1 items-center justify-center w-full p-8 bg-primary'
         >
-            <Text className='text-3xl text-white font-bold p-2'>Selecione o tipo de uso</Text>
+            <Text className='text-center text-3xl text-white font-bold p-2'>Selecione o tipo de uso</Text>
             <View
                 className='flex-1 gap-16 justify-center'
             >

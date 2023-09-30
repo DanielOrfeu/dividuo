@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 
 interface OwnProps {
     text: string,
@@ -9,7 +9,7 @@ interface OwnProps {
 type Props = OwnProps
 
 export default function Button(props: Props) {
-    const className = `bg-${props.disabled ? 'gray-500' : 'primary'} rounded-xl p-3 w-full justify-center items-center`
+    const className = `${props.disabled ? 'bg-gray-500' : 'bg-primary'} rounded-xl p-3 w-full justify-center items-center`
     return (
             <TouchableOpacity
                 disabled={props.disabled}

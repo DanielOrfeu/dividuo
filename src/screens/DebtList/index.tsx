@@ -4,7 +4,7 @@ import firestore from '@react-native-firebase/firestore';
 import { Debt, DebtCategory } from '../../@types/Debt';
 import DebtService from '../../services/Debt';
 import UserService from '../../services/User';
-import * as Utils from '../../utils';
+import * as Utils from '../../Utils';
 import * as S from './styles'
 import { useCategoryStore } from '../../store/CategoryStore';
 
