@@ -1,16 +1,15 @@
-import { Alert, Text, View, Image, TouchableOpacity } from 'react-native';
-import { Debt } from '../../@types/Debt';
-import DebtService from '../../services/Debt';
+import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
+import { Alert, Text, View, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { Debt } from '../../@types/Debt';
+import { AuthErrorTypes } from '../../@types/Firebase';
+import DebtService from '../../services/Debt';
 import { useUserStore } from '../../store/UserStore';
 import { useCategoryStore } from '../../store/CategoryStore';
-import Input from '../../components/Input';
 import DatepickerInput from '../../components/DatepickerInput';
+import Input from '../../components/Input';
 import Button from '../../components/Button';
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import { AuthErrorTypes } from '../../@types/Firebase';
-
-
+import * as Utils from '../../Utils';
 
 export default function CreateDebit({ navigation }) {
     const [user] = useUserStore((state) => [
@@ -30,6 +29,7 @@ export default function CreateDebit({ navigation }) {
             description,
             category,
             value,
+            valueRemaning: value,
             dueDate: dueDate.toString(),
             createDate: new Date().toString(),
             active: true,
@@ -66,7 +66,7 @@ export default function CreateDebit({ navigation }) {
             />
             <Input
                 placeholder='Valor do débito'
-                value={value ? `R$ ${value.toFixed(2)}`.replace('.',',') : null}
+                value={value ? Utils.NumberToBRL(value) : null}
                 numeric
                 onChangeText={(txt) => {
                     let val = (+txt.replace(/[^0-9]/g, '')/100)

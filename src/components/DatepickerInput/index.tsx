@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Text, TextInput, View, TouchableOpacity } from 'react-native';
 import DatePicker from 'react-native-date-picker';
+import * as Utils from '../../Utils';
 
 interface OwnProps {
     title: string
@@ -28,7 +29,7 @@ export default function DatepickerInput(props: Props) {
                 {
                     props.value
                     ? <Text>
-                        {props.value?.toLocaleDateString('pt-br')}
+                        {Utils.NormalizeDate(props.value)}
                     </Text>
                     : <Text className='text-gray-400'>
                         {props.title}

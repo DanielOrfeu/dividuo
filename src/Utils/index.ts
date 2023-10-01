@@ -1,9 +1,7 @@
-import { FirebaseTime } from "../@types/Firebase";
-
-export function TimestampToDate(date: FirebaseTime) {
-    let d = (date.seconds+date.nanoseconds*10**-9)*1000
-    return new Date(d).toLocaleDateString('pt-BR')
+export function NormalizeDate(date: string | Date): string {
+    return new Date(date).toLocaleDateString('pt-br')
 }
 
-export function NumberToBRL(value: number) {
+export function NumberToBRL(value: number):string {
+    return value ? `R$ ${value.toFixed(2)}`.replace('.',',') : 'R$ 0,00'
 }

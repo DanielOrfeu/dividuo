@@ -6,6 +6,7 @@ import DebtService from '../../services/Debt';
 import UserService from '../../services/User';
 import * as Utils from '../../Utils';
 import * as S from './styles'
+
 import { useCategoryStore } from '../../store/CategoryStore';
 
 export default function Home({ navigation }) {
@@ -35,16 +36,16 @@ export default function Home({ navigation }) {
         return (
             <View style={{borderColor: 'red', borderWidth: 3}}>
                 <Text>Débito: {debt.description}</Text>
-                <Text>Valor: {debt.value}</Text>
-                <Text>Valor pago: {debt.valuePaid}</Text>
-                <Text>Valor Restante: {debt.valueRemaning}</Text>
+                <Text>Valor: {Utils.NumberToBRL(debt.value)}</Text>
+                <Text>Valor pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
+                <Text>Valor Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
                 {
                     debt.createDate &&
-                    <Text>Criado em {Utils.TimestampToDate(debt.createDate)}</Text>
+                    <Text>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
                 }
                 {
                     debt.dueDate &&
-                    <Text>Vencimento{Utils.TimestampToDate(debt.dueDate)}</Text>
+                    <Text>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
                 }
             </View>
         )
