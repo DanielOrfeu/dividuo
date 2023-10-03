@@ -48,27 +48,23 @@ export default function CreateDebit({ navigation }) {
         paymentHistory: []
     });
 
-    useEffect(() => {
-        console.log(linkedPerson)
-    }, [linkedPerson]);
-
-    const setDebtInfos = async () => {
-        let debtorID = personType === 'debtorID' ? linkedPerson : user.uid
-        let receiverID = personType === 'receiverID' ? linkedPerson : user.uid
-        console.log('debtorID', debtorID)
-        console.log('receiverID', receiverID)
-        setdebt({
-            ...debt,
-            receiverID,
-            debtorID,
+    const getPersons = async () => {
+        await PersonService.GetPersonByCreator(user.uid)
+        .then(res => {
+            setpersonList(res)
         })
-        //Verificar debtorID e receiverID
+        .catch((err) => {
+            Alert.alert('Erro ao listar recebedor/devedor', AuthErrorTypes[err.code] || err.code)
+        })
     }
 
     const createDebt = async () => {
         setloading(true)
-        setDebtInfos()
-        await DebtService.CreateDebt(debt)
+        await DebtService.CreateDebt({
+            ...debt,
+            receiverID: personType === 'receiverID' ? user.uid : linkedPerson,
+            debtorID: personType === 'debtorID' ? user.uid : linkedPerson
+        })
         .then((res) => {
             Alert.alert('Sucesso!', 'Débito criado com sucesso')
         })
@@ -87,19 +83,7 @@ export default function CreateDebit({ navigation }) {
     }, [monthAmount]);
     
     useEffect(() => {
-        const subscribe = 
-            firestore()
-            .collection('Persons')
-            .onSnapshot(querySnapshot => {
-                const data = querySnapshot.docs.map((d) => {
-                    return {
-                        id: d.id,
-                        ...d.data()
-                    }
-                }) as Person[]
-                setpersonList(data)
-            })
-            return () => subscribe();
+        getPersons()
     }, []);
     
     return (
@@ -109,7 +93,7 @@ export default function CreateDebit({ navigation }) {
             <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
             <Text className='text-3xl text-primary font-semibold'>Novo débito</Text>
             <Input
-                title='Descrição (opicional)'
+                title='Descrição'
                 value={debt.description}
                 onChangeText={(description) => {
                     setdebt({
@@ -135,10 +119,9 @@ export default function CreateDebit({ navigation }) {
                 title='Data de vencimento'
                 value={new Date(debt.dueDate)}
                 onPickDate={(date) => {
-                    let dueDate =  date.toString()
                     setdebt({
                         ...debt,
-                        dueDate
+                        dueDate: date.toString()
                     })
                 }}
             />
@@ -223,6 +206,7 @@ export default function CreateDebit({ navigation }) {
                         creatorID: user.uid
                     })
                     .then((res) => {
+                        getPersons()
                         Alert.alert('Sucesso!', 'Devedor/recebedor criado com sucesso')
                     })
                     .catch((err) => {
@@ -257,13 +241,14 @@ export default function CreateDebit({ navigation }) {
                 startAction={async () => {
                     setmultipleMonthModalOpen(false)
                     setloading(true)
-                    await setDebtInfos()
                     for (let i = 0; i <= monthAmount; i++) {
                         let dueDate = new Date(debt.dueDate)
                         dueDate.setMonth(new Date(debt.dueDate).getMonth() + i)
                         await DebtService.CreateDebt({
                             ...debt,
-                            dueDate: dueDate.toString()
+                            dueDate: dueDate.toString(),
+                            receiverID: personType === 'receiverID' ? user.uid : linkedPerson,
+                            debtorID: personType === 'debtorID' ? user.uid : linkedPerson
                         })
                         .catch((err) => {
                             Alert.alert(`Erro ao criar Débito do dia ${Utils.NormalizeDate(dueDate)}`, AuthErrorTypes[err.code] || err.code)
