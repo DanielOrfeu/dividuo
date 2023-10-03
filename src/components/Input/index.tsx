@@ -4,7 +4,7 @@ import { Entypo } from '@expo/vector-icons';
 import colors from 'tailwindcss/colors'
 
 interface OwnProps {
-    placeholder: string,
+    title: string,
     value: string,
     isPassword?: boolean,
     numeric?: boolean,
@@ -19,13 +19,13 @@ export default function Input(props: Props) {
     
     return (
         <View className='my-2 w-full'>
-            <Text className='text-primary font-medium text-sm'>{props.placeholder}</Text>
+            <Text className='text-primary font-medium text-sm'>{props.title}</Text>
             <View
                 className='w-full flex-row items-center'
             >
                 <TextInput
                     className='w-full h-10 rounded-xl px-4 border-2 border-gray-300 focus:border-primary'
-                    placeholder={props.placeholder}
+                    placeholder={props.title}
                     value={props.value}
                     keyboardType={props.numeric ? 'numeric' : props.email ? 'email-address' : 'default'}
                     onChangeText={(txt) => {

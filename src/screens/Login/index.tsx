@@ -23,14 +23,14 @@ export default function Login({ navigation }) {
             <Text className='text-3xl text-primary font-bold p-2'>Login</Text>
 
                 <Input
-                    placeholder='E-mail'
+                    title='E-mail'
                     value={email}
                     onChangeText={(txt) => {
                         setemail(txt)
                     }}
                 />
                 <Input
-                    placeholder='Senha'
+                    title='Senha'
                     value={password}
                     onChangeText={(txt) => {
                         setpassword(txt)

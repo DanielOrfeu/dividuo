@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "dividuo",
+    "name": "Dividuo",
     "slug": "dividuo",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#00ab8c"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -23,7 +23,7 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#00ab8c"
       },
       "package": "com.dividuo"
     },

@@ -1,4 +1,3 @@
-import { Alert } from 'react-native'
 import firestore from '@react-native-firebase/firestore';
 import { Debt } from '../../@types/Debt';
 
@@ -9,6 +8,4 @@ export default class DebtService {
         .add(debt)
     }
 }
-
-
 

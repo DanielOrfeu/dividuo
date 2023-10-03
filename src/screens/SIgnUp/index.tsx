@@ -24,14 +24,14 @@ export default function SignUp({ navigation }) {
             <Text className='text-3xl text-primary font-bold p-2'>Cadastro</Text>
 
                 <Input
-                    placeholder='E-mail'
+                    title='E-mail'
                     value={email}
                     onChangeText={(txt) => {
                         setemail(txt)
                     }}
                 />
                 <Input
-                    placeholder='Senha'
+                    title='Senha'
                     value={password}
                     onChangeText={(txt) => {
                         setpassword(txt)
@@ -39,7 +39,7 @@ export default function SignUp({ navigation }) {
                     isPassword
                 />
                 <Input
-                    placeholder='Confirmar senha'
+                    title='Confirmar senha'
                     value={confirmPassword}
                     onChangeText={(txt) => {
                         setconfirmPassword(txt)
