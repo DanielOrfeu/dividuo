@@ -7,5 +7,22 @@ export default class DebtService {
         .collection('Debts')
         .add(debt)
     }
+
+//     static async GetPersonByCreator(creatorID: string) {
+//         return firestore()
+//         .collection('Debts')
+//         .orderBy('name')
+//         // .where('creatorID', '==', creatorID)
+//         .get()
+//         .then(res => {
+//             let data = res?.docs?.map((doc) => {
+//                 return {
+//                     id: doc.id,
+//                     ...doc.data()
+//                 }
+//             }) as Debt[] || []  
+//             return data
+//         })
+//     }
 }
 

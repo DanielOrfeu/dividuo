@@ -6,7 +6,7 @@ interface OwnProps {
 
 type Props = OwnProps
 
-export default function (props: Props) {
+export default function Loading(props: Props) {
     return (
         <ActivityIndicator size={"large"} color={'#00ab8c'}/>
     );

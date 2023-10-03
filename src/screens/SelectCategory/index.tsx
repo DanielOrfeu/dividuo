@@ -19,7 +19,7 @@ export default function SelectCategory({ navigation }) {
                 <TouchableOpacity
                     onPress={() => {
                         setCategory(DebtCategory.individual)
-                        navigation.navigate('DebtList')
+                        navigation.navigate('DebtListStack')
                     }}
                 >
                     <View
@@ -32,13 +32,13 @@ export default function SelectCategory({ navigation }) {
                 <TouchableOpacity
                     onPress={() => {
                         setCategory(DebtCategory.coletivo)
-                        navigation.navigate('DebtList')
+                        navigation.navigate('DebtListStack')
                     }}
                 >
                     <View
                         className='bg-white rounded-xl items-center justify-center p-4'
                     >
-                        <Text className='text-xl font-bold p-2 text-primary'>Coeltivo</Text>
+                        <Text className='text-xl font-bold p-2 text-primary'>Coletivo</Text>
                         <Text className='text-sm font-medium p-2 text-center text-primary'>No modo coletivo, você tem as funcionalidades do modo individual com o acréscimo de vincular outras pessoas cadastradas no aplicativo, podendo ambas pessoas editarem os débitos em tempo real.</Text>
                     </View>
                 </TouchableOpacity>

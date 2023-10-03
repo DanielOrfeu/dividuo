@@ -2,55 +2,32 @@
 	"Create Dividuo Component": {
 		"prefix": "cdc",
 		"body": [
-			"import { Text } from 'react-native';",
-			"import * as S from './styles'\n",
-			"export default function $1({ navigation }) {",
+			"import { Text, View } from 'react-native';\n",
+			"interface OwnProps {\n",
+			"}\n",
+			"type Props = OwnProps\n",
+			"export default function $1(props: Props) {",
 			"\treturn (",
-			"\t\t<S.Container>",
+			"\t\t<View className='flex-1 w-full justify-center items-center p-4'>",
 			"\t\t\t<Text>$1 Component</Text>",
-			"\t\t</S.Container>",
+			"\t\t</View>",
 			"\t);",
-			"}"
+			"}",
 		],
 		"description": "Create Dividuo Component"
 	},
-	"Create Dividuo Styles": {
+	"Create Dividuo Screen": {
 		"prefix": "cds",
 		"body": [
-			"import styled from \"styled-components/native\";\n",
-
-			"export const Container = styled.View`"
-			"\tdisplay: flex;",
-			"\tflex: 1;",
-			"\talign-items: center;"
-			"\tjustify-content: center;"
-			"\twidth: 100%;",
-			"\tpadding: 15px;",
-			"`"
+			"import { Text, View } from 'react-native';\n",
+			"export default function $1({ navigation }) {",
+			"\treturn (",
+			"\t\t<View className='flex-1 w-full justify-center items-center p-4'>",
+			"\t\t\t<Text>$1 Screen</Text>",
+			"\t\t</View>",
+			"\t);",
+			"}",
 		],
-		"description": "Create Dividuo Styles"
-	},
-	"Export css class": {
-		"prefix": "ec",
-		"body": [
-			"export const $1 = styled.$2`"
-			"\t",
-			"`"
-		],
-		"description": "Export css class"
+		"description": "Create Dividuo Screen"
 	},
 }
-}
-
-
-
-
-export const Container = styled.View`
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 15px;
-    background-color: #00AB8C;
-`

@@ -88,9 +88,9 @@ export default function CreateDebit({ navigation }) {
     
     return (
         <View
-            className='flex-1 items-center justify-center w-full p-8 bg-white'
+            className='flex-1 items-center  w-full p-8 bg-white'
         >
-            <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
+            <Image className='m-2' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
             <Text className='text-3xl text-primary font-semibold'>Novo débito</Text>
             <Input
                 title='Descrição'
