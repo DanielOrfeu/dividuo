@@ -15,6 +15,7 @@ export default function Home({ navigation }) {
         state.category
     ])
     const [debts, setdebts] = useState<Debt[]>([]);
+    const [laoding, setlaoding] = useState<boolean>(false);
     
     useEffect(() => {
         const subscribe = 
@@ -39,7 +40,7 @@ export default function Home({ navigation }) {
         const dateExpired = new Date(debt.dueDate).getTime() <= new Date().getTime() ? `text-red-600` : ''
 
         return (
-            <View className={`border-2 border-${bgColor} m-1 px-3 pb-3 rounded-xl items-center`}>
+            <TouchableOpacity className={`border-2 border-${bgColor} m-1 px-3 pb-3 rounded-xl items-center`}>
                 <Text className={`text-${color} font-semibold text-lg`}>{debt.description}</Text>
                 <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
                 <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
@@ -52,7 +53,7 @@ export default function Home({ navigation }) {
                     debt.dueDate &&
                     <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
                 }
-            </View>
+            </TouchableOpacity>
         )
     }
 
