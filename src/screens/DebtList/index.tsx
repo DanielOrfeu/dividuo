@@ -32,9 +32,12 @@ export default function Home({ navigation }) {
         const dateExpired = new Date(debt.dueDate).getTime() <= new Date().getTime() ? `text-red-600` : ''
 
         return (
-            <View className={`border-2 m-1 px-1 pb-3 rounded-xl items-center`} style={{
-                borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
-            }}>
+            <TouchableOpacity 
+                className={`border-2 m-1 px-1 pb-3 rounded-xl items-center`} 
+                style={{
+                    borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
+                }}
+            >
                 <Text className={`text-${color} font-semibold text-lg`}>{debt.description}</Text>
                 <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
                 <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
@@ -47,7 +50,7 @@ export default function Home({ navigation }) {
                     debt.dueDate &&
                     <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
                 }
-            </View>
+            </TouchableOpacity>
         )
     } 
 

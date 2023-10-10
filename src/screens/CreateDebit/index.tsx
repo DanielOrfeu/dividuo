@@ -172,7 +172,6 @@ export default function CreateDebit({ navigation }) {
                                 setcreatePersonModalOpen(true)
                             }}            
                         />
-                        <View className="p-1"/>
                         <Button 
                             disabled={!debt.description || !debt.value || !debt.dueDate || !linkedPerson}
                             text={'Criar débito'} 
@@ -180,7 +179,6 @@ export default function CreateDebit({ navigation }) {
                                 createDebt()
                             }}
                         />
-                        <View className="p-1"/>
                         <Button 
                             disabled={!debt.description || !debt.value || !debt.dueDate ||!linkedPerson}
                             text={"Criar débitos recorrentes"} 

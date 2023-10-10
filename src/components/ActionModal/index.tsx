@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 
 interface OwnProps {
     title: string
+    type?: string
     actionText: string
     isVisible: boolean
     content: ReactNode
@@ -20,7 +21,7 @@ type Props = OwnProps
 export default function ActionModal(props: Props) {
     return (
             <Modal 
-            className="flex-1"
+                className="flex-1"
                 isVisible={props.isVisible}
                 backdropColor='#00ab8c'
                 backdropOpacity={0.6}
@@ -38,6 +39,7 @@ export default function ActionModal(props: Props) {
                             {props.content}
                         </View>
                         <Button 
+                            type={props.type}
                             disabled={props.disableAction}
                             text={props.actionText} 
                             onPress={() => {

@@ -9,7 +9,7 @@ export default class UserService {
     }
 
     static async SignUp(email, pass, confirmpass) {
-        if( pass === confirmpass) {
+        if(pass === confirmpass) {
             return auth()
             .createUserWithEmailAndPassword(email, pass)
         } else {
@@ -35,6 +35,24 @@ export default class UserService {
         .updateProfile({
             displayName: name,
         })
+    }
+
+    static async EditUserEmail(email){
+        return auth()
+        .currentUser
+        .updateEmail(email)
+    }
+
+    static async VerifyEmail(){
+        return auth()
+        .currentUser
+        .sendEmailVerification()
+    }
+
+    static async DeleteUser(){
+        return auth()
+        .currentUser
+        .delete()
     }
 }
 

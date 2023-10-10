@@ -7,17 +7,17 @@ interface OwnProps {
     title: string
     value: Date
     onPickDate(d: Date): void
+    w?: string
 }
 
 type Props = OwnProps
 
 export default function DatepickerInput(props: Props) {
     const [openDatePicker, setopenDatePicker] = useState<boolean>(false);
+    const className = `my-2 w-${props.w ? props.w : 'full'}`
 
     return (
-        <View
-            className='my-2 w-full'
-        >  
+        <View className={className}>
             <Text className='text-primary font-medium text-sm'>{props.title}</Text>
 
             <TouchableOpacity

@@ -13,15 +13,14 @@ export default function Login({ navigation }) {
     const [loading, setloading] = useState<boolean>(false)
 
     return (
-        <View 
+        <View
             className='flex-1 items-center justify-center w-full p-8 bg-primary'
-        >   
-            <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
+        >
+            <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{ width: 75, height: 75 }} />
             <View
                 className='p-4 w-full items-center justify-center bg-white rounded-3xl'
             >
-            <Text className='text-3xl text-primary font-bold p-2'>Login</Text>
-
+                <Text className='text-3xl text-primary font-bold p-2'>Login</Text>
                 <Input
                     title='E-mail'
                     value={email}
@@ -42,55 +41,56 @@ export default function Login({ navigation }) {
                     onPress={async () => {
                         setloading(true)
                         await UserService.ForgotPassword(email)
-                        .then((res) => {
-                            Alert.alert('Sucesso!', `Foi enviado um e-mail para ${email} com instruções para criar uma nova senha`)
-                        })
-                        .catch((err) => {
-                            setloading(false)
-                            Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
-                        })
-                        .finally(() => {
-                            setloading(false)
-                        })
+                            .then((res) => {
+                                Alert.alert('Sucesso!', `Foi enviado um e-mail para ${email} com instruções para criar uma nova senha`)
+                            })
+                            .catch((err) => {
+                                setloading(false)
+                                Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
+                            })
+                            .finally(() => {
+                                setloading(false)
+                            })
                     }}
                 >
-                    { 
-                        loading 
-                        ? null 
-                        : <Text
-                            className={`${!email || !email.includes('@') ? 'text-gray-500' : 'text-primary'}`}
-                        >
-                            Esqueceu a senha?
-                        </Text>
+                    {
+                        loading
+                            ? null
+                            : <Text
+                                className={`${!email || !email.includes('@') ? 'text-gray-500' : 'text-primary'}`}
+                            >
+                                Esqueceu a senha?
+                            </Text>
                     }
                 </TouchableOpacity>
                 <View
                     className='m-4 w-full'
                 >
-                    {
-                        loading 
-                        ? <Loading/>
-                        :  <Button
-                            disabled={!email || !email.includes('@') || !password || password.length < 6}
-                            text='Entrar'
-                            onPress={async () => {
+                    <Button
+                        disabled={!email || !email.includes('@') || !password || password.length < 6 || loading}
+                        text='Entrar'
+                        onPress={async () => {
                             setloading(true)
                             await UserService.Login(email, password)
-                            .catch((err) => {
-                                setloading(false)
+                                .catch((err) => {
+                                    setloading(false)
                                     Alert.alert('Erro ao logar!', AuthErrorTypes[err.code] || err.code)
                                 })
-                            }}
-                        />
-                    }
+                        }}
+                        icon={
+                            loading ?
+                                <Loading color='white' size={28} /> :
+                                null
+                        }
+                    />
                 </View>
                 <View className='w-full items-center justify-center'>
-                    <Text className='mb-4'>Ainda não possui uma conta?</Text>
-                    <InvertedButton 
+                    <Text className='mb-2'>Ainda não possui uma conta?</Text>
+                    <InvertedButton
                         text={'Cadastre-se'}
                         onPress={() => {
                             navigation.navigate('SignUp')
-                        }}                    
+                        }}
                     />
                 </View>
             </View>

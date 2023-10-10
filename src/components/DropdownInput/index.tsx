@@ -14,11 +14,13 @@ interface OwnProps {
     title: string
     selectedItem: string
     setSelectedItem(s: string): void
+    w?: string
 }
 
 type Props = OwnProps
 
 export default function DropdownInput(props: Props) {
+    const className = `my-2 w-${props.w ? props.w : 'full'}`
 
     const buildList = () => {
         let list = [
@@ -49,16 +51,11 @@ export default function DropdownInput(props: Props) {
     }
 
     return (
-        <View
-            className='my-2 w-full'
-        >  
+        <View className={className}> 
             <Text className='text-primary font-medium text-sm'>{props.title}</Text>
-
             <TouchableOpacity
                 className='w-full h-10 justify-center rounded-xl border-2 border-gray-300 focus:border-primary'
             >
-
-
             <Picker
                 placeholder=''
                 selectedValue={props.selectedItem}

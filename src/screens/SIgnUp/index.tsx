@@ -14,14 +14,14 @@ export default function SignUp({ navigation }) {
     const [loading, setloading] = useState<boolean>(false)
 
     return (
-        <View 
+        <View
             className='flex-1 items-center justify-center w-full p-8 bg-primary'
-        >   
-            <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
+        >
+            <Image className='m-4' source={require('../../../assets/images/transparent-icon.png')} style={{ width: 75, height: 75 }} />
             <View
                 className='p-4 w-full items-center justify-center bg-white rounded-3xl'
             >
-            <Text className='text-3xl text-primary font-bold p-2'>Cadastro</Text>
+                <Text className='text-3xl text-primary font-bold p-2'>Cadastro</Text>
 
                 <Input
                     title='E-mail'
@@ -49,33 +49,36 @@ export default function SignUp({ navigation }) {
                 <View
                     className='m-4 w-full'
                 >
-                    {
-                        loading 
-                        ? <Loading/>
-                        :  <Button
-                            disabled={!email || !email.includes('@') 
-                                || !password || password.length < 6
-                                || !confirmPassword || confirmPassword.length < 6
-                            }
-                            text='Criar conta'
-                            onPress={async () => {
+                    <Button
+                        disabled={!email || !email.includes('@')
+                            || !password || password.length < 6
+                            || !confirmPassword || confirmPassword.length < 6
+                            || loading
+                        }
+                        text='Criar conta'
+                        onPress={async () => {
                             setloading(true)
                             await UserService.SignUp(email, password, confirmPassword)
-                            .catch((err) => {
-                                setloading(false)
+                                .catch((err) => {
+                                    setloading(false)
                                     Alert.alert('Erro ao logar!', AuthErrorTypes[err.code] || err.code)
                                 })
-                            }}
-                        />
-                    }
+                        }}
+                        icon={
+                            loading ?
+                                <Loading color='white' size={28} /> :
+                                null
+                        }
+                    />
+
                 </View>
                 <View className='w-full items-center justify-center'>
                     <Text className='mb-4'>Já possui conta?</Text>
-                    <InvertedButton 
+                    <InvertedButton
                         text={'Entrar'}
                         onPress={() => {
                             navigation.navigate('Login')
-                        }}                    
+                        }}
                     />
                 </View>
             </View>
