@@ -9,6 +9,6 @@ type UserStore = {
 export const useUserStore = create<UserStore>((set) => {
     return {
         user: null,
-        setUser: (u) => set((state) => ({user: u}))
+        setUser: (u) => set({user: u})
     }
 })

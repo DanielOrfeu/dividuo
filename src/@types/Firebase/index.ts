@@ -65,4 +65,5 @@ export enum AuthErrorTypes {
     'auth/email-already-in-use' = 'O e-mail informado já está cadastrado',
     'auth/network-request-failed' = 'Houve um problema na requisição. Por favor, tente novamente.',
     'auth/passwords-not-match' = 'As senhas devem ser iguais!',
+    'firestore/failed-precondition' = 'A busca requerida não tem um índice configurado.'
 }

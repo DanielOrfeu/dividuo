@@ -10,6 +10,6 @@ type CategoryStore = {
 export const useCategoryStore = create<CategoryStore>((set) => {
     return {
         category: null,
-        setCategory: (c) => set((state) => ({category: c}))
+        setCategory: (c) => set({category: c})
     }
 })

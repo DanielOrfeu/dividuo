@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, Text, View, FlatList,  TouchableOpacity} from 'react-native';
+import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import { Debt, DebtCategory } from '../../@types/Debt';
 import DebtService from '../../services/Debt';
@@ -9,38 +9,32 @@ import * as Utils from '../../Utils';
 import { useCategoryStore } from '../../store/CategoryStore';
 import Button from '../../components/Button';
 import InvertedButton from '../../components/InvertedButton';
+import { useUserStore } from '../../store/UserStore';
+import { AuthErrorTypes } from '../../@types/Firebase';
+import { useDebtStore } from '../../store/DebtStore';
+import Loading from '../../components/Loading';
 
 export default function Home({ navigation }) {
-    const [category] = useCategoryStore((state) => [
-        state.category
-    ])
-    const [debts, setdebts] = useState<Debt[]>([]);
-    const [laoding, setlaoding] = useState<boolean>(false);
-    
+    const [user] = useUserStore((state) => [state.user])
+    const [category] = useCategoryStore((state) => [state.category])
+    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
+    const [debtsToPay, debtsToReceive] = useDebtStore((state) => [state.debtsToPay, state.debtsToReceive])
+    const [loadDebtToPay, loadDebtToReceive] = useDebtStore((state) => [state.loadDebtToPay, state.loadDebtToReceive])
+
     useEffect(() => {
-        const subscribe = 
-            firestore()
-            .collection('Debts')
-            .onSnapshot(querySnapshot => {
-                const data = querySnapshot.docs.map((d) => {
-                    return {
-                        id: d.id,
-                        ...d.data()
-                    }
-                }) as Debt[]
-                setdebts(data)
-            })
-            return () => subscribe();
+        getMyDebtsToPay(user.uid, category)
+        getMyDebtsToReceive(user.uid, category)
     }, []);
+
 
     const debtItem = (debt: Debt, personType: string) => {
         const color = personType === 'receiverID' ? 'primary' : 'red-600'
-        const bgColor = personType === 'receiverID' ? 'primary' : 'red-500'
-
         const dateExpired = new Date(debt.dueDate).getTime() <= new Date().getTime() ? `text-red-600` : ''
 
         return (
-            <TouchableOpacity className={`border-2 border-${bgColor} m-1 px-3 pb-3 rounded-xl items-center`}>
+            <View className={`border-2 m-1 px-1 pb-3 rounded-xl items-center`} style={{
+                borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
+            }}>
                 <Text className={`text-${color} font-semibold text-lg`}>{debt.description}</Text>
                 <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
                 <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
@@ -53,22 +47,62 @@ export default function Home({ navigation }) {
                     debt.dueDate &&
                     <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
                 }
-            </TouchableOpacity>
+            </View>
+        )
+    } 
+
+    const listToPay = () => {
+        return (
+            <View className='flex-1 items-center'>
+                <Text className={`text-red-600 text-lg font-semibold pb-1`}>A pagar</Text>
+                {
+                    loadDebtToPay 
+                    ? <Loading/>
+                    : debtsToPay.length > 0
+                        ? <FlatList
+                            className='w-full'
+                            data={debtsToPay}
+                            renderItem={({ item }) => debtItem(item, 'debtorID')}
+                            keyExtractor={item => item.id || item.description}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={loadDebtToPay}
+                                    onRefresh={() => {
+                                        getMyDebtsToPay(user.uid, category)
+                                    }}
+                                />
+                            }
+                        />
+                        : <Text className='text-md'>Sem débitos a pagar</Text>
+                }
+            </View>
         )
     }
 
-    const debtlist = (personType: string) => {
-        const color = personType === 'receiverID' ? 'primary' : 'red-600'
-
+    const listToReceive = () => {
         return (
             <View className='flex-1 items-center'>
-                <Text className={`text-${color} text-lg font-semibold`}>{personType === 'receiverID' ? 'A receber' : 'A pagar'}</Text>
-                <FlatList
-                    className='w-full'
-                    data={debts}
-                    renderItem={({item}) => debtItem(item, personType)}
-                    keyExtractor={item => item.id || item.description}
-                />
+                <Text className={`text-primary text-lg font-semibold pb-1`}>A receber</Text>
+                {
+                    loadDebtToReceive 
+                    ? <Loading/>
+                    : debtsToReceive.length > 0
+                        ? <FlatList
+                            className='w-full'
+                            data={debtsToReceive}
+                            renderItem={({ item }) => debtItem(item, 'receiverID')}
+                            keyExtractor={item => item.id || item.description}
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={loadDebtToReceive}
+                                    onRefresh={() => {
+                                        getMyDebtsToReceive(user.uid, category)
+                                    }}
+                                />
+                            }
+                        />
+                        : <Text className='text-md'>Sem débitos a receber</Text>
+                }
             </View>
         )
     }
@@ -78,19 +112,19 @@ export default function Home({ navigation }) {
             <View className='flex-1 w-full mb-4'>
                 <View className='flex-row w-full'>
                     {
-                        debtlist('receiverID')
+                        listToReceive()
                     }
                     {
-                        debtlist('debtorID')
+                        listToPay()
                     }
                 </View>
             </View>
             <View className='w-full pt-2 mt-2'>
-                <Button 
-                    text={'Criar Débito'} 
+                <Button
+                    text={'Criar Débito'}
                     onPress={() => {
                         navigation.navigate('CreateDebit')
-                    }}            
+                    }}
                 />
             </View>
         </View>

@@ -17,14 +17,12 @@ import PersonService from "../../services/Person";
 import { Person } from "../../@types/Person";
 import ActionModal from "../../components/ActionModal";
 import Loading from "../../components/Loading";
+import { useDebtStore } from "../../store/DebtStore";
 
 export default function CreateDebit({ navigation }) {
-    const [user] = useUserStore((state) => [
-        state.user
-    ])
-    const [category] = useCategoryStore((state) => [
-        state.category
-    ])
+    const [user] = useUserStore((state) => [state.user])
+    const [category] = useCategoryStore((state) => [state.category])
+    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
     const [multipleMonthModalOpen, setmultipleMonthModalOpen] = useState<boolean>(false);
     const [createPersonModalOpen, setcreatePersonModalOpen] = useState<boolean>(false);
     const [personType, setpersonType] = useState<string>('debtorID')
@@ -67,6 +65,9 @@ export default function CreateDebit({ navigation }) {
         })
         .then((res) => {
             Alert.alert('Sucesso!', 'Débito criado com sucesso')
+            personType === 'receiverID'
+            ? getMyDebtsToReceive(user.uid, category)
+            : getMyDebtsToPay(user.uid, category)
         })
         .catch((err) => {
             Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)

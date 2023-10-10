@@ -8,21 +8,42 @@ export default class DebtService {
         .add(debt)
     }
 
-//     static async GetPersonByCreator(creatorID: string) {
-//         return firestore()
-//         .collection('Debts')
-//         .orderBy('name')
-//         // .where('creatorID', '==', creatorID)
-//         .get()
-//         .then(res => {
-//             let data = res?.docs?.map((doc) => {
-//                 return {
-//                     id: doc.id,
-//                     ...doc.data()
-//                 }
-//             }) as Debt[] || []  
-//             return data
-//         })
-//     }
+    static async GetMyDebtsToReceive(userID: string, category: number) {
+        return firestore()
+        .collection('Debts')
+        .where('receiverID', '==', userID)
+        .where('category', '==', category)
+        .get()
+        .then(res => {
+            let data = res?.docs?.map((doc) => {
+                return {
+                    id: doc.id,
+                    ...doc.data()
+                }
+            }) as Debt[] || []  
+            return data.sort((a: Debt, b:Debt) => {
+                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime() 
+            })
+        })
+    }
+
+    static async GetMyDebtsToPay(userID: string, category: number) {
+        return firestore()
+        .collection('Debts')
+        .where('debtorID', '==', userID)
+        .where('category', '==', category)
+        .get()
+        .then(res => {
+            let data = res?.docs?.map((doc) => {
+                return {
+                    id: doc.id,
+                    ...doc.data()
+                }
+            }) as Debt[] || []  
+            return data.sort((a: Debt, b:Debt) => {
+                return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime() 
+            })
+        })
+    }
 }
 
