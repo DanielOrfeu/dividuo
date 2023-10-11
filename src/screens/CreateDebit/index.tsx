@@ -18,6 +18,7 @@ import { Person } from "../../@types/Person";
 import ActionModal from "../../components/ActionModal";
 import Loading from "../../components/Loading";
 import { useDebtStore } from "../../store/DebtStore";
+import moment from "moment";
 
 export default function CreateDebit({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
@@ -38,8 +39,8 @@ export default function CreateDebit({ navigation }) {
         value: 0,
         valuePaid: 0,
         valueRemaning: 0,
-        dueDate: new Date().toString(),
-        createDate: new Date().toString(),
+        dueDate: moment().format(),
+        createDate: moment().format(),
         active: true,
         receiverID: null,
         debtorID: null,
@@ -89,7 +90,7 @@ export default function CreateDebit({ navigation }) {
     
     return (
         <View
-            className='flex-1 items-center  w-full p-8 bg-white'
+            className='flex-1 items-center p-4 bg-white w-screen'
         >
             <Image className='m-2' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
             <Text className='text-3xl text-primary font-semibold'>Novo débito</Text>
@@ -245,7 +246,7 @@ export default function CreateDebit({ navigation }) {
                         dueDate.setMonth(new Date(debt.dueDate).getMonth() + i)
                         await DebtService.CreateDebt({
                             ...debt,
-                            dueDate: dueDate.toString(),
+                            dueDate: moment(dueDate).format(),
                             receiverID: personType === 'receiverID' ? user.uid : linkedPerson,
                             debtorID: personType === 'debtorID' ? user.uid : linkedPerson
                         })

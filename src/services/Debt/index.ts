@@ -8,6 +8,26 @@ export default class DebtService {
         .add(debt)
     }
 
+    static async GetDebtByID(debtID: string) {
+        return firestore()
+        .collection('Debts')
+        .doc(debtID)
+        .get()
+        .then(res => {
+            return {
+                id: res.id,
+                ...res.data()
+            } as Debt || {}
+        })
+    }
+
+    static async EditDebtByID(debt: Debt) {
+        return firestore()
+        .collection('Debts')
+        .doc(debt.id)
+        .update(debt)
+    }
+
     static async GetMyDebtsToReceive(userID: string, category: number) {
         return firestore()
         .collection('Debts')

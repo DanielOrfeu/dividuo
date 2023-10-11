@@ -13,6 +13,7 @@ import { useUserStore } from '../../store/UserStore';
 import { AuthErrorTypes } from '../../@types/Firebase';
 import { useDebtStore } from '../../store/DebtStore';
 import Loading from '../../components/Loading';
+import moment from 'moment';
 
 export default function Home({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
@@ -29,7 +30,7 @@ export default function Home({ navigation }) {
 
     const debtItem = (debt: Debt, personType: string) => {
         const color = personType === 'receiverID' ? 'primary' : 'red-600'
-        const dateExpired = new Date(debt.dueDate).getTime() <= new Date().getTime() ? `text-red-600` : ''
+        const dateExpired = moment().isAfter(moment(debt.dueDate)) ? `text-red-600` : ''
 
         return (
             <TouchableOpacity 
@@ -37,19 +38,16 @@ export default function Home({ navigation }) {
                 style={{
                     borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
                 }}
+                onPress={() => {
+                    navigation.navigate('DebtDetail', debt.id)
+                }}
             >
                 <Text className={`text-${color} font-semibold text-lg`}>{debt.description}</Text>
                 <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
                 <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
                 <Text className={`font-medium`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
-                {
-                    debt.createDate &&
-                    <Text className={`font-medium`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
-                }
-                {
-                    debt.dueDate &&
-                    <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
-                }
+                <Text className={`font-medium`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
+                <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
             </TouchableOpacity>
         )
     } 

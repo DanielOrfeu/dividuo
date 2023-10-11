@@ -35,7 +35,7 @@ export default function Input(props: Props) {
             />
             {
                 props.isPassword &&
-                <View className='absolute right-3'>
+                <View className='absolute right-3 bottom-2'>
                     <TouchableOpacity
                         onPress={() => {
                             sethidePassword(!hidePassword)

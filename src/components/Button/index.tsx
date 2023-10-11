@@ -41,7 +41,7 @@ export default function Button(props: Props) {
             switch (props.type) {
                 case 'warning':
                     setpallet({
-                        bgColor: '#ffe100',
+                        bgColor: '#eab308',
                         color: '#000000'
                     })
                     break;
@@ -67,7 +67,7 @@ export default function Button(props: Props) {
         }
     }
 
-    const className = `w-${props.w ? props.w : 'full'} rounded-xl p-3 my-2  justify-center items-center`
+    const className = `w-${props.w ? props.w : 'full'} rounded-xl p-3 my-1 justify-center items-center`
     return (
         <TouchableOpacity
             disabled={props.disabled}

@@ -19,8 +19,7 @@ export enum DebtCategory {
     coletivo
 }
 
-interface PaymentHistory {
-    debtID: string
+export interface PaymentHistory {
     payDate: string
     payValue: number
 }
