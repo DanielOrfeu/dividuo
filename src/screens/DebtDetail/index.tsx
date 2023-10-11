@@ -164,14 +164,14 @@ export default function DebtDetail({ navigation, route }) {
                             <View className="w-full flex-row justify-center items-center py-4">
                                 <View className="w-4/12 items-center">
                                     <Text className='font-semibold text-lg text-red-600'>Devedor</Text>
-                                    <Text>{debt.debtorID === user.uid ? user.displayName || user.email : person?.name || '---'}</Text>
+                                    <Text>{debt.debtorID === user.uid ? 'Você' : person?.name || '---'}</Text>
                                 </View>
                                 <View className="w-2/12 items-center">
                                     <AntDesign name="arrowright" size={24} color='#00ab8c' />
                                 </View>
                                 <View className="w-4/12 items-center">
                                     <Text className='font-semibold text-lg text-primary'>Recebedor</Text>
-                                    <Text>{debt.receiverID === user.uid ? user.displayName || user.email : person?.name || '---'}</Text>
+                                    <Text>{debt.receiverID === user.uid ? 'Você' : person?.name || '---'}</Text>
                                 </View>
                             </View>
                             <View className='w-full items-center flex-1'>
