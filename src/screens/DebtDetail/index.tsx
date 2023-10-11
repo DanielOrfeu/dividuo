@@ -145,7 +145,7 @@ export default function DebtDetail({ navigation, route }) {
                             <Text className={`text-lg`}>Valor pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
                             <Text className={`text-lg`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
                             <Text className={`text-lg`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
-                            <Text className={`${moment().isAfter(moment(debt.dueDate)) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
+                            <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
                             <View className='w-full items-center flex-1'>
                                 <Text className='text-primary font-bold text-xl mb-1'>Lista de pagamentos</Text>
                                 {

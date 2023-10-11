@@ -30,7 +30,7 @@ export default function Home({ navigation }) {
 
     const debtItem = (debt: Debt, personType: string) => {
         const color = personType === 'receiverID' ? 'primary' : 'red-600'
-        const dateExpired = moment().isAfter(moment(debt.dueDate)) ? `text-red-600` : ''
+        const dateExpired = moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600` : ''
 
         return (
             <TouchableOpacity 
