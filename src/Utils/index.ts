@@ -9,5 +9,5 @@ export function NormalizeDateTime(date: string | Date): string {
 }
 
 export function NumberToBRL(value: number):string {
-    return value ? `R$ ${value.toFixed(2)}`.replace('.',',') : 'R$ 0,00'
+    return value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'});
 }

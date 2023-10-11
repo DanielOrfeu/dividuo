@@ -30,6 +30,7 @@ export default function SelectCategory({ navigation }) {
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity
+                    disabled
                     onPress={() => {
                         setCategory(DebtCategory.coletivo)
                         navigation.navigate('DebtListStack')
@@ -38,8 +39,8 @@ export default function SelectCategory({ navigation }) {
                     <View
                         className='bg-white rounded-xl items-center justify-center p-4'
                     >
-                        <Text className='text-xl font-bold p-2 text-primary'>Coletivo</Text>
-                        <Text className='text-sm font-medium p-2 text-center text-primary'>No modo coletivo, você tem as funcionalidades do modo individual com o acréscimo de vincular outras pessoas cadastradas no aplicativo, podendo ambas pessoas editarem os débitos em tempo real.</Text>
+                        <Text className='text-xl font-bold p-2 text-gray-500'>Coletivo (em desenvolvimento)</Text>
+                        <Text className='text-sm font-medium p-2 text-center text-gray-500'>No modo coletivo, você tem as funcionalidades do modo individual com o acréscimo de vincular outras pessoas cadastradas no aplicativo, podendo ambas pessoas editarem os débitos em tempo real.</Text>
                     </View>
                 </TouchableOpacity>
             </View>

@@ -11,8 +11,10 @@ import { AuthErrorTypes } from '../../@types/Firebase';
 import { useDebtStore } from '../../store/DebtStore';
 import { useUserStore } from '../../store/UserStore';
 import { useCategoryStore } from '../../store/CategoryStore';
-import { Feather } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from 'moment'
+import { Person } from '../../@types/Person';
+import PersonService from '../../services/Person';
 
 enum EditAction {
     add,
@@ -24,24 +26,36 @@ export default function DebtDetail({ navigation, route }) {
     const [debt, setdebt] = useState<Debt>(null);
     const [loading, setloading] = useState<boolean>(false);
     const [payValue, setpayValue] = useState<number>(0);
-    const [addPaymentModalOpen, setaddPaymentModalOpen] = useState<boolean>(false);
+    const [paymentModalOpen, setpaymentModalOpen] = useState<boolean>(false);
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [action, setaction] = useState<EditAction>();
     const [index, setindex] = useState<number>();
+    const [person, setperson] = useState<Person>();
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
 
     const getDebt = async () => {
         setloading(true)
         await DebtService.GetDebtByID(route.params)
             .then((res: Debt) => {
+
                 setdebt(res)
+                getPerson(res)
             })
             .finally(() => {
                 setloading(false)
             })
     }
 
+    const getPerson = async (debt: Debt) => {
+        await PersonService.GetPersonByID(user.uid === debt.debtorID ? debt.receiverID : debt.debtorID)
+            .then((res: Person) => {
+                setperson(res)
+            })
+            .catch((err) => {
+                Alert.alert(`Erro ao buscar dados do ${user.uid === debt.debtorID ? 'recebedor' : 'pagador'}`, AuthErrorTypes[err.code] || err.code)
+            })
+    }
 
     const editDebtPayments = async () => {
         let payments = debt.paymentHistory
@@ -55,7 +69,7 @@ export default function DebtDetail({ navigation, route }) {
 
         if (action == EditAction.edit) {
             payments = payments.map((p, i) => {
-                if (i === index){
+                if (i === index) {
                     return {
                         ...p,
                         payValue
@@ -81,21 +95,22 @@ export default function DebtDetail({ navigation, route }) {
             valuePaid,
             paymentHistory: payments
         })
-        .then(async () => {
-            user.uid === debt.receiverID
-                ? getMyDebtsToReceive(user.uid, category)
-                : getMyDebtsToPay(user.uid, category)
-            setpayValue(0)
-            getDebt()
-            Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado' } com sucesso`, [{
-                text: 'OK',
-                onPress: () => setaddPaymentModalOpen(false)
-            }])
+            .then(async () => {
+                user.uid === debt.receiverID
+                    ? getMyDebtsToReceive(user.uid, category)
+                    : getMyDebtsToPay(user.uid, category)
+                getDebt()
+                Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`, [{
+                    text: 'OK',
+                    onPress: () => setpaymentModalOpen(false)
+                }])
 
-        })
-        .catch((err) => {
-            Alert.alert(`Erro ao ${action == EditAction.add ? 'adicionar' : action == EditAction.remove ? 'remover' : 'editar' } pagamento!`, AuthErrorTypes[err.code] || err.code)
-        })
+            })
+            .catch((err) => {
+                Alert.alert(`Erro ao ${action == EditAction.add ? 'adicionar' : action == EditAction.remove ? 'remover' : 'editar'} pagamento!`, AuthErrorTypes[err.code] || err.code)
+            })
+
+        setpayValue(0)
     }
 
     useEffect(() => {
@@ -115,7 +130,7 @@ export default function DebtDetail({ navigation, route }) {
                             setindex(index)
                             setpayValue(item.payValue)
                             setaction(EditAction.edit)
-                            setaddPaymentModalOpen(true)
+                            setpaymentModalOpen(true)
                         }}
                     >
                         <Feather name="edit-3" size={24} color="black" />
@@ -124,7 +139,7 @@ export default function DebtDetail({ navigation, route }) {
                         onPress={() => {
                             setindex(index)
                             setaction(EditAction.remove)
-                            setaddPaymentModalOpen(true)
+                            setpaymentModalOpen(true)
                         }}
                     >
                         <Feather name="trash-2" size={24} color="red" />
@@ -146,6 +161,19 @@ export default function DebtDetail({ navigation, route }) {
                             <Text className={`text-lg`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
                             <Text className={`text-lg`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
                             <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
+                            <View className="w-full flex-row justify-center items-center py-4">
+                                <View className="w-4/12 items-center">
+                                    <Text className='font-semibold text-lg text-red-600'>Devedor</Text>
+                                    <Text>{debt.debtorID === user.uid ? user.displayName || user.email : person?.name || '---'}</Text>
+                                </View>
+                                <View className="w-2/12 items-center">
+                                    <AntDesign name="arrowright" size={24} color='#00ab8c' />
+                                </View>
+                                <View className="w-4/12 items-center">
+                                    <Text className='font-semibold text-lg text-primary'>Recebedor</Text>
+                                    <Text>{debt.receiverID === user.uid ? user.displayName || user.email : person?.name || '---'}</Text>
+                                </View>
+                            </View>
                             <View className='w-full items-center flex-1'>
                                 <Text className='text-primary font-bold text-xl mb-1'>Lista de pagamentos</Text>
                                 {
@@ -172,7 +200,7 @@ export default function DebtDetail({ navigation, route }) {
                                 text={'Adicionar pagamento'}
                                 onPress={() => {
                                     setaction(EditAction.add)
-                                    setaddPaymentModalOpen(true)
+                                    setpaymentModalOpen(true)
                                 }}
                                 icon={
                                     loading ?
@@ -200,10 +228,10 @@ export default function DebtDetail({ navigation, route }) {
                 type={action === EditAction.remove ? 'alert' : ''}
                 title={`${action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'} pagamento`}
                 actionText={action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'}
-                isVisible={addPaymentModalOpen}
+                isVisible={paymentModalOpen}
                 disableAction={false}
                 closeModal={() => {
-                    setaddPaymentModalOpen(false)
+                    setpaymentModalOpen(false)
                 }}
                 startAction={async () => {
                     await editDebtPayments()
