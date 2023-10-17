@@ -14,6 +14,8 @@ import { AuthErrorTypes } from '../../@types/Firebase';
 import { useDebtStore } from '../../store/DebtStore';
 import Loading from '../../components/Loading';
 import moment from 'moment';
+import DropdownInput from '../../components/DropdownInput';
+import { usePersonStore } from '../../store/PersonStore';
 
 export default function Home({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
@@ -21,12 +23,17 @@ export default function Home({ navigation }) {
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
     const [debtsToPay, debtsToReceive] = useDebtStore((state) => [state.debtsToPay, state.debtsToReceive])
     const [loadDebtToPay, loadDebtToReceive] = useDebtStore((state) => [state.loadDebtToPay, state.loadDebtToReceive])
+    const [getPersonsByCreator, persons, setSelectedPersonID, selectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.setSelectedPersonID, state.selectedPersonID])
+
+    const getDebts = async (personID?: string) => {
+        getMyDebtsToPay(user.uid, category, personID)
+        getMyDebtsToReceive(user.uid, category, personID)
+    }
 
     useEffect(() => {
-        getMyDebtsToPay(user.uid, category)
-        getMyDebtsToReceive(user.uid, category)
+        getPersonsByCreator(user.uid)
+        getDebts()
     }, []);
-
 
     const debtItem = (debt: Debt, personType: string) => {
         const color = personType === 'receiverID' ? 'primary' : 'red-600'
@@ -59,22 +66,23 @@ export default function Home({ navigation }) {
                 {
                     loadDebtToPay 
                     ? <Loading/>
-                    : debtsToPay.length > 0
-                        ? <FlatList
-                            className='w-full'
-                            data={debtsToPay}
-                            renderItem={({ item }) => debtItem(item, 'debtorID')}
-                            keyExtractor={item => item.id || item.description}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={loadDebtToPay}
-                                    onRefresh={() => {
-                                        getMyDebtsToPay(user.uid, category)
-                                    }}
-                                />
-                            }
-                        />
-                        : <Text className='text-md'>Sem débitos a pagar</Text>
+                    : <FlatList
+                        className='w-full'
+                        data={debtsToPay}
+                        renderItem={({ item }) => debtItem(item, 'debtorID')}
+                        keyExtractor={item => item.id || item.description}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loadDebtToPay}
+                                onRefresh={() => {
+                                    getMyDebtsToPay(user.uid, category, selectedPersonID)
+                                }}
+                            />
+                        }
+                        ListEmptyComponent={<View className='items-center'>
+                            <Text className='text-md'>Sem débitos a pagar</Text>
+                        </View>}
+                    />
                 }
             </View>
         )
@@ -87,22 +95,23 @@ export default function Home({ navigation }) {
                 {
                     loadDebtToReceive 
                     ? <Loading/>
-                    : debtsToReceive.length > 0
-                        ? <FlatList
-                            className='w-full'
-                            data={debtsToReceive}
-                            renderItem={({ item }) => debtItem(item, 'receiverID')}
-                            keyExtractor={item => item.id || item.description}
-                            refreshControl={
-                                <RefreshControl
-                                    refreshing={loadDebtToReceive}
-                                    onRefresh={() => {
-                                        getMyDebtsToReceive(user.uid, category)
-                                    }}
-                                />
-                            }
-                        />
-                        : <Text className='text-md'>Sem débitos a receber</Text>
+                    : <FlatList
+                        className='w-full'
+                        data={debtsToReceive}
+                        renderItem={({ item }) => debtItem(item, 'receiverID')}
+                        keyExtractor={item => item.id || item.description}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loadDebtToReceive}
+                                onRefresh={() => {
+                                    getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                                }}
+                            />
+                        }
+                        ListEmptyComponent={<View className='items-center'>
+                            <Text className='text-md'>Sem débitos a receber</Text>
+                        </View>}
+                    />
                 }
             </View>
         )
@@ -110,8 +119,22 @@ export default function Home({ navigation }) {
 
     return (
         <View className='flex-1 w-full p-4'>
-            <View className='flex-1 w-full mb-4'>
-                <View className='flex-row w-full'>
+            <View className='flex-1 w-full'>
+                <DropdownInput 
+                    title={'Filtro por pessoa'}   
+                    data={persons?.map(ps => {
+                        return {
+                            label: ps.name,
+                            value: ps.id
+                        };
+                    }) || []}
+                    selectedItem={selectedPersonID}
+                    setSelectedItem={(item) => {
+                        setSelectedPersonID(item);
+                        getDebts(item)
+                    }}          
+                />
+                <View className='flex-1 flex-row w-full mt-2'>
                     {
                         listToReceive()
                     }

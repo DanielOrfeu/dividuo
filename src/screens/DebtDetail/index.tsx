@@ -15,6 +15,7 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from 'moment'
 import { Person } from '../../@types/Person';
 import PersonService from '../../services/Person';
+import { usePersonStore } from '../../store/PersonStore';
 
 enum EditAction {
     add,
@@ -33,6 +34,8 @@ export default function DebtDetail({ navigation, route }) {
     const [index, setindex] = useState<number>();
     const [person, setperson] = useState<Person>();
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
+    const [selectedPersonID] = usePersonStore((state) => [state.selectedPersonID])
+    
 
     const getDebt = async () => {
         setloading(true)
@@ -97,8 +100,8 @@ export default function DebtDetail({ navigation, route }) {
         })
             .then(async () => {
                 user.uid === debt.receiverID
-                    ? getMyDebtsToReceive(user.uid, category)
-                    : getMyDebtsToPay(user.uid, category)
+                    ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                    : getMyDebtsToPay(user.uid, category, selectedPersonID)
                 getDebt()
                 Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`, [{
                     text: 'OK',

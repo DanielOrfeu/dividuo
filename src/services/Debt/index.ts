@@ -28,12 +28,17 @@ export default class DebtService {
         .update(debt)
     }
 
-    static async GetMyDebtsToReceive(userID: string, category: number) {
-        return firestore()
+    static async GetMyDebtsToReceive(userID: string, category: number, personID?: string | null) {
+        let query = firestore()
         .collection('Debts')
-        .where('receiverID', '==', userID)
         .where('category', '==', category)
-        .get()
+        .where('receiverID', '==', userID)
+
+        if(personID) {
+            query = query.where('debtorID', '==', personID)
+        }
+
+        return query.get()
         .then(res => {
             let data = res?.docs?.map((doc) => {
                 return {
@@ -47,12 +52,17 @@ export default class DebtService {
         })
     }
 
-    static async GetMyDebtsToPay(userID: string, category: number) {
-        return firestore()
+    static async GetMyDebtsToPay(userID: string, category: number, personID?: string | null) {
+        let query = firestore()
         .collection('Debts')
-        .where('debtorID', '==', userID)
         .where('category', '==', category)
-        .get()
+        .where('debtorID', '==', userID)
+
+        if(personID) {
+            query = query.where('receiverID', '==', personID)
+        }
+
+        return query.get()
         .then(res => {
             let data = res?.docs?.map((doc) => {
                 return {

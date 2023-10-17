@@ -1,4 +1,4 @@
-import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
 import Button from '../../components/Button';
 import Loading from '../../components/Loading';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,9 @@ import { Feather } from '@expo/vector-icons';
 import * as Utils from '../../Utils';
 import ActionModal from '../../components/ActionModal';
 import Input from '../../components/Input';
+import { usePersonStore } from '../../store/PersonStore';
+import { useDebtStore } from '../../store/DebtStore';
+import { useCategoryStore } from '../../store/CategoryStore';
 
 enum EditAction {
     add,
@@ -19,26 +22,14 @@ enum EditAction {
 
 export default function EditPersons({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
-    const [loading, setloading] = useState<boolean>(false);
-    const [personList, setpersonList] = useState<Person[]>([]);
     const [index, setindex] = useState<number>();
     const [action, setaction] = useState<EditAction>();
     const [personName, setpersonName] = useState<string>('');
     const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
+    const [getPersonsByCreator, persons, loading, selectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.loadingPersons, state.selectedPersonID])
+    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
+    const [category] = useCategoryStore((state) => [state.category])
 
-    const getPersons = async () => {
-        setloading(true)
-        await PersonService.GetPersonByCreator(user.uid)
-            .then(res => {
-                setpersonList(res)
-            })
-            .catch((err) => {
-                Alert.alert('Erro ao listar recebedor/devedor', AuthErrorTypes[err.code] || err.code)
-            })
-            .finally(() => {
-                setloading(false)
-            })
-    }
 
     const editPersonlist = async () => {
         if (action === EditAction.add) {
@@ -50,7 +41,7 @@ export default function EditPersons({ navigation }) {
                     Alert.alert('Sucesso!', 'Devedor/recebedor criado com sucesso', [{
                         text: 'OK',
                         onPress: () => {
-                            getPersons()
+                            getPersonsByCreator(user.uid)
                             setpersonModalOpen(false)
                         }
                     }])
@@ -62,14 +53,16 @@ export default function EditPersons({ navigation }) {
 
         if (action === EditAction.edit) {
             await PersonService.EditPerson({
-                ...personList[index],
+                ...persons[index],
                 name: personName
             })
                 .then((res) => {
                     Alert.alert('Sucesso!', 'Devedor/recebedor editado com sucesso', [{
                         text: 'OK',
                         onPress: () => {
-                            getPersons()
+                            getPersonsByCreator(user.uid)
+                            getMyDebtsToPay(user.uid, category, selectedPersonID)
+                            getMyDebtsToReceive(user.uid, category, selectedPersonID)
                             setpersonModalOpen(false)
                         }
                     }])
@@ -82,14 +75,16 @@ export default function EditPersons({ navigation }) {
 
         if (action === EditAction.remove) {
             await PersonService.DeletePerson({
-                ...personList[index],
+                ...persons[index],
                 name: personName
             })
                 .then((res) => {
                     Alert.alert('Sucesso!', 'Devedor/recebedor deletado com sucesso', [{
                         text: 'OK',
                         onPress: () => {
-                            getPersons()
+                            getPersonsByCreator(user.uid)
+                            getMyDebtsToPay(user.uid, category, null)
+                            getMyDebtsToReceive(user.uid, category, null)
                             setpersonModalOpen(false)
                         }
                     }])
@@ -134,7 +129,7 @@ export default function EditPersons({ navigation }) {
     }
 
     useEffect(() => {
-        getPersons()
+        getPersonsByCreator(user.uid)
     }, []);
 
     return (
@@ -142,12 +137,20 @@ export default function EditPersons({ navigation }) {
             <View className='w-full items-center flex-1'>
                 <Text className='text-primary font-bold text-xl mb-1'>Lista de Devedores/recebedores</Text>
                 {
-                    personList.length > 0
+                    persons.length > 0
                         ? <View className='flex-1 w-full'>
                             <FlatList
-                                data={personList}
+                                data={persons}
                                 renderItem={({ item, index }) => personItem(item, index)}
                                 keyExtractor={item => item.id}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={loading}
+                                        onRefresh={() => {
+                                            getPersonsByCreator(user.uid)
+                                        }}
+                                    />
+                                }
                             />
                         </View>
                         :

@@ -30,4 +30,29 @@
 		],
 		"description": "Create Dividuo Screen"
 	},
+	"Create Dividuo Screen": {
+		"prefix": "cds",
+		"body": [
+			"import { Text, View } from 'react-native';\n",
+			"export default function $1({ navigation }) {",
+			"\treturn (",
+			"\t\t<View className='flex-1 w-screen justify-center items-center p-4'>",
+			"\t\t\t<Text>$1 Screen</Text>",
+			"\t\t</View>",
+			"\t);",
+			"}",
+		],
+		"description": "Create Dividuo Screen"
+	},
+
+	"Create Store State": {
+		"prefix": "ssf",
+		"body": [
+			"const [] = $1((state) => [])",
+		],
+		"description": "Create Store State"
+	},
 }
+
+
+

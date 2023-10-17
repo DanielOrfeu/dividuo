@@ -19,15 +19,16 @@ import ActionModal from "../../components/ActionModal";
 import Loading from "../../components/Loading";
 import { useDebtStore } from "../../store/DebtStore";
 import moment from "moment";
+import { usePersonStore } from "../../store/PersonStore";
 
 export default function CreateDebit({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
+    const [getPersonsByCreator, persons, selectedPersonID ] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.selectedPersonID])
     const [multipleMonthModalOpen, setmultipleMonthModalOpen] = useState<boolean>(false);
     const [createPersonModalOpen, setcreatePersonModalOpen] = useState<boolean>(false);
     const [personType, setpersonType] = useState<string>('debtorID')
-    const [personList, setpersonList] = useState<Person[]>();
     const [personName, setpersonName] = useState<string>('');
     const [linkedPerson, setlinkedPerson] = useState('');
     const [monthAmount, setmonthAmount] = useState<number>(0);
@@ -47,16 +48,6 @@ export default function CreateDebit({ navigation }) {
         paymentHistory: []
     });
 
-    const getPersons = async () => {
-        await PersonService.GetPersonByCreator(user.uid)
-        .then(res => {
-            setpersonList(res)
-        })
-        .catch((err) => {
-            Alert.alert('Erro ao listar recebedor/devedor', AuthErrorTypes[err.code] || err.code)
-        })
-    }
-
     const createDebt = async () => {
         setloading(true)
         await DebtService.CreateDebt({
@@ -67,8 +58,8 @@ export default function CreateDebit({ navigation }) {
         .then((res) => {
             Alert.alert('Sucesso!', 'Débito criado com sucesso')
             personType === 'receiverID'
-            ? getMyDebtsToReceive(user.uid, category)
-            : getMyDebtsToPay(user.uid, category)
+            ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
+            : getMyDebtsToPay(user.uid, category, selectedPersonID)
         })
         .catch((err) => {
             Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
@@ -85,7 +76,7 @@ export default function CreateDebit({ navigation }) {
     }, [monthAmount]);
     
     useEffect(() => {
-        getPersons()
+        getPersonsByCreator(user.uid)
     }, []);
     
     return (
@@ -151,7 +142,7 @@ export default function CreateDebit({ navigation }) {
             </View>
             <DropdownInput 
                 title={personType === 'debtorID' ? 'Recebedor' : 'Devedor'}
-                data={personList?.map(ps => {
+                data={persons?.map(ps => {
                     return {
                         label: ps.name,
                         value: ps.id
@@ -206,7 +197,7 @@ export default function CreateDebit({ navigation }) {
                         creatorID: user.uid
                     })
                     .then((res) => {
-                        getPersons()
+                        getPersonsByCreator(user.uid)
                         Alert.alert('Sucesso!', 'Devedor/recebedor criado com sucesso')
                     })
                     .catch((err) => {

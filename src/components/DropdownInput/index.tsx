@@ -20,7 +20,7 @@ interface OwnProps {
 type Props = OwnProps
 
 export default function DropdownInput(props: Props) {
-    const className = `my-2 w-${props.w ? props.w : 'full'}`
+    const className = `w-${props.w ? props.w : 'full'}`
 
     const buildList = () => {
         let list = [

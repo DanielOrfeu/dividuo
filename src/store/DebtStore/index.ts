@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { Debt } from '../../@types/Debt'
-import { useUserStore } from '../UserStore'
 import DebtService from '../../services/Debt'
 import { Alert } from 'react-native'
 import { AuthErrorTypes } from '../../@types/Firebase'
@@ -10,13 +9,13 @@ type DebtStore = {
     loadDebtToPay: boolean
     setDebtsToPay: (dc: Debt[]) => void
     setLoadDebtsToPay: (l: boolean) => void
-    getMyDebtsToPay: (id: string, category: number) => void
+    getMyDebtsToPay: (userID: string, category: number, personId?: string | null) => void
 
     debtsToReceive: Debt[]
     loadDebtToReceive: boolean
     setDebtsToReceive: (dc: Debt[]) => void
     setLoadDebtsToReceive: (l: boolean) => void
-    getMyDebtsToReceive: (id: string, category: number) => void
+    getMyDebtsToReceive: (userID: string, category: number, personId?: string | null) => void
 }
 
 export const useDebtStore = create<DebtStore>((set) => {
@@ -25,9 +24,9 @@ export const useDebtStore = create<DebtStore>((set) => {
         loadDebtToPay: false,
         setDebtsToPay: (dp) => set({debtsToPay: dp}),
         setLoadDebtsToPay: (l) => set({loadDebtToPay: l}),
-        getMyDebtsToPay: async (id, category) => {
+        getMyDebtsToPay: async (userID, category, personId) => {
             set({loadDebtToPay: true})
-            await DebtService.GetMyDebtsToPay(id, category)
+            await DebtService.GetMyDebtsToPay(userID, category, personId)
             .then(res => {
                 set({debtsToPay: res})
             })
@@ -42,9 +41,9 @@ export const useDebtStore = create<DebtStore>((set) => {
         loadDebtToReceive: false,
         setDebtsToReceive: (dr) => set({debtsToReceive: dr}),
         setLoadDebtsToReceive: (l) => set({loadDebtToReceive: l}),
-        getMyDebtsToReceive: async (id, category) => {
+        getMyDebtsToReceive: async (userID, category, personId) => {
             set({loadDebtToReceive: true})
-            await DebtService.GetMyDebtsToReceive(id, category)
+            await DebtService.GetMyDebtsToReceive(userID, category, personId)
             .then(res => {
                 set({debtsToReceive: res})
             })
