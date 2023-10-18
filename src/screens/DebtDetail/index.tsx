@@ -28,6 +28,7 @@ export default function DebtDetail({ navigation, route }) {
     const [loading, setloading] = useState<boolean>(false);
     const [payValue, setpayValue] = useState<number>(0);
     const [paymentModalOpen, setpaymentModalOpen] = useState<boolean>(false);
+    const [deleteDebtModalOpen, setdeleteDebtModalOpen] = useState<boolean>(false);
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [action, setaction] = useState<EditAction>();
@@ -41,7 +42,6 @@ export default function DebtDetail({ navigation, route }) {
         setloading(true)
         await DebtService.GetDebtByID(route.params)
             .then((res: Debt) => {
-
                 setdebt(res)
                 getPerson(res)
             })
@@ -96,18 +96,21 @@ export default function DebtDetail({ navigation, route }) {
             ...debt,
             valueRemaning: debt.value - valuePaid,
             valuePaid,
-            paymentHistory: payments
+            paymentHistory: payments,
+            active: valuePaid < debt.value
         })
             .then(async () => {
                 user.uid === debt.receiverID
                     ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
                     : getMyDebtsToPay(user.uid, category, selectedPersonID)
-                getDebt()
-                Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`, [{
-                    text: 'OK',
-                    onPress: () => setpaymentModalOpen(false)
-                }])
-
+                await getDebt()
+                setpaymentModalOpen(false)
+                if (valuePaid >= debt.value) {
+                    navigation.navigate('DebtList')
+                    Alert.alert('Sucesso!', `Débito foi totalmente pago. Ele não será mais exibido na lista`)
+                } else [
+                    Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`)
+                ]
             })
             .catch((err) => {
                 Alert.alert(`Erro ao ${action == EditAction.add ? 'adicionar' : action == EditAction.remove ? 'remover' : 'editar'} pagamento!`, AuthErrorTypes[err.code] || err.code)
@@ -211,18 +214,19 @@ export default function DebtDetail({ navigation, route }) {
                                         null
                                 }
                             />
-                            {/* <Button
+                            <Button
                                 disabled={loading}
-                                type='warning'
-                                text={'Inativar dívida'}
+                                type='alert'
+                                text={'Deletar dívida'}
                                 onPress={() => {
+                                    setdeleteDebtModalOpen(true)
                                 }}
                                 icon={
                                     loading ?
                                         <Loading color='white' size={20} /> :
                                         null
                                 }
-                            /> */}
+                            />
                         </View>
                     </>
                     : <Text className='text-gray-500 text-lg'>Não foi possível carregar dados do débito</Text>
@@ -255,6 +259,40 @@ export default function DebtDetail({ navigation, route }) {
                                         }}
                                     />
                             }
+                        </View>
+                    </View>
+                }
+            />
+            <ActionModal
+                type={'alert'}
+                title={`Excluir débito`}
+                actionText={'Excluir'}
+                isVisible={deleteDebtModalOpen}
+                disableAction={false}
+                closeModal={() => {
+                    setdeleteDebtModalOpen(false)
+                }}
+                startAction={async () => {
+                    await DebtService.DeleteDebtByID(route.params)
+                    .then(async () => {
+                        user.uid === debt.receiverID
+                        ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                        : getMyDebtsToPay(user.uid, category, selectedPersonID)
+                        setdeleteDebtModalOpen(false)
+                        Alert.alert('Sucesso!', `Débito deletado com sucesso`, [{
+                            text: 'OK',
+                            onPress: () => navigation.navigate('DebtList')
+                        }])
+        
+                    })
+                    .catch((err) => {
+                        Alert.alert(`Erro ao deletar débito!`, AuthErrorTypes[err.code] || err.code)
+                    })
+                }}
+                content={
+                    <View className="w-full">
+                        <View className="w-full flex-row justify-evenly items-center py-2">
+                            <Text className='text-center text-lg'>Essa ação é irreversível e deletará quaisquer informações associadas à esse débito. Continuar?</Text>
                         </View>
                     </View>
                 }

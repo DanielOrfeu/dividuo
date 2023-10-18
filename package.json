@@ -6,6 +6,7 @@
     "prebuild": "npx expo prebuild --clean",
     "dev": "expo start --dev-client",
     "dev-clear": "expo start --dev-client --clear",
+    "metro-start": "npx react-native start",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",

@@ -31,7 +31,7 @@ export const useDebtStore = create<DebtStore>((set) => {
                 set({debtsToPay: res})
             })
             .catch((err) => {
-                Alert.alert('Erro ao listar recebedor/devedor', AuthErrorTypes[err.code] || err.code)
+                Alert.alert('Erro ao listar débitos a pagar', AuthErrorTypes[err.code] || err.code)
             })
             .finally(() => {
                 set({loadDebtToPay: false})
@@ -48,7 +48,7 @@ export const useDebtStore = create<DebtStore>((set) => {
                 set({debtsToReceive: res})
             })
             .catch((err) => {
-                Alert.alert('Erro ao listar recebedor/devedor', AuthErrorTypes[err.code] || err.code)
+                Alert.alert('Erro ao listar débitos a receber', AuthErrorTypes[err.code] || err.code)
             })
             .finally(() => {
                 set({loadDebtToReceive: false})

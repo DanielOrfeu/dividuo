@@ -31,6 +31,7 @@ export default class DebtService {
     static async GetMyDebtsToReceive(userID: string, category: number, personID?: string | null) {
         let query = firestore()
         .collection('Debts')
+        .where('active', '==', true)
         .where('category', '==', category)
         .where('receiverID', '==', userID)
 
@@ -55,6 +56,7 @@ export default class DebtService {
     static async GetMyDebtsToPay(userID: string, category: number, personID?: string | null) {
         let query = firestore()
         .collection('Debts')
+        .where('active', '==', true)
         .where('category', '==', category)
         .where('debtorID', '==', userID)
 
@@ -74,6 +76,13 @@ export default class DebtService {
                 return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime() 
             })
         })
+    }
+
+    static async DeleteDebtByID(debtID: string) {
+        return firestore()
+        .collection('Debts')
+        .doc(debtID)
+        .delete()
     }
 }
 
