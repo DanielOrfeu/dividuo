@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "6755678644",
-    "project_id": "dividuo-9b3ac",
-    "storage_bucket": "dividuo-9b3ac.appspot.com"
+    "project_number": "261021103083",
+    "project_id": "dividuo-85af1",
+    "storage_bucket": "dividuo-85af1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:6755678644:android:4f1a8defb2f75b644d9ae1",
+        "mobilesdk_app_id": "1:261021103083:android:ec3dbfdb13330ba61a5fae",
         "android_client_info": {
           "package_name": "com.dividuo"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCNPGS2oIBN6WU9YnNGD2kp0Epvveha7Lk"
+          "current_key": "AIzaSyDlvTFNsS26BCzP9h2rakV8YWeA5fL9N4I"
         }
       ],
       "services": {
