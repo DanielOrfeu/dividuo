@@ -15,6 +15,8 @@ interface OwnProps {
     selectedItem: string
     setSelectedItem(s: string): void
     w?: string
+    firstOptionLabel?: string
+    firstOptionIsValid?: boolean
 }
 
 type Props = OwnProps
@@ -25,11 +27,11 @@ export default function DropdownInput(props: Props) {
     const buildList = () => {
         let list = [
                 <Picker.Item 
-                    key={`Selecione...`} 
-                    label={`Selecione...`} 
+                    key={props.firstOptionLabel || `Selecione...`} 
+                    label={props.firstOptionLabel || `Selecione...`} 
                     value={null}
                     style={{
-                        color: '#a1a1aa'
+                        color: props.firstOptionIsValid ? '#000000' : '#a1a1aa'
                     }}
                 />
             ]

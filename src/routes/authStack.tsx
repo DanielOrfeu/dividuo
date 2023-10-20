@@ -1,7 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack'
 import DebtList from '../screens/DebtList'
 import SelectCategory from '../screens/SelectCategory'
-import CreateDebit from '../screens/CreateDebit'
+import CreateDebt from '../screens/CreateDebt'
+import EditDebt from '../screens/EditDebt'
 import DebtListStack from './debtListStack'
 import DebtDetail from '../screens/DebtDetail'
 
@@ -23,8 +24,19 @@ export default function AuthStack() {
                 component={DebtListStack}
             />
             <Screen 
-                name='CreateDebit' 
-                component={CreateDebit}
+                name='CreateDebt' 
+                component={CreateDebt}
+                options={{
+                    title: 'Criar débito',
+                    headerStyle: {
+                        backgroundColor: '#00ab8c',
+                    },
+                    headerTintColor: '#fff'
+                }}
+            />
+            <Screen 
+                name='EditDebt' 
+                component={EditDebt}
                 options={{
                     title: 'Criar débito',
                     headerStyle: {

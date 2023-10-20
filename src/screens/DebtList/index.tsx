@@ -121,7 +121,9 @@ export default function Home({ navigation }) {
         <View className='flex-1 w-full p-4'>
             <View className='flex-1 w-full'>
                 <DropdownInput 
-                    title={'Filtro por pessoa'}   
+                    title={'Filtro por pessoa'}
+                    firstOptionLabel='Todos'
+                    firstOptionIsValid
                     data={persons?.map(ps => {
                         return {
                             label: ps.name,
@@ -147,7 +149,7 @@ export default function Home({ navigation }) {
                 <Button
                     text={'Criar Débito'}
                     onPress={() => {
-                        navigation.navigate('CreateDebit')
+                        navigation.navigate('CreateDebt')
                     }}
                 />
             </View>

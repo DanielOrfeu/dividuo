@@ -16,6 +16,7 @@ import moment from 'moment'
 import { Person } from '../../@types/Person';
 import PersonService from '../../services/Person';
 import { usePersonStore } from '../../store/PersonStore';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 enum EditAction {
     add,
@@ -161,12 +162,51 @@ export default function DebtDetail({ navigation, route }) {
                 debt
                     ? <>
                         <View className='w-full items-center flex-1'>
-                            <Text className={`text-primary font-semibold text-xl`}>{debt.description}</Text>
-                            <Text className={`text-lg`}>Total: {Utils.NumberToBRL(debt.value)}</Text>
-                            <Text className={`text-lg`}>Valor pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
-                            <Text className={`text-lg`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
-                            <Text className={`text-lg`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
-                            <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
+                            <View className='w-9/12 items-center gap-1'>
+                            <View className='items-center justify-evenly flex-row gap-1 pb-3 rounded-xl'>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                navigation.navigate('EditDebt', {
+                                                    debt,
+                                                    onGoBack: () => getDebt()
+                                                })
+                                            }}
+                                        >
+                                            <Feather name="edit-3" size={24} color="black" />
+                                        </TouchableOpacity>
+                                        <View className='mr-1'/>
+                                        <TouchableOpacity
+                                            onPress={() => {
+
+                                            }}
+                                        >
+                                            <FontAwesome5 name="history" size={24} color="black" />
+                                        </TouchableOpacity>
+                                    </View>
+                                <View className='w-full justify-center items-center flex-row mb-2'>
+                                    <Text className={`text-primary font-semibold text-xl tex`}>{debt.description} </Text>
+                                </View>
+                                <View className='w-full justify-between flex-row'>
+                                    <Text className={`text-lg`}>Total: </Text>
+                                    <Text className={`text-lg`}>{Utils.NumberToBRL(debt.value)}</Text>
+                                </View>
+                                <View className='w-full justify-between flex-row'>
+                                    <Text className={`text-lg`}>Valor pago: </Text>
+                                    <Text className={`text-lg`}>{Utils.NumberToBRL(debt.valuePaid)}</Text>
+                                </View>
+                                <View className='w-full justify-between flex-row'>
+                                    <Text className={`text-lg`}>Restante: </Text>
+                                    <Text className={`text-lg`}>{Utils.NumberToBRL(debt.valueRemaning)}</Text>
+                                </View>
+                                <View className='w-full justify-between flex-row'>
+                                    <Text className={`text-lg`}>Criado em: </Text>
+                                    <Text className={`text-lg`}>{Utils.NormalizeDate(debt.createDate)}</Text>
+                                </View>
+                                <View className='w-full justify-between flex-row'>
+                                    <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento: </Text>
+                                    <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>{Utils.NormalizeDate(debt.dueDate)}</Text>
+                                </View>
+                            </View>
                             <View className="w-full flex-row justify-center items-center py-4">
                                 <View className="w-4/12 items-center">
                                     <Text className='font-semibold text-lg text-red-600'>Devedor</Text>
@@ -217,7 +257,7 @@ export default function DebtDetail({ navigation, route }) {
                             <Button
                                 disabled={loading}
                                 type='alert'
-                                text={'Deletar dívida'}
+                                text={'Deletar débito'}
                                 onPress={() => {
                                     setdeleteDebtModalOpen(true)
                                 }}

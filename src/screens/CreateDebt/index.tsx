@@ -21,7 +21,7 @@ import { useDebtStore } from "../../store/DebtStore";
 import moment from "moment";
 import { usePersonStore } from "../../store/PersonStore";
 
-export default function CreateDebit({ navigation }) {
+export default function CreateDebt({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
@@ -248,6 +248,9 @@ export default function CreateDebit({ navigation }) {
                     }
                     Alert.alert('Sucesso!', 'Débitos criados com sucesso')
                     setloading(false)
+                    personType === 'receiverID'
+                    ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                    : getMyDebtsToPay(user.uid, category, selectedPersonID)
                 }}
                 content={
                     <View className="w-full">

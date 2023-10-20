@@ -195,7 +195,6 @@ export default function EditPersons({ navigation }) {
                                     : <Input
                                         title='Nome do devedor/recebedor'
                                         value={personName}
-                                        numeric
                                         onChangeText={(txt) => {
                                             setpersonName(txt)
                                         }}
