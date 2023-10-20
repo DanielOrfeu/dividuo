@@ -22,7 +22,7 @@ export default function Home({ navigation }) {
     const [category] = useCategoryStore((state) => [state.category])
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
     const [debtsToPay, debtsToReceive] = useDebtStore((state) => [state.debtsToPay, state.debtsToReceive])
-    const [loadDebtToPay, loadDebtToReceive] = useDebtStore((state) => [state.loadDebtToPay, state.loadDebtToReceive])
+    const [loadDebtToPay, loadDebtToReceive, getDebtByID] = useDebtStore((state) => [state.loadDebtToPay, state.loadDebtToReceive, state.getDebtByID])
     const [getPersonsByCreator, persons, setSelectedPersonID, selectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.setSelectedPersonID, state.selectedPersonID])
 
     const getDebts = async (personID?: string) => {
@@ -46,10 +46,11 @@ export default function Home({ navigation }) {
                     borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
                 }}
                 onPress={() => {
-                    navigation.navigate('DebtDetail', debt.id)
+                    getDebtByID(debt.id)
+                    navigation.navigate('DebtDetail')
                 }}
             >
-                <Text className={`text-${color} font-semibold text-lg`}>{debt.description}</Text>
+                <Text className={`text-${color} font-semibold text-lg text-center`}>{debt.description}</Text>
                 <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
                 <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
                 <Text className={`font-medium`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>

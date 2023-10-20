@@ -39,6 +39,7 @@ export default function DatepickerInput(props: Props) {
             </TouchableOpacity>
 
             <DatePicker
+                theme='light'
                 modal
                 title={props.title}
                 mode="date"

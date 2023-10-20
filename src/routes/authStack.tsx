@@ -5,6 +5,7 @@ import CreateDebt from '../screens/CreateDebt'
 import EditDebt from '../screens/EditDebt'
 import DebtListStack from './debtListStack'
 import DebtDetail from '../screens/DebtDetail'
+import EditDebtHistory from '../screens/EditDebtHistory'
 
 const { Navigator, Screen } = createStackNavigator()
 
@@ -38,7 +39,18 @@ export default function AuthStack() {
                 name='EditDebt' 
                 component={EditDebt}
                 options={{
-                    title: 'Criar débito',
+                    title: 'Editar débito',
+                    headerStyle: {
+                        backgroundColor: '#00ab8c',
+                    },
+                    headerTintColor: '#fff'
+                }}
+            />
+            <Screen 
+                name='EditDebtHistory' 
+                component={EditDebtHistory}
+                options={{
+                    title: 'Histórico de edição',
                     headerStyle: {
                         backgroundColor: '#00ab8c',
                     },

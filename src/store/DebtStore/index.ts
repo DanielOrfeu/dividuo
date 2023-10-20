@@ -16,6 +16,12 @@ type DebtStore = {
     setDebtsToReceive: (dc: Debt[]) => void
     setLoadDebtsToReceive: (l: boolean) => void
     getMyDebtsToReceive: (userID: string, category: number, personId?: string | null) => void
+
+    debt: Debt | null
+    loadDebt: boolean
+    setDebt: (d: Debt | null) => void
+    setLoadDebt: (l: boolean) => void
+    getDebtByID: (userID: string) => void
 }
 
 export const useDebtStore = create<DebtStore>((set) => {
@@ -54,5 +60,22 @@ export const useDebtStore = create<DebtStore>((set) => {
                 set({loadDebtToReceive: false})
             })              
         },
+        debt: null,
+        loadDebt: false,
+        setDebt: (d) => set({debt: d}),
+        setLoadDebt: (l) => set({loadDebt: l}),
+        getDebtByID: async (debtID) => {
+            set({loadDebt: true})
+            await DebtService.GetDebtByID(debtID)
+            .then((res: Debt) => {
+                set({debt: res})
+            })
+            .catch((err) => {
+                Alert.alert('Erro ao buscar débito', AuthErrorTypes[err.code] || err.code)
+            })
+            .finally(() => {
+                set({loadDebt: false})
+            })
+        }
     }
 })

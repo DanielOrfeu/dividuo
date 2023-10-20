@@ -3,7 +3,7 @@ import { Alert, Text, View, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import firestore from '@react-native-firebase/firestore';
-import { Debt } from '../../@types/Debt';
+import { EditHistory, HistoryItem } from '../../@types/Debt';
 import { AuthErrorTypes } from '../../@types/Firebase';
 import DebtService from '../../services/Debt';
 import { useUserStore } from '../../store/UserStore';
@@ -25,10 +25,18 @@ export default function EditDebt({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [selectedPersonID] = usePersonStore((state) => [state.selectedPersonID])
-    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
+    const [getMyDebtsToPay, getMyDebtsToReceive, debt, setDebt, getDebtByID] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive, state.debt, state.setDebt, state.getDebtByID])
     const [loading, setloading] = useState<boolean>(false);
-    const [debt, setdebt] = useState<Debt>(route.params.debt);
-    
+    const [oldInfo, setoldInfo] = useState<HistoryItem>();
+
+    useEffect(() => {
+        setoldInfo({
+            description: debt.description,
+            dueDate: debt.dueDate,
+            value: debt.value
+        })
+    }, []);
+
     return (
         <View
             className='flex-1 items-center p-4 bg-white w-screen justify-center'
@@ -39,7 +47,7 @@ export default function EditDebt({ navigation, route }) {
                 title='Descrição'
                 value={debt.description}
                 onChangeText={(description) => {
-                    setdebt({
+                    setDebt({
                         ...debt,
                         description
                     })
@@ -51,7 +59,7 @@ export default function EditDebt({ navigation, route }) {
                 numeric
                 onChangeText={(txt) => {
                     let value = (+txt.replace(/[^0-9]/g, '')/100)
-                    setdebt({
+                    setDebt({
                         ...debt,
                         value,
                         valueRemaning: value
@@ -62,7 +70,7 @@ export default function EditDebt({ navigation, route }) {
                 title='Data de vencimento'
                 value={new Date(debt.dueDate)}
                 onPickDate={(date) => {
-                    setdebt({
+                    setDebt({
                         ...debt,
                         dueDate: date.toString()
                     })
@@ -78,7 +86,22 @@ export default function EditDebt({ navigation, route }) {
                             text={'Editar débito'} 
                             onPress={async () => {
                                 setloading(true)
-                                await DebtService.EditDebtByID(debt)
+                                let editHistory: EditHistory[] = debt.editHistory?.length > 0 ? debt.editHistory : []
+                                editHistory.push({
+                                    editDate: moment().format(),
+                                    editorID: user.uid,
+                                    oldInfo,
+                                    newInfo: {
+                                        description: debt.description,
+                                        value: debt.value,
+                                        dueDate: debt.dueDate,
+                                    }
+                                })
+                            
+                                await DebtService.EditDebtByID({
+                                    ...debt,
+                                    editHistory
+                                })
                                 .then(() => {
                                     user.uid === debt.receiverID
                                     ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
@@ -86,11 +109,10 @@ export default function EditDebt({ navigation, route }) {
                                     Alert.alert('Sucesso!', `Débito editado com sucesso!`, [{
                                         text: 'OK',
                                         onPress: () => {
-                                            route.params.onGoBack()
+                                            getDebtByID(debt.id)
                                             navigation.goBack()
                                         }
                                     }])
-
                                 })
                                 .catch((err) => {
                                     Alert.alert(`Erro ao editar débito`, AuthErrorTypes[err.code] || err.code)

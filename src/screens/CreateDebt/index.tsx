@@ -45,7 +45,8 @@ export default function CreateDebt({ navigation }) {
         active: true,
         receiverID: null,
         debtorID: null,
-        paymentHistory: []
+        paymentHistory: [],
+        editHistory: []
     });
 
     const createDebt = async () => {

@@ -12,6 +12,7 @@ export interface Debt {
     receiverID?: string
     debtorID?: string
     paymentHistory: PaymentHistory[]
+    editHistory: EditHistory[]
 }
 
 export enum DebtCategory {
@@ -22,4 +23,17 @@ export enum DebtCategory {
 export interface PaymentHistory {
     payDate: string
     payValue: number
+}
+
+export interface EditHistory {
+    editDate: string
+    editorID: string
+    oldInfo: HistoryItem
+    newInfo: HistoryItem
+}
+
+export interface HistoryItem {
+    description: string
+    value: number
+    dueDate: string
 }
