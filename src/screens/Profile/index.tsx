@@ -18,7 +18,11 @@ export default function Profile({ navigation }) {
     const [loading, setloading] = useState<boolean>(false);
     const [deleUserModalOpen, setdeleUserModalOpen] = useState<boolean>(false);
     const [password, setpassword] = useState<string>();
+    const [newPassword, setnewPassword] = useState<string>();
+    const [confirmNewPassword, setconfirmNewPassword] = useState<string>();
     const [reauthUserModalOpen, setreauthUserModalOpen] = useState<boolean>(false);
+    const [changePasswordModalOpen, setchangePasswordModalOpen] = useState<boolean>(false);
+    const [showVerifyEmailBtn, setshowVerifyEmailBtn] = useState<boolean>(user.emailVerified);
 
     const deleteAllUserData = async () => {
         setdeleUserModalOpen(false)
@@ -47,6 +51,7 @@ export default function Profile({ navigation }) {
             }
         })
     }
+
     useEffect(() => {
         if (user.displayName) {
             setname(user.displayName)
@@ -55,6 +60,10 @@ export default function Profile({ navigation }) {
             setemail(user.email)
         }
     }, []);
+
+    useEffect(() => {
+        setshowVerifyEmailBtn(user.emailVerified)
+    }, [user]);
 
     return (
         <View className='flex-1 w-screen p-4'>
@@ -132,21 +141,36 @@ export default function Profile({ navigation }) {
                 </View>
             </View>
             <View>
+                {
+                    !showVerifyEmailBtn &&
+                    <Button
+                        text={'Verificar e-mail'}
+                        disabled={loading}
+                        onPress={async () => {
+                            setloading(true)
+                            await UserService.VerifyEmail()
+                                .then((res) => {
+                                    Alert.alert('Sucesso!', 'E-mail de verificação enviado com sucesso!')
+                                })
+                                .catch((err) => {
+                                    Alert.alert('Erro ao envir e-mail!', AuthErrorTypes[err.code] || err.code)
+                                })
+                                .finally(() => {
+                                    setloading(false)
+                                })
+                        }}
+                        icon={
+                            loading ?
+                                <Loading color='white' size={20} /> :
+                                null
+                        }
+                    />
+                }
                 <Button
-                    text={'Verificar e-mail'}
                     disabled={loading}
-                    onPress={async () => {
-                        setloading(true)
-                        await UserService.VerifyEmail()
-                            .then((res) => {
-                                Alert.alert('Sucesso!', 'E-mail de verificação enviado com sucesso!')
-                            })
-                            .catch((err) => {
-                                Alert.alert('Erro ao envir e-mail!', AuthErrorTypes[err.code] || err.code)
-                            })
-                            .finally(() => {
-                                setloading(false)
-                            })
+                    text={'Alterar senha'}
+                    onPress={() => {
+                        setchangePasswordModalOpen(true)
                     }}
                     icon={
                         loading ?
@@ -177,8 +201,9 @@ export default function Profile({ navigation }) {
                 closeModal={() => {
                     setdeleUserModalOpen(false)
                 }}
-                startAction={async () => {
-                    deleteAllUserData()
+                startAction={() => {
+                    setdeleUserModalOpen(false)
+                    setreauthUserModalOpen(true)
                 }}
                 content={
                     <View className="w-full">
@@ -220,6 +245,76 @@ export default function Profile({ navigation }) {
                                 value={password}
                                 onChangeText={(txt) => {
                                     setpassword(txt)
+                                }}
+                                isPassword
+                            />
+                        </View>
+                    </View>
+                }
+            />
+            <ActionModal
+                title="Alterar de senha"
+                actionText="Alterar"
+                isVisible={changePasswordModalOpen}
+                disableAction={password?.length < 6 || newPassword?.length < 6 || newPassword != confirmNewPassword || loading}
+                closeModal={() => {
+                    setchangePasswordModalOpen(false)
+                    setpassword('')
+                    setconfirmNewPassword('')
+                    setnewPassword('')
+                }}
+                startAction={async () => {
+                    setloading(true)
+                    setchangePasswordModalOpen(false)
+                    await UserService.ReauthenticateUser(password)
+                    .then(async () => {
+                        setpassword('')
+                        
+                        await UserService.ChangePassword(newPassword)
+                        .then(() => {
+                            Alert.alert('Sucesso!', 'Senha alterada com sucesso')
+                            setconfirmNewPassword('')
+                            setnewPassword('')
+                        })
+                        .catch((err) => {
+                            Alert.alert('Erro ao alterar senha!', AuthErrorTypes[err.code] || err.code)
+                        })
+                        .finally(() => {
+                            setloading(false)
+                        })
+                    })
+                    .catch((err) => {
+                        Alert.alert('Erro ao reautenticar usuário!', AuthErrorTypes[err.code] || err.code)
+                    })
+                    .finally(() => {
+                        setloading(false)
+                    })
+                }}
+                content={
+                    <View className="w-full">
+                        <View className="w-full justify-evenly items-center py-2">
+                            <Text className='text-center text-lg'>Para alterar sua senha, por favor preencha os campos abaixo.</Text>
+                            <Input
+                                title='Senha atual'
+                                value={password}
+                                onChangeText={(txt) => {
+                                    setpassword(txt)
+                                }}
+                                isPassword
+                            />
+                            <Input
+                                title='Nova senha'
+                                value={newPassword}
+                                onChangeText={(txt) => {
+                                    setnewPassword(txt)
+                                }}
+                                isPassword
+                            />
+                            <Input
+                                title='Confirme a nova senha'
+                                value={confirmNewPassword}
+                                onChangeText={(txt) => {
+                                    setconfirmNewPassword(txt)
                                 }}
                                 isPassword
                             />

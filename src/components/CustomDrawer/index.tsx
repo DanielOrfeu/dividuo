@@ -1,12 +1,14 @@
 import React from 'react'
 import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
 import { Text, TouchableOpacity, View } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import UserService from '../../services/User';
 import { useUserStore } from '../../store/UserStore';
+import { useNavigation } from '@react-navigation/native';
 
 export default function CustomDrawer(props) {
   const [user] = useUserStore((state) => [state.user])
+  const navigation = useNavigation<any>();
 
   return (
     <View className='flex-1'>
@@ -27,7 +29,14 @@ export default function CustomDrawer(props) {
           <DrawerItemList {...props} />
         </View>
       </DrawerContentScrollView>
-      <View className='p-8 border-t-2 border-gray-200 justify-center'>
+      <View className='p-6 border-t-2 border-gray-200 justify-center'>
+        <TouchableOpacity className='flex-row gap-2 items-center' onPress={async () => {
+          navigation.navigate('About')
+        }}>
+          <Feather name="info" size={24} color='#00ab8c'/>
+          <Text className='text-primary'>Sobre</Text>
+        </TouchableOpacity>
+        <View className='p-2'/>
         <TouchableOpacity className='flex-row gap-2 items-center' onPress={async () => {
           await UserService.Logout()
         }}>

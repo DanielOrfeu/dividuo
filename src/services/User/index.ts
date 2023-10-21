@@ -3,12 +3,12 @@ import firestore from '@react-native-firebase/firestore';
 import { Alert } from 'react-native'
 
 export default class UserService {
-    static async Login(email, pass) {
+    static async Login(email: string, pass: string) {
         return auth()
         .signInWithEmailAndPassword(email, pass)
     }
 
-    static async SignUp(email, pass, confirmpass) {
+    static async SignUp(email: string, pass: string, confirmpass: string) {
         if(pass === confirmpass) {
             return auth()
             .createUserWithEmailAndPassword(email, pass)
@@ -19,7 +19,7 @@ export default class UserService {
         }
     }
 
-    static async ForgotPassword(email){
+    static async ForgotPassword(email: string){
         return auth()
         .sendPasswordResetEmail(email)
     }
@@ -29,7 +29,7 @@ export default class UserService {
         .signOut()
     }
 
-    static async EditUser(name){
+    static async EditUser(name: string){
         return auth()
         .currentUser
         .updateProfile({
@@ -37,7 +37,7 @@ export default class UserService {
         })
     }
 
-    static async EditUserEmail(email){
+    static async EditUserEmail(email: string){
         return auth()
         .currentUser
         .updateEmail(email)
@@ -53,6 +53,12 @@ export default class UserService {
         return auth()
         .currentUser
         .delete()
+    }
+
+    static async ChangePassword(password: string){
+        return auth()
+        .currentUser
+        .updatePassword(password)
     }
 
     static async ReauthenticateUser(password: string){

@@ -8,11 +8,19 @@ import DebtDetail from '../screens/DebtDetail'
 import EditDebtHistory from '../screens/EditDebtHistory'
 import { TouchableOpacity, View } from 'react-native'
 import { Feather, FontAwesome5 } from '@expo/vector-icons'
+import About from '../screens/About';
 
 const { Navigator, Screen } = createStackNavigator()
 
 export default function AuthStack() {
     const navigation = useNavigation<any>();
+
+    const defaultHeaderPattern = {
+        headerStyle: {
+            backgroundColor: '#00ab8c',
+        },
+        headerTintColor: '#fff'
+    }                  
     return (
         <Navigator>
             <Screen options={{
@@ -32,10 +40,7 @@ export default function AuthStack() {
                 component={CreateDebt}
                 options={{
                     title: 'Criar débito',
-                    headerStyle: {
-                        backgroundColor: '#00ab8c',
-                    },
-                    headerTintColor: '#fff'
+                    ...defaultHeaderPattern,
                 }}
             />
             <Screen 
@@ -43,10 +48,7 @@ export default function AuthStack() {
                 component={EditDebt}
                 options={{
                     title: 'Editar débito',
-                    headerStyle: {
-                        backgroundColor: '#00ab8c',
-                    },
-                    headerTintColor: '#fff'
+                    ...defaultHeaderPattern,
                 }}
             />
             <Screen 
@@ -54,10 +56,7 @@ export default function AuthStack() {
                 component={EditDebtHistory}
                 options={{
                     title: 'Histórico de edição',
-                    headerStyle: {
-                        backgroundColor: '#00ab8c',
-                    },
-                    headerTintColor: '#fff'
+                    ...defaultHeaderPattern,
                 }}
             />
             <Screen 
@@ -65,10 +64,7 @@ export default function AuthStack() {
                 component={DebtDetail}
                 options={{
                     title: 'Detalhes do débito',
-                    headerStyle: {
-                        backgroundColor: '#00ab8c',
-                    },
-                    headerTintColor: '#fff',
+                    ...defaultHeaderPattern,
                     headerRight: () => {
                         return <View className='p-4 flex-row gap-3'>
                             <TouchableOpacity
@@ -89,6 +85,14 @@ export default function AuthStack() {
                     }
                 }}
 
+            />
+            <Screen 
+                name='About' 
+                component={About}
+                options={{
+                    title: 'Sobre',
+                    ...defaultHeaderPattern
+                }}
             />
         </Navigator>
     )
