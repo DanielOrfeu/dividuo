@@ -11,17 +11,17 @@ export default function About({ navigation }) {
                 </View>
 
 
-                <View className='pb-2 items-center'>
+                <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Versão</Text>
                     <Text className='text-lg'>1.0.0</Text>
                 </View>
 
-                <View className='pb-2 items-center'>
+                <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Criado em</Text>
                     <Text className='text-lg'>18/09/2023</Text>
                 </View>
 
-                <View className='pb-2 items-center'>
+                <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Idealização, criação e desenvolvimento</Text>
                     <TouchableOpacity
                         onPress={() => {
@@ -32,7 +32,7 @@ export default function About({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                <View className='pb-2 items-center'>
+                <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Design e correções</Text>
                     <TouchableOpacity
                         onPress={() => {
@@ -44,10 +44,11 @@ export default function About({ navigation }) {
                     <Text className='text-lg'>Cíntia Silveira</Text>
                 </View>
 
-                <View className='pb-2 items-center'>
+                <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Beta Testers</Text>
                     <Text className='text-lg'>Amanda Moraes</Text>
                     <Text className='text-lg'>Cíntia Silveira</Text>
+                    <Text className='text-lg'>Wellington Jorge</Text>
                     <Text className='text-lg'>Joice Paz</Text>
                 </View>
             </View>
