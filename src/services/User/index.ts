@@ -54,6 +54,12 @@ export default class UserService {
         .currentUser
         .delete()
     }
+
+    static async ReauthenticateUser(password: string){
+        let user = auth().currentUser
+        let credential = auth.EmailAuthProvider.credential(user.email, password)
+        return user.reauthenticateWithCredential(credential)
+    }
 }
 
 

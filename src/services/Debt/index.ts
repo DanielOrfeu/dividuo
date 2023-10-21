@@ -84,5 +84,77 @@ export default class DebtService {
         .doc(debtID)
         .delete()
     }
+
+    static async DeleteAllDebtsByPersonID(personID: string) {
+        const batch = firestore().batch();
+
+        let queryPersonIsReceiver = await firestore()
+        .collection('Debts')
+        .where('category', '==', 0)
+        .where('receiverID', '==', personID)
+        .get()
+        .then((res) => {
+            res.forEach((q) => {
+                batch.delete(q.ref)
+            })
+        })
+
+        let queryPersonIsDebtor = await firestore()
+        .collection('Debts')
+        .where('category', '==', 0)
+        .where('debtorID', '==', personID)
+        .get()
+        .then((res) => {
+            res.forEach((q) => {
+                batch.delete(q.ref)
+            })
+        })
+        
+        Promise.all([queryPersonIsDebtor, queryPersonIsReceiver])
+        .then(() => {
+            return batch.commit()
+        })
+        .catch(() => {
+            throw {
+                code: 'Erro ao deletar todos os débitos associados'
+            }
+        })
+    }
+
+    static async DeleteAllUserDebts(userID: string) {
+        const batch = firestore().batch();
+
+        let queryUserIsReceiver = await firestore()
+        .collection('Debts')
+        .where('category', '==', 0)
+        .where('receiverID', '==', userID)
+        .get()
+        .then((res) => {
+            res.forEach((q) => {
+                batch.delete(q.ref)
+            })
+        })
+
+        let queryUserIsDebtor = await firestore()
+        .collection('Debts')
+        .where('category', '==', 0)
+        .where('debtorID', '==', userID)
+        .get()
+        .then((res) => {
+            res.forEach((q) => {
+                batch.delete(q.ref)
+            })
+        })
+        
+        Promise.all([queryUserIsDebtor, queryUserIsReceiver])
+        .then(() => {
+            return batch.commit()
+        })
+        .catch(() => {
+            throw {
+                code: 'Erro ao deletar todos os débitos do usuário'
+            }
+        })
+    }
 }
 

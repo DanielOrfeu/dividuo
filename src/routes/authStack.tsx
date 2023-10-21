@@ -1,15 +1,18 @@
 import { createStackNavigator } from '@react-navigation/stack'
-import DebtList from '../screens/DebtList'
+import { useNavigation } from '@react-navigation/native';
 import SelectCategory from '../screens/SelectCategory'
 import CreateDebt from '../screens/CreateDebt'
 import EditDebt from '../screens/EditDebt'
 import DebtListStack from './debtListStack'
 import DebtDetail from '../screens/DebtDetail'
 import EditDebtHistory from '../screens/EditDebtHistory'
+import { TouchableOpacity, View } from 'react-native'
+import { Feather, FontAwesome5 } from '@expo/vector-icons'
 
 const { Navigator, Screen } = createStackNavigator()
 
 export default function AuthStack() {
+    const navigation = useNavigation<any>();
     return (
         <Navigator>
             <Screen options={{
@@ -65,8 +68,27 @@ export default function AuthStack() {
                     headerStyle: {
                         backgroundColor: '#00ab8c',
                     },
-                    headerTintColor: '#fff'
+                    headerTintColor: '#fff',
+                    headerRight: () => {
+                        return <View className='p-4 flex-row gap-3'>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('EditDebt')
+                                }}
+                            >
+                                <Feather name="edit-3" size={24} color="white" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    navigation.navigate('EditDebtHistory')
+                                }}
+                            >
+                                <FontAwesome5 name="history" size={24} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    }
                 }}
+
             />
         </Navigator>
     )

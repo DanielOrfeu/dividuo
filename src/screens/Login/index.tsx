@@ -11,6 +11,7 @@ export default function Login({ navigation }) {
     const [email, setemail] = useState<string>()
     const [password, setpassword] = useState<string>()
     const [loading, setloading] = useState<boolean>(false)
+    const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi
 
     return (
         <View
@@ -38,6 +39,7 @@ export default function Login({ navigation }) {
                 />
                 <TouchableOpacity
                     className='self-end'
+                    disabled={!emailRegex.test(email)}
                     onPress={async () => {
                         setloading(true)
                         await UserService.ForgotPassword(email)
@@ -57,7 +59,7 @@ export default function Login({ navigation }) {
                         loading
                             ? null
                             : <Text
-                                className={`${!email || !email.includes('@') ? 'text-gray-500' : 'text-primary'}`}
+                                className={`${!emailRegex.test(email) ? 'text-gray-500' : 'text-primary'}`}
                             >
                                 Esqueceu a senha?
                             </Text>
@@ -67,7 +69,7 @@ export default function Login({ navigation }) {
                     className='m-4 w-full'
                 >
                     <Button
-                        disabled={!email || !email.includes('@') || !password || password.length < 6 || loading}
+                        disabled={!emailRegex.test(email) || !password || password.length < 6 || loading}
                         text='Entrar'
                         onPress={async () => {
                             setloading(true)

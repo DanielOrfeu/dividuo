@@ -156,23 +156,6 @@ export default function DebtDetail({ navigation, route }) {
                         ? <>
                             <View className='w-full items-center flex-1'>
                                 <View className='w-9/12 items-center gap-1'>
-                                <View className='items-center justify-evenly flex-row gap-1 pb-3 rounded-xl'>
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    navigation.navigate('EditDebt')
-                                                }}
-                                            >
-                                                <Feather name="edit-3" size={24} color="black" />
-                                            </TouchableOpacity>
-                                            <View className='mr-1'/>
-                                            <TouchableOpacity
-                                                onPress={() => {
-                                                    navigation.navigate('EditDebtHistory', person.name)
-                                                }}
-                                            >
-                                                <FontAwesome5 name="history" size={24} color="black" />
-                                            </TouchableOpacity>
-                                        </View>
                                     <View className='w-full justify-center items-center flex-row mb-2'>
                                         <Text className={`text-primary font-semibold text-xl tex`}>{debt.description} </Text>
                                     </View>
@@ -202,7 +185,7 @@ export default function DebtDetail({ navigation, route }) {
                                         <Text className='font-semibold text-lg text-red-600'>Devedor</Text>
                                         <Text>{debt.debtorID === user.uid ? 'Você' : person?.name || '---'}</Text>
                                     </View>
-                                    <View className="w-2/12 items-center">
+                                    <View className="items-center">
                                         <AntDesign name="arrowright" size={24} color='#00ab8c' />
                                     </View>
                                     <View className="w-4/12 items-center">

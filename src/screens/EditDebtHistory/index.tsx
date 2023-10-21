@@ -6,12 +6,11 @@ import { Fragment, useEffect } from 'react';
 import { AntDesign } from '@expo/vector-icons';
 import { useUserStore } from '../../store/UserStore';
 
-export default function EditDebtHistory({ navigation, route }) {
+export default function EditDebtHistory({ navigation }) {
     const [debt] = useDebtStore((state) => [state.debt])
     const [user] = useUserStore((state) => [state.user])
 
     const formatInfo = (prop: string, item: any): string => {
-        console.log(prop)
         switch (prop) {
         case 'description':
             return `Nome: ${item}`;
@@ -60,7 +59,7 @@ export default function EditDebtHistory({ navigation, route }) {
                     {
                         debt.category == 1 &&
                         <Text className='text-md font-semibold'>{
-                            `Editor: ${item.editorID == user.uid ? user.displayName || user.email : route.params || item.editorID}`}
+                            `Editor: ${item.editorID == user.uid ? user.displayName || user.email : item.editorID}`}
                         </Text>
                     }
                     <Text className='text-md font-semibold'>Data da edição: {Utils.NormalizeDateTime(item.editDate)}</Text>

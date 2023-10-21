@@ -51,4 +51,28 @@ export default class PersonService {
             } as Person || {}
         })
     }
+
+    static async DeleteAllUserPersons(userID: string) {
+        const batch = firestore().batch();
+
+        let queryUserIsCreator = await firestore()
+        .collection('Persons')
+        .where('creatorID', '==', userID)
+        .get()
+        .then((res) => {
+            res.forEach((q) => {
+                batch.delete(q.ref)
+            })
+        })
+        
+        Promise.all([queryUserIsCreator])
+        .then(() => {
+            return batch.commit()
+        })
+        .catch(() => {
+            throw {
+                code: 'Erro ao deletar todos os devedores/recebedores do usuário'
+            }
+        })
+    }
 }

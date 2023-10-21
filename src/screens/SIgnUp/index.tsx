@@ -12,6 +12,7 @@ export default function SignUp({ navigation }) {
     const [password, setpassword] = useState<string>()
     const [confirmPassword, setconfirmPassword] = useState<string>()
     const [loading, setloading] = useState<boolean>(false)
+    const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/gi
 
     return (
         <View
@@ -50,7 +51,7 @@ export default function SignUp({ navigation }) {
                     className='m-4 w-full'
                 >
                     <Button
-                        disabled={!email || !email.includes('@')
+                        disabled={!emailRegex.test(email)
                             || !password || password.length < 6
                             || !confirmPassword || confirmPassword.length < 6
                             || loading

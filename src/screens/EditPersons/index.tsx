@@ -13,6 +13,7 @@ import Input from '../../components/Input';
 import { usePersonStore } from '../../store/PersonStore';
 import { useDebtStore } from '../../store/DebtStore';
 import { useCategoryStore } from '../../store/CategoryStore';
+import DebtService from '../../services/Debt';
 
 enum EditAction {
     add,
@@ -26,7 +27,7 @@ export default function EditPersons({ navigation }) {
     const [action, setaction] = useState<EditAction>();
     const [personName, setpersonName] = useState<string>('');
     const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
-    const [getPersonsByCreator, persons, loading, selectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.loadingPersons, state.selectedPersonID])
+    const [getPersonsByCreator, persons, loading, selectedPersonID, setSelectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.loadingPersons, state.selectedPersonID, state.setSelectedPersonID])
     const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
     const [category] = useCategoryStore((state) => [state.category])
 
@@ -60,10 +61,12 @@ export default function EditPersons({ navigation }) {
                     Alert.alert('Sucesso!', 'Devedor/recebedor editado com sucesso', [{
                         text: 'OK',
                         onPress: () => {
-                            getPersonsByCreator(user.uid)
-                            getMyDebtsToPay(user.uid, category, selectedPersonID)
-                            getMyDebtsToReceive(user.uid, category, selectedPersonID)
                             setpersonModalOpen(false)
+                            getPersonsByCreator(user.uid)
+                            if (persons[index].id === selectedPersonID) {
+                                getMyDebtsToPay(user.uid, category, selectedPersonID)
+                                getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                            } 
                         }
                     }])
                 })
@@ -74,24 +77,30 @@ export default function EditPersons({ navigation }) {
 
 
         if (action === EditAction.remove) {
-            await PersonService.DeletePerson({
+            let deletePerson = await PersonService.DeletePerson({
                 ...persons[index],
                 name: personName
             })
-                .then((res) => {
-                    Alert.alert('Sucesso!', 'Devedor/recebedor deletado com sucesso', [{
-                        text: 'OK',
-                        onPress: () => {
-                            getPersonsByCreator(user.uid)
+            let deletePersonDebts = await DebtService.DeleteAllDebtsByPersonID(persons[index].id)
+
+            Promise.all([deletePerson, deletePersonDebts])
+            .then((res) => {
+                Alert.alert('Sucesso!', 'Devedor/recebedor e todos débitos associados deletados com sucesso', [{
+                    text: 'OK',
+                    onPress: () => {
+                        setpersonModalOpen(false)
+                        getPersonsByCreator(user.uid)
+                        if (persons[index].id === selectedPersonID) {
                             getMyDebtsToPay(user.uid, category, null)
                             getMyDebtsToReceive(user.uid, category, null)
-                            setpersonModalOpen(false)
-                        }
-                    }])
-                })
-                .catch((err) => {
-                    Alert.alert('Erro ao deletar devedor/recebedor!', AuthErrorTypes[err.code] || err.code)
-                })
+                            setSelectedPersonID(null)
+                        }                        
+                    }
+                }])
+            })
+            .catch((err) => {
+                Alert.alert('Erro ao deletar devedor/recebedor e débitos associados', AuthErrorTypes[err.code] || err.code)
+            })
         }
 
         setpersonName('')
@@ -191,7 +200,7 @@ export default function EditPersons({ navigation }) {
                         <View className="w-full flex-row justify-evenly items-center ">
                             {
                                 action === EditAction.remove
-                                    ? <Text className='text-center text-lg'>Deseja realmente excluir o devedor/recebedor?</Text>
+                                    ? <Text className='text-center text-lg'>Excluir o devedor/recebedor deletará também todas as dívidas relacionadas ao perfil selecionado! Continuar?</Text>
                                     : <Input
                                         title='Nome do devedor/recebedor'
                                         value={personName}

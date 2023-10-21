@@ -8,6 +8,8 @@ import { AuthErrorTypes } from '../../@types/Firebase';
 import Loading from '../../components/Loading';
 import { Entypo } from '@expo/vector-icons';
 import ActionModal from '../../components/ActionModal';
+import DebtService from '../../services/Debt';
+import PersonService from '../../services/Person';
 
 export default function Profile({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
@@ -15,7 +17,36 @@ export default function Profile({ navigation }) {
     const [email, setemail] = useState<string>(user.email || '');
     const [loading, setloading] = useState<boolean>(false);
     const [deleUserModalOpen, setdeleUserModalOpen] = useState<boolean>(false);
+    const [password, setpassword] = useState<string>();
+    const [reauthUserModalOpen, setreauthUserModalOpen] = useState<boolean>(false);
 
+    const deleteAllUserData = async () => {
+        setdeleUserModalOpen(false)
+        setloading(true)
+        let userID = user.uid
+        await UserService.DeleteUser()
+        .then(async () => {
+            let deleteUserDebts = await DebtService.DeleteAllUserDebts(userID)
+            let deleteUserPersons = await PersonService.DeleteAllUserPersons(userID)
+                
+            Promise.all([deleteUserDebts, deleteUserPersons])
+            .then(async (res) => {
+                Alert.alert('Sucesso', 'O usuário e todos os seus dados foram deletados com sucesso')
+            })
+            .catch((err) => {
+                Alert.alert('Erro ao deletar dados do usuário!', AuthErrorTypes[err.code] || err.code)
+                setloading(false)
+            })
+        })
+        .catch((err) => {
+            setloading(false)
+            if( err.code === 'auth/requires-recent-login') {
+                setreauthUserModalOpen(true)
+            } else {
+                Alert.alert('Erro ao deletar usuário!', AuthErrorTypes[err.code] || err.code)
+            }
+        })
+    }
     useEffect(() => {
         if (user.displayName) {
             setname(user.displayName)
@@ -119,7 +150,7 @@ export default function Profile({ navigation }) {
                     }}
                     icon={
                         loading ?
-                            <Loading color='white' size={28} /> :
+                            <Loading color='white' size={20} /> :
                             null
                     }
                 />
@@ -132,7 +163,7 @@ export default function Profile({ navigation }) {
                     }}
                     icon={
                         loading ?
-                            <Loading color='white' size={28} /> :
+                            <Loading color='white' size={20} /> :
                             null
                     }
                 />
@@ -147,21 +178,51 @@ export default function Profile({ navigation }) {
                     setdeleUserModalOpen(false)
                 }}
                 startAction={async () => {
-                    setdeleUserModalOpen(false)
-                    setloading(true)
-                    await UserService.DeleteUser()
-                        .then((res) => {
-                            Alert.alert('Sucesso', 'Usuário deletado com sucesso')
-                        })
-                        .catch((err) => {
-                            Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
-                            setloading(false)
-                        })
+                    deleteAllUserData()
                 }}
                 content={
                     <View className="w-full">
                         <View className="w-full flex-row justify-evenly items-center py-2">
                             <Text className='text-center text-lg'>Essa ação é irreversível e deletará quaisquer informações associadas à esse usuário. Continuar?</Text>
+                        </View>
+                    </View>
+                }
+            />
+            <ActionModal
+                type='alert'
+                title="Reautenticar usuário"
+                actionText="Continuar com a exclusão"
+                isVisible={reauthUserModalOpen}
+                disableAction={password?.length < 6 || loading}
+                closeModal={() => {
+                    setreauthUserModalOpen(false)
+                    setpassword('')
+                }}
+                startAction={async () => {
+                    setloading(true)
+                    await UserService.ReauthenticateUser(password)
+                    .then(() => {
+                        setreauthUserModalOpen(false)
+                        setpassword('')
+                        deleteAllUserData()
+                    })
+                    .catch((err) => {
+                        Alert.alert('Erro ao reautenticar usuário!', AuthErrorTypes[err.code] || err.code)
+                        setloading(false)
+                    })
+                }}
+                content={
+                    <View className="w-full">
+                        <View className="w-full justify-evenly items-center py-2">
+                            <Text className='text-center text-lg'>Para dar continuidade com a exclusão de seus dados, por favor insira novamente sua senha.</Text>
+                            <Input
+                                title='Senha'
+                                value={password}
+                                onChangeText={(txt) => {
+                                    setpassword(txt)
+                                }}
+                                isPassword
+                            />
                         </View>
                     </View>
                 }
