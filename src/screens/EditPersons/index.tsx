@@ -1,19 +1,21 @@
-import { Alert, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native';
-import Button from '../../components/Button';
-import Loading from '../../components/Loading';
-import { useEffect, useState } from 'react';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import PersonService from '../../services/Person';
-import { Person } from '../../@types/Person';
-import { useUserStore } from '../../store/UserStore';
-import { Feather } from '@expo/vector-icons';
-import * as Utils from '../../Utils';
-import ActionModal from '../../components/ActionModal';
-import Input from '../../components/Input';
-import { usePersonStore } from '../../store/PersonStore';
-import { useDebtStore } from '../../store/DebtStore';
-import { useCategoryStore } from '../../store/CategoryStore';
-import DebtService from '../../services/Debt';
+import { Feather } from '@expo/vector-icons'
+import { useEffect, useState } from 'react'
+import { Alert, FlatList, RefreshControl, Text, TouchableOpacity, View } from 'react-native'
+
+import Input from '@components/Inputs/Input'
+import Button from '@components/Buttons/Button'
+import Loading from '@components/Loading'
+import ActionModal from '@components/ActionModal'
+
+import DebtService from '@services/Debt'
+import PersonService from '@services/Person'
+
+import { useDebtStore } from '@store/Debt'
+import { useUserStore } from '@store/User'
+import { Person } from '@store/Person/types'
+import { usePersonStore } from '@store/Person'
+import { useCategoryStore } from '@store/Category'
+import { AuthErrorTypes } from '@store/Firebase/types'
 
 enum EditAction {
     add,
@@ -23,13 +25,32 @@ enum EditAction {
 
 export default function EditPersons({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
+    const [category] = useCategoryStore((state) => [state.category])
+    const [
+        getMyDebtsToPay, 
+        getMyDebtsToReceive
+    ] = useDebtStore((state) => [
+        state.getMyDebtsToPay, 
+        state.getMyDebtsToReceive
+    ])
+    const [
+        persons, 
+        loading, 
+        selectedPersonID, 
+        getPersonsByCreator, 
+        setSelectedPersonID
+    ] = usePersonStore((state) => [
+        state.persons, 
+        state.loadingPersons, 
+        state.selectedPersonID, 
+        state.getPersonsByCreator, 
+        state.setSelectedPersonID
+    ])
+    
     const [index, setindex] = useState<number>();
     const [action, setaction] = useState<EditAction>();
     const [personName, setpersonName] = useState<string>('');
     const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
-    const [getPersonsByCreator, persons, loading, selectedPersonID, setSelectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.loadingPersons, state.selectedPersonID, state.setSelectedPersonID])
-    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
-    const [category] = useCategoryStore((state) => [state.category])
 
 
     const editPersonlist = async () => {
@@ -202,7 +223,7 @@ export default function EditPersons({ navigation }) {
                                 action === EditAction.remove
                                     ? <Text className='text-center text-lg'>Excluir o devedor/recebedor deletará também todas as dívidas relacionadas ao perfil selecionado! Continuar?</Text>
                                     : <Input
-                                        title='Nome do devedor/recebedor'
+                                        title='Nome'
                                         value={personName}
                                         onChangeText={(txt) => {
                                             setpersonName(txt)

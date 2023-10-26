@@ -1,36 +1,54 @@
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import { Alert, Text, View, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import firestore from '@react-native-firebase/firestore';
-import { Debt } from '../../@types/Debt';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import DebtService from '../../services/Debt';
-import { useUserStore } from '../../store/UserStore';
-import { useCategoryStore } from '../../store/CategoryStore';
-import DatepickerInput from '../../components/DatepickerInput';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import * as Utils from '../../Utils';
-import DropdownInput from "../../components/DropdownInput";
-import PersonService from "../../services/Person";
-import { Person } from "../../@types/Person";
-import ActionModal from "../../components/ActionModal";
-import Loading from "../../components/Loading";
-import { useDebtStore } from "../../store/DebtStore";
-import moment from "moment";
-import { usePersonStore } from "../../store/PersonStore";
+
+import moment from 'moment'
+import { AntDesign } from '@expo/vector-icons'
+import React, { useEffect, useState } from 'react'
+import { Alert, Text, View, Image } from 'react-native'
+import RadioButtonGroup, { RadioButtonItem } from 'expo-radio-button'
+
+import Input from '@components/Inputs/Input'
+import Button from '@components/Buttons/Button'
+import Loading from '@components/Loading'
+import ActionModal from '@components/ActionModal'
+import DatepickerInput from '@components/Inputs/DatepickerInput'
+import MultipleSelectInput from '@components/Inputs/MultipleSelectInput'
+
+import DebtService from '@services/Debt'
+import PersonService from '@services/Person'
+
+import { Debt } from '@store/Debt/types'
+import { useDebtStore } from '@store/Debt'
+import { useUserStore } from '@store/User'
+import { usePersonStore } from '@store/Person'
+import { useCategoryStore } from '@store/Category'
+import { AuthErrorTypes } from '@store/Firebase/types'
+
+import * as utils from '@utils/index';
 
 export default function CreateDebt({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
-    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
-    const [getPersonsByCreator, persons, selectedPersonID ] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.selectedPersonID])
-    const [multipleMonthModalOpen, setmultipleMonthModalOpen] = useState<boolean>(false);
+    const [
+        getMyDebtsToPay, 
+        getMyDebtsToReceive
+    ] = useDebtStore((state) => [
+        state.getMyDebtsToPay, 
+        state.getMyDebtsToReceive
+    ])
+    const [
+        persons, 
+        selectedPersonID,
+        getPersonsByCreator, 
+    ] = usePersonStore((state) => [
+        state.persons, 
+        state.selectedPersonID,
+        state.getPersonsByCreator
+    ])
+
     const [createPersonModalOpen, setcreatePersonModalOpen] = useState<boolean>(false);
-    const [personType, setpersonType] = useState<string>('debtorID')
+    const [createInfosModal, setcreateInfosModal] = useState<boolean>(false);
+    const [personType, setpersonType] = useState<string>('receiverID')
     const [personName, setpersonName] = useState<string>('');
-    const [linkedPerson, setlinkedPerson] = useState('');
+    const [selectedPersons, setselectedPersons] = useState<string[]>([]);
     const [monthAmount, setmonthAmount] = useState<number>(0);
     const [finalDate, setfinalDate] = useState<Date>();
     const [loading, setloading] = useState<boolean>(false);
@@ -42,33 +60,13 @@ export default function CreateDebt({ navigation }) {
         valueRemaning: 0,
         dueDate: moment().format(),
         createDate: moment().format(),
+        settleDate: null,
         active: true,
         receiverID: null,
         debtorID: null,
         paymentHistory: [],
         editHistory: []
     });
-
-    const createDebt = async () => {
-        setloading(true)
-        await DebtService.CreateDebt({
-            ...debt,
-            receiverID: personType === 'receiverID' ? user.uid : linkedPerson,
-            debtorID: personType === 'debtorID' ? user.uid : linkedPerson
-        })
-        .then((res) => {
-            Alert.alert('Sucesso!', 'Débito criado com sucesso')
-            personType === 'receiverID'
-            ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-            : getMyDebtsToPay(user.uid, category, selectedPersonID)
-        })
-        .catch((err) => {
-            Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
-        })
-        .finally(() => {
-            setloading(false)
-        })
-    }
 
     useEffect(() => {
         let tempDate = new Date(debt.dueDate)
@@ -84,7 +82,6 @@ export default function CreateDebt({ navigation }) {
         <View
             className='flex-1 items-center p-4 bg-white w-screen'
         >
-            <Image className='m-2' source={require('../../../assets/images/transparent-icon.png')} style={{width: 75, height: 75}} />
             <Text className='text-3xl text-primary font-semibold'>Novo débito</Text>
             <Input
                 title='Descrição'
@@ -98,7 +95,7 @@ export default function CreateDebt({ navigation }) {
             />
             <Input
                 title='Valor do débito'
-                value={debt.value ? Utils.NumberToBRL(debt.value) : null}
+                value={debt.value ? utils.NumberToBRL(debt.value) : null}
                 numeric
                 onChangeText={(txt) => {
                     let value = (+txt.replace(/[^0-9]/g, '')/100)
@@ -106,16 +103,6 @@ export default function CreateDebt({ navigation }) {
                         ...debt,
                         value,
                         valueRemaning: value
-                    })
-                }}
-            />
-            <DatepickerInput
-                title='Data de vencimento'
-                value={new Date(debt.dueDate)}
-                onPickDate={(date) => {
-                    setdebt({
-                        ...debt,
-                        dueDate: date.toString()
                     })
                 }}
             />
@@ -127,31 +114,51 @@ export default function CreateDebt({ navigation }) {
                     onSelected={(value) => setpersonType(value)}
                     radioBackground={'#00ab8c'}
                 >
-                    <RadioButtonItem 
-                        value="debtorID" 
-                        label={
-                            <Text className='text-primary'>Sou o devedor</Text>
-                        }
-                    />
                     <RadioButtonItem
                         value="receiverID"
                         label={
                             <Text className='text-primary'>Sou o recebedor</Text>
                         }
                     />
+                    <RadioButtonItem 
+                        value="debtorID" 
+                        label={
+                            <Text className='text-primary'>Sou o devedor</Text>
+                        }
+                    />
                 </RadioButtonGroup>
             </View>
-            <DropdownInput 
-                title={personType === 'debtorID' ? 'Recebedor' : 'Devedor'}
-                data={persons?.map(ps => {
-                    return {
-                        label: ps.name,
-                        value: ps.id
+            <MultipleSelectInput 
+                data={persons.map((p) => {
+                return {
+                        label: p.name,
+                        value: p.id
                     }
-                }) || []}
-                selectedItem={linkedPerson}
-                setSelectedItem={(item) => {
-                    setlinkedPerson(item)
+                }) || []} 
+                title={personType === 'debtorID' ? 'Recebedores' : 'Devedores'}
+                selectedItems={selectedPersons} 
+                setSelectedItems={(list) => {
+                    setselectedPersons(list)
+                }}
+            />  
+            <DatepickerInput
+                title='Data de vencimento'
+                value={new Date(debt.dueDate)}
+                onPickDate={(date) => {
+                    setdebt({
+                        ...debt,
+                        dueDate: date.toString()
+                    })
+                }}
+            />
+            <Input
+                title='Quantas vezes a dívida se repete?'
+                placeholder='Deixe vazio ou 0 para dívida única'
+                value={monthAmount ? monthAmount.toString() : null}
+                numeric
+                onChangeText={(txt) => {
+                    let value = (+txt.replace(/[^0-9]/g, ''))
+                    setmonthAmount(value)
                 }}
             />
             <View className="w-full py-2">
@@ -166,17 +173,10 @@ export default function CreateDebt({ navigation }) {
                             }}            
                         />
                         <Button 
-                            disabled={!debt.description || !debt.value || !debt.dueDate || !linkedPerson}
-                            text={'Criar débito'} 
-                            onPress={() => {
-                                createDebt()
-                            }}
-                        />
-                        <Button 
-                            disabled={!debt.description || !debt.value || !debt.dueDate ||!linkedPerson}
-                            text={"Criar débitos recorrentes"} 
+                            disabled={!debt.description || !debt.value || !debt.dueDate || selectedPersons.length <= 0}
+                            text={"Criar débito(s)"} 
                             onPress={() => { 
-                                setmultipleMonthModalOpen(true)
+                                setcreateInfosModal(true)
                             }}            
                         />
                     </>
@@ -223,58 +223,75 @@ export default function CreateDebt({ navigation }) {
                 }
             />
             <ActionModal 
-                title="Débito recorrente"
-                actionText="Criar débito recorrente"
-                isVisible={multipleMonthModalOpen} 
-                disableAction={!monthAmount || monthAmount < 0}
+                title="Criar débito(s)"
+                actionText="Criar"
+                isVisible={createInfosModal} 
+                disableAction={false}
                 closeModal={() => {
-                    setmultipleMonthModalOpen(false)
+                    setcreateInfosModal(false)
                 }}
-                startAction={async () => {
-                    setmultipleMonthModalOpen(false)
+                startAction={async() => {
+                    setcreateInfosModal(false)
                     setloading(true)
-                    for (let i = 0; i <= monthAmount; i++) {
-                        let dueDate = new Date(debt.dueDate)
-                        dueDate.setMonth(new Date(debt.dueDate).getMonth() + i)
-                        await DebtService.CreateDebt({
-                            ...debt,
-                            dueDate: moment(dueDate).format(),
-                            receiverID: personType === 'receiverID' ? user.uid : linkedPerson,
-                            debtorID: personType === 'debtorID' ? user.uid : linkedPerson
-                        })
-                        .catch((err) => {
-                            Alert.alert(`Erro ao criar Débito do dia ${Utils.NormalizeDate(dueDate)}`, AuthErrorTypes[err.code] || err.code)
-                            setloading(false)
-                        })
-                    }
-                    Alert.alert('Sucesso!', 'Débitos criados com sucesso')
-                    setloading(false)
-                    personType === 'receiverID'
-                    ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-                    : getMyDebtsToPay(user.uid, category, selectedPersonID)
+
+                    let newDebts: Debt[] = []
+
+                    selectedPersons.forEach((personID) => {
+                        for (let i = 0; i <= monthAmount; i++) {
+                            let dueDate = new Date(debt.dueDate)
+                            dueDate.setMonth(new Date(debt.dueDate).getMonth() + i)
+                            newDebts.push({
+                                ...debt,
+                                dueDate: moment(dueDate).format(),
+                                receiverID: personType === 'receiverID' ? user.uid : personID,
+                                debtorID: personType === 'debtorID' ? user.uid : personID
+                            })
+                        }
+                    })
+
+                    await DebtService.CreateMultipleDebts(newDebts)
+                    .then((res) => {
+                        personType === 'receiverID'
+                        ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                        : getMyDebtsToPay(user.uid, category, selectedPersonID)
+            
+                        Alert.alert('Sucesso!', 'Débito(s) criado(s) com sucesso! \nDeseja continuar criando débitos?', [
+                            {
+                                text: 'Não',
+                                onPress: () => {
+                                    navigation.goBack()
+                                }
+                            },
+                            {
+                                text: 'Sim',
+                                onPress: () => {}
+                            },
+                        ])
+                    })
+                    .catch((err) => {
+                        Alert.alert('Erro!', AuthErrorTypes[err.code] || err.code)
+                    })
+                    .finally(() => {
+                        setloading(false)
+                    })
                 }}
                 content={
                     <View className="w-full">
-                        <Input 
-                            title={"Quantidade de meses recorrentes"} 
-                            numeric
-                            value={monthAmount.toString()} 
-                            onChangeText={(n) => {
-                            let val = +n.replace(/[^0-9]/g, '')
-                                setmonthAmount(val)
-                            }}                    
-                        />
+                        <View className="w-full py-2">
+                            {selectedPersons.length > 1 && <Text className='text-center'>{`Ao selecionar ${selectedPersons.length} pessoa(s), você está criando um débito para cada pessoa, para cada um dos ${monthAmount+1} mês(es) selecioado(s).`}</Text>}
+                            <Text className='py-2 text-center'>{`No total serão criados ${selectedPersons.length * (monthAmount+1)} débitos. Continuar?`}</Text>
+                        </View>
                         <View className="w-full flex-row justify-evenly items-center py-2">
-                            <View className="w-4/12 items-center">
-                                <Text>Mês inicial</Text>
-                                <Text>{Utils.NormalizeDate(debt.dueDate)}</Text>
+                            <View className="w-5/12 items-center">
+                                <Text>Primeiro mês</Text>
+                                <Text>{utils.NormalizeDate(debt.dueDate)}</Text>
                             </View>
-                            <View className="w-2/12 items-center">
+                            <View className="items-center">
                                 <AntDesign name="arrowright" size={24} color='#00ab8c' />
                             </View>
-                            <View className="w-4/12 items-center">
-                                <Text>Mês final</Text>
-                                <Text>{Utils.NormalizeDate(finalDate)}</Text>
+                            <View className="w-5/12 items-center">
+                                <Text>Último mês</Text>
+                                <Text>{utils.NormalizeDate(finalDate)}</Text>
                             </View>
                         </View>
                     </View>

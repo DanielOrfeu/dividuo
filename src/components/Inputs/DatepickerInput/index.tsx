@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Text, TextInput, View, TouchableOpacity } from 'react-native';
-import DatePicker from 'react-native-date-picker';
-import * as Utils from '../../Utils';
+import { useState } from 'react'
+import DatePicker from 'react-native-date-picker'
+import { Text, TextInput, View, TouchableOpacity } from 'react-native'
+
+import * as utils from '@utils/index'
 
 interface OwnProps {
     title: string
@@ -29,7 +30,7 @@ export default function DatepickerInput(props: Props) {
                 {
                     props.value
                     ? <Text>
-                        {Utils.NormalizeDate(props.value)}
+                        {utils.NormalizeDate(props.value)}
                     </Text>
                     : <Text className='text-gray-400'>
                         {props.title}

@@ -1,10 +1,12 @@
 import React from 'react'
-import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
-import UserService from '../../services/User';
-import { useUserStore } from '../../store/UserStore';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native'
+import { Feather, MaterialIcons } from '@expo/vector-icons'
+import { Text, TouchableOpacity, View } from 'react-native'
+import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer'
+
+import UserService from '@services/User';
+
+import { useUserStore } from '@store/User';
 
 export default function CustomDrawer(props) {
   const [user] = useUserStore((state) => [state.user])

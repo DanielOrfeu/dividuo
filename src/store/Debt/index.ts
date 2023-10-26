@@ -1,10 +1,15 @@
 import { create } from 'zustand'
-import { Debt } from '../../@types/Debt'
-import DebtService from '../../services/Debt'
 import { Alert } from 'react-native'
-import { AuthErrorTypes } from '../../@types/Firebase'
+
+import DebtService from '@services/Debt'
+
+import { Debt } from '@store/Debt/types'
+import { AuthErrorTypes } from '@store/Firebase/types'
 
 type DebtStore = {
+    showPaidDebts: boolean
+    setShowPaidDebts: (pd: boolean) => void
+
     debtsToPay: Debt[]
     loadDebtToPay: boolean
     setDebtsToPay: (dc: Debt[]) => void
@@ -24,15 +29,18 @@ type DebtStore = {
     getDebtByID: (userID: string) => void
 }
 
-export const useDebtStore = create<DebtStore>((set) => {
+export const useDebtStore = create<DebtStore>((set, get) => {
     return {
+        showPaidDebts: false,
+        setShowPaidDebts: (pd) => set({showPaidDebts: pd}),
+
         debtsToPay: [],
         loadDebtToPay: false,
         setDebtsToPay: (dp) => set({debtsToPay: dp}),
         setLoadDebtsToPay: (l) => set({loadDebtToPay: l}),
         getMyDebtsToPay: async (userID, category, personId) => {
             set({loadDebtToPay: true})
-            await DebtService.GetMyDebtsToPay(userID, category, personId)
+            await DebtService.GetMyDebtsToPay(userID, category, get().showPaidDebts, personId)
             .then(res => {
                 set({debtsToPay: res})
             })
@@ -49,7 +57,7 @@ export const useDebtStore = create<DebtStore>((set) => {
         setLoadDebtsToReceive: (l) => set({loadDebtToReceive: l}),
         getMyDebtsToReceive: async (userID, category, personId) => {
             set({loadDebtToReceive: true})
-            await DebtService.GetMyDebtsToReceive(userID, category, personId)
+            await DebtService.GetMyDebtsToReceive(userID, category, get().showPaidDebts, personId)
             .then(res => {
                 set({debtsToReceive: res})
             })

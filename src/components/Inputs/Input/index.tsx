@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Text, TextInput, View, TouchableOpacity } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
+import { useState } from 'react'
 import colors from 'tailwindcss/colors'
+import { Entypo } from '@expo/vector-icons'
+import { Text, TextInput, View, TouchableOpacity } from 'react-native'
 
 interface OwnProps {
     title: string,
+    placeholder?: string,
     value: string,
     isPassword?: boolean,
     numeric?: boolean,
@@ -19,12 +20,13 @@ type Props = OwnProps
 export default function Input(props: Props) {
     const [hidePassword, sethidePassword] = useState<boolean>(props.isPassword);
     const width = `w-${props.w?.length > 0 ? props.w : 'full'}`
+    
     return (
         <View className={`my-2 ${width}`}>
             <Text className='text-primary font-medium text-sm pl-1'>{props.title}</Text>
             <TextInput
                 className={`w-full h-10 rounded-xl px-4 border-2 border-gray-300 focus:border-primary`}
-                placeholder={props.title}
+                placeholder={props.placeholder ? props.placeholder : props.title}
                 value={props.value}
                 keyboardType={props.numeric ? 'numeric' : props.email ? 'email-address' : 'default'}
                 onChangeText={(txt) => {

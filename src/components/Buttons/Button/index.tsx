@@ -1,5 +1,5 @@
-import { ReactNode, useEffect, useState } from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native'
+import { ReactNode, useEffect, useState } from 'react'
 
 interface OwnProps {
     w?: string,
@@ -76,7 +76,9 @@ export default function Button(props: Props) {
             }}
             className={className}
             style={{
-                backgroundColor: pallet.bgColor
+                backgroundColor: pallet.bgColor,
+                borderColor: pallet.bgColor,
+                borderWidth: 2
             }}
         >
             {   

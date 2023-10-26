@@ -1,6 +1,7 @@
-import { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import { create } from 'zustand'
-import { DebtCategory } from '../../@types/Debt'
+import { FirebaseAuthTypes } from '@react-native-firebase/auth'
+
+import { DebtCategory } from '@store/Debt/types'
 
 type CategoryStore = {
     category: DebtCategory

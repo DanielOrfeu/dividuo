@@ -1,31 +1,42 @@
-import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-import { Alert, Text, View, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import firestore from '@react-native-firebase/firestore';
-import { EditHistory, HistoryItem } from '../../@types/Debt';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import DebtService from '../../services/Debt';
-import { useUserStore } from '../../store/UserStore';
-import { useCategoryStore } from '../../store/CategoryStore';
-import DatepickerInput from '../../components/DatepickerInput';
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import * as Utils from '../../Utils';
-import DropdownInput from "../../components/DropdownInput";
-import PersonService from "../../services/Person";
-import { Person } from "../../@types/Person";
-import ActionModal from "../../components/ActionModal";
-import Loading from "../../components/Loading";
-import { useDebtStore } from "../../store/DebtStore";
-import moment from "moment";
-import { usePersonStore } from "../../store/PersonStore";
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { Alert, Text, View, Image } from 'react-native'
+
+import Input from '@components/Inputs/Input'
+import Button from '@components/Buttons/Button'
+import Loading from '@components/Loading'
+import DatepickerInput from '@components/Inputs/DatepickerInput'
+
+import DebtService from '@services/Debt'
+
+import { useDebtStore } from '@store/Debt'
+import { useUserStore } from '@store/User'
+import { usePersonStore } from '@store/Person'
+import { useCategoryStore } from '@store/Category'
+import { AuthErrorTypes } from '@store/Firebase/types'
+import { EditHistory, HistoryItem } from '@store/Debt/types'
+
+import * as utils from '@utils/index';
+
 
 export default function EditDebt({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [selectedPersonID] = usePersonStore((state) => [state.selectedPersonID])
-    const [getMyDebtsToPay, getMyDebtsToReceive, debt, setDebt, getDebtByID] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive, state.debt, state.setDebt, state.getDebtByID])
+    const [
+        debt, 
+        setDebt, 
+        getDebtByID,
+        getMyDebtsToPay, 
+        getMyDebtsToReceive, 
+    ] = useDebtStore((state) => [
+        state.debt, 
+        state.setDebt, 
+        state.getDebtByID,
+        state.getMyDebtsToPay, 
+        state.getMyDebtsToReceive, 
+    ])
+
     const [loading, setloading] = useState<boolean>(false);
     const [oldInfo, setoldInfo] = useState<HistoryItem>();
 
@@ -55,7 +66,7 @@ export default function EditDebt({ navigation, route }) {
             />
             <Input
                 title='Valor do débito'
-                value={debt.value ? Utils.NumberToBRL(debt.value) : null}
+                value={debt.value ? utils.NumberToBRL(debt.value) : null}
                 numeric
                 onChangeText={(txt) => {
                     let value = (+txt.replace(/[^0-9]/g, '')/100)
@@ -97,16 +108,27 @@ export default function EditDebt({ navigation, route }) {
                                         dueDate: debt.dueDate,
                                     }
                                 })
-                            
+
+                                console.log(editHistory)
+                                let valueRemaning = debt.value - debt.valuePaid
                                 await DebtService.EditDebtByID({
                                     ...debt,
-                                    editHistory
+                                    valueRemaning,
+                                    editHistory,
+                                    active: debt.valuePaid < debt.value,
+                                    settleDate: debt.valuePaid < debt.value ? null : moment().format()
                                 })
                                 .then(() => {
                                     user.uid === debt.receiverID
                                     ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
                                     : getMyDebtsToPay(user.uid, category, selectedPersonID)
-                                    Alert.alert('Sucesso!', `Débito editado com sucesso!`, [{
+
+                                    let message = 'Débito editado com sucesso!'
+                                    if (debt.valuePaid >= debt.value) {
+                                        message = `${message} \nNota: O valor atual é menor ou igual ao valor já pago. Dívida automaticamente configurada como quitada.`
+                                    }
+
+                                    Alert.alert('Sucesso!', message, [{
                                         text: 'OK',
                                         onPress: () => {
                                             getDebtByID(debt.id)

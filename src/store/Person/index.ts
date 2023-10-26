@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { Alert } from 'react-native'
-import { AuthErrorTypes } from '../../@types/Firebase'
-import { Person } from '../../@types/Person'
-import PersonService from '../../services/Person'
+
+import PersonService from '@services/Person'
+
+import { Person } from '@store/Person/types'
+import { AuthErrorTypes } from '@store/Firebase/types'
 
 type PersonStore = {
     persons: Person[]

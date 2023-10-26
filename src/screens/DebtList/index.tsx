@@ -1,29 +1,61 @@
-import { useEffect, useState } from 'react';
-import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
-import { Debt, DebtCategory } from '../../@types/Debt';
-import DebtService from '../../services/Debt';
-import UserService from '../../services/User';
-import * as Utils from '../../Utils';
-
-import { useCategoryStore } from '../../store/CategoryStore';
-import Button from '../../components/Button';
-import InvertedButton from '../../components/InvertedButton';
-import { useUserStore } from '../../store/UserStore';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import { useDebtStore } from '../../store/DebtStore';
-import Loading from '../../components/Loading';
 import moment from 'moment';
-import DropdownInput from '../../components/DropdownInput';
-import { usePersonStore } from '../../store/PersonStore';
+import Checkbox from 'expo-checkbox'
+import { useEffect, useState } from 'react'
+import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native'
+
+import Loading from '@components/Loading'
+import Button from '@components/Buttons/Button'
+import DropdownInput from '@components/Inputs/DropdownInput'
+import InvertedButton from '@components/Buttons/InvertedButton'
+
+import { useUserStore } from '@store/User'
+import { useDebtStore } from '@store/Debt'
+import { usePersonStore } from '@store/Person'
+import { useCategoryStore } from '@store/Category'
+import { Debt, DebtCategory } from '@store/Debt/types'
+
+import * as utils from '@utils/index'
 
 export default function Home({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
-    const [getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.getMyDebtsToPay, state.getMyDebtsToReceive])
-    const [debtsToPay, debtsToReceive] = useDebtStore((state) => [state.debtsToPay, state.debtsToReceive])
-    const [loadDebtToPay, loadDebtToReceive, getDebtByID] = useDebtStore((state) => [state.loadDebtToPay, state.loadDebtToReceive, state.getDebtByID])
-    const [getPersonsByCreator, persons, setSelectedPersonID, selectedPersonID] = usePersonStore((state) => [state.getPersonsByCreator, state.persons, state.setSelectedPersonID, state.selectedPersonID])
+    const [
+        getMyDebtsToPay, 
+        getMyDebtsToReceive
+    ] = useDebtStore((state) => [
+        state.getMyDebtsToPay, 
+        state.getMyDebtsToReceive
+    ])
+    const [debtsToPay, 
+        debtsToReceive
+    ] = useDebtStore((state) => [
+        state.debtsToPay, 
+        state.debtsToReceive
+    ])
+    const [
+        getDebtByID,
+        loadDebtToPay, 
+        loadDebtToReceive, 
+        showPaidDebts,
+        setShowPaidDebts
+    ] = useDebtStore((state) => [
+        state.getDebtByID,
+        state.loadDebtToPay, 
+        state.loadDebtToReceive,
+        state.showPaidDebts,
+        state.setShowPaidDebts
+    ])
+    const [
+        persons, 
+        selectedPersonID,
+        getPersonsByCreator, 
+        setSelectedPersonID, 
+    ] = usePersonStore((state) => [
+        state.persons, 
+        state.selectedPersonID,
+        state.getPersonsByCreator,
+        state.setSelectedPersonID, 
+    ])
 
     const getDebts = async (personID?: string) => {
         getMyDebtsToPay(user.uid, category, personID)
@@ -35,15 +67,19 @@ export default function Home({ navigation }) {
         getDebts()
     }, []);
 
+    useEffect(() => {
+        getMyDebtsToPay(user.uid, category, selectedPersonID || null)
+        getMyDebtsToReceive(user.uid, category, selectedPersonID || null)
+    }, [showPaidDebts]);
+
     const debtItem = (debt: Debt, personType: string) => {
-        const color = personType === 'receiverID' ? 'primary' : 'red-600'
-        const dateExpired = moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600` : ''
+        const color = !debt.active ? 'gray-500' : personType === 'receiverID' ? 'primary' : 'red-600'
 
         return (
             <TouchableOpacity 
                 className={`border-2 m-1 px-1 pb-3 rounded-xl items-center`} 
                 style={{
-                    borderColor: personType === 'receiverID' ? '#00ab8c' : '#ff0000'
+                    borderColor: !debt.active ? '#6b7280' : personType === 'receiverID' ? '#00ab8c' : '#ff0000'
                 }}
                 onPress={() => {
                     getDebtByID(debt.id)
@@ -51,11 +87,16 @@ export default function Home({ navigation }) {
                 }}
             >
                 <Text className={`text-${color} font-semibold text-lg text-center`}>{debt.description}</Text>
-                <Text className={`font-medium`}>Valor: {Utils.NumberToBRL(debt.value)}</Text>
-                <Text className={`font-medium`}>Pago: {Utils.NumberToBRL(debt.valuePaid)}</Text>
-                <Text className={`font-medium`}>Restante: {Utils.NumberToBRL(debt.valueRemaning)}</Text>
-                <Text className={`font-medium`}>Criado em {Utils.NormalizeDate(debt.createDate)}</Text>
-                <Text className={`${dateExpired} font-medium`}>Vencimento {Utils.NormalizeDate(debt.dueDate)}</Text>
+                <Text className={`font-medium`}>Valor: {utils.NumberToBRL(debt.value)}</Text>
+                <Text className={`font-medium`}>Pago: {utils.NumberToBRL(debt.valuePaid)}</Text>
+                <Text className={`font-medium`}>Restante: {utils.NumberToBRL(debt.valueRemaning)}</Text>
+                <Text className={`font-medium`}>Criado em: {utils.NormalizeDate(debt.createDate)}</Text>
+                <Text className={`font-medium`}
+                    style={{
+                        color: !debt.active ? '#6b7280' : moment().isAfter(moment(new Date(debt.dueDate))) ? '#ff0000' : '#000'
+                    }}
+                >Vencimento {utils.NormalizeDate(debt.dueDate)}</Text>
+                {debt.settleDate && <Text className={`font-medium`}>Quitado em: {utils.NormalizeDate(debt.settleDate)}</Text>}
             </TouchableOpacity>
         )
     } 
@@ -98,7 +139,9 @@ export default function Home({ navigation }) {
                     ? <Loading/>
                     : <FlatList
                         className='w-full'
-                        data={debtsToReceive}
+                        data={debtsToReceive.sort((a, b) => {
+                            return Number(b.active) - Number(a.active)
+                        })}
                         renderItem={({ item }) => debtItem(item, 'receiverID')}
                         keyExtractor={item => item.id || item.description}
                         refreshControl={
@@ -137,6 +180,20 @@ export default function Home({ navigation }) {
                         getDebts(item)
                     }}          
                 />
+                <TouchableOpacity className='flex-row gap-2 items-center justify-center m-2'
+                    onPress={() => {
+                        setShowPaidDebts(!showPaidDebts)
+                    }}
+                > 
+                    <Checkbox
+                        value={showPaidDebts}
+                        color={showPaidDebts ? '#00ab8c' : undefined}
+                        onValueChange={(v) => {
+                            setShowPaidDebts(v)
+                        }}
+                    />
+                    <Text className='text-primary font-bold-'>Exibir dívidas quitadas</Text>
+                </TouchableOpacity>
                 <View className='flex-1 flex-row w-full mt-2'>
                     {
                         listToReceive()

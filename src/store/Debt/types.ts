@@ -6,6 +6,7 @@ export interface Debt {
     value: number
     valuePaid?: number
     valueRemaning?: number
+    settleDate?: string
     dueDate: string
     createDate: string
     active: boolean

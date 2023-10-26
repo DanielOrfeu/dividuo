@@ -1,11 +1,14 @@
-import { Alert, Text, View, Image, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
-import UserService from "../../services/User";
-import Input from '../../components/Input';
-import Button from '../../components/Button';
-import InvertedButton from '../../components/InvertedButton';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import Loading from '../../components/Loading';
+import { useState } from 'react'
+import { Alert, Text, View, Image, TouchableOpacity } from 'react-native'
+
+import Input from '@components/Inputs/Input'
+import Button from '@components/Buttons/Button'
+import Loading from '@components/Loading'
+import InvertedButton from '@components/Buttons/InvertedButton'
+
+import UserService from '@services/User'
+
+import { AuthErrorTypes } from '@store/Firebase/types'
 
 export default function SignUp({ navigation }) {
     const [email, setemail] = useState<string>()

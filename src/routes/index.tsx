@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
+import auth from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native'
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import AuthStack from './authStack';
-import NonAuthStack from './nonAuthStack';
-import { useUserStore } from '../store/UserStore';
+
+import AuthStack from '@routes/authStack';
+import NonAuthStack from '@routes/nonAuthStack';
+
+import { useUserStore } from '@store/User';
 
 export default function Routes() {
     const [user, setUser] = useUserStore((state) => [

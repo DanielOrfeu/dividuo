@@ -1,6 +1,7 @@
-import { Text, TouchableOpacity, View } from 'react-native';
-import { DebtCategory } from '../../@types/Debt';
-import { useCategoryStore } from '../../store/CategoryStore';
+import { Text, TouchableOpacity, View } from 'react-native'
+
+import { DebtCategory } from '@store/Debt/types'
+import { useCategoryStore } from '@store/Category'
 
 export default function SelectCategory({ navigation }) {
     const [category, setCategory] = useCategoryStore((state) => [

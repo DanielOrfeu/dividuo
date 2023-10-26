@@ -1,5 +1,6 @@
 import firestore from '@react-native-firebase/firestore';
-import { Person } from '../../@types/Person';
+
+import { Person } from '@store/Person/types';
 
 export default class PersonService {
     static async CreatePerson(person: Person) {

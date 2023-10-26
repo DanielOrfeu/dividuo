@@ -1,8 +1,3 @@
-export interface FirebaseTime {
-    seconds: number,
-    nanoseconds: number
-}
-
 export enum AuthErrorTypes {
     'auth/claims-too-large' = 'O payload de declarações fornecido para setCustomUserClaims() excede o tamanho máximo permitido de 1.000 bytes.',
     'auth/email-already-exists' = 'O e-mail fornecido já está em uso por outro usuário. Cada usuário precisa ter um e-mail exclusivo.',

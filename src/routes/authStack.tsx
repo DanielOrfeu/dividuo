@@ -1,14 +1,17 @@
-import { createStackNavigator } from '@react-navigation/stack'
-import { useNavigation } from '@react-navigation/native';
-import SelectCategory from '../screens/SelectCategory'
-import CreateDebt from '../screens/CreateDebt'
-import EditDebt from '../screens/EditDebt'
-import DebtListStack from './debtListStack'
-import DebtDetail from '../screens/DebtDetail'
-import EditDebtHistory from '../screens/EditDebtHistory'
 import { TouchableOpacity, View } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import { Feather, FontAwesome5 } from '@expo/vector-icons'
-import About from '../screens/About';
+import { createStackNavigator } from '@react-navigation/stack'
+
+import DebtListStack from '@routes/debtListStack'
+
+import About from '@screens/About'
+import EditDebt from '@screens/EditDebt'
+import CreateDebt from '@screens/CreateDebt'
+import DebtDetail from '@screens/DebtDetail'
+import SelectCategory from '@screens/SelectCategory'
+import EditDebtHistory from '@screens/EditDebtHistory'
+
 
 const { Navigator, Screen } = createStackNavigator()
 

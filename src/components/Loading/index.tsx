@@ -1,4 +1,4 @@
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator } from 'react-native'
 
 interface OwnProps {
     size?: number

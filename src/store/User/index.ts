@@ -1,5 +1,5 @@
-import { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import { create } from 'zustand'
+import { FirebaseAuthTypes } from '@react-native-firebase/auth'
 
 type UserStore = {
     user: FirebaseAuthTypes.User | null

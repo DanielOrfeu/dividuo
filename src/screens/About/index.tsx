@@ -1,7 +1,18 @@
-import { ScrollView, Text, View, TouchableOpacity } from 'react-native';
-import * as Linking from 'expo-linking';
+import * as Linking from 'expo-linking'
+import { ScrollView, Text, View, TouchableOpacity } from 'react-native'
 
 export default function About({ navigation }) {
+    
+    const  linkedName = (name: string, url: string) => {
+        return <TouchableOpacity
+            onPress={() => {
+                Linking.openURL(url);
+            }}
+        >
+            <Text className='text-lg'>{name}</Text>
+        </TouchableOpacity>
+    }
+
     return (
         <ScrollView className='flex-1 w-screen p-4'>
             <View className='w-full items-center'>
@@ -22,36 +33,29 @@ export default function About({ navigation }) {
                 </View>
 
                 <View className='pb-4 items-center'>
-                    <Text className='font-semibold text-lg'>Idealização, criação e desenvolvimento</Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            Linking.openURL('https://www.linkedin.com/in/danielorfeu/');
-                        }}
-                    >
-                        <Text className='text-lg'>Daniel Orfeu</Text>
-                    </TouchableOpacity>
+                    <Text className='font-semibold text-lg text-center'>Idealização, desenvolvimento e manutenção</Text>
+                    {linkedName('Daniel Orfeu', 'https://www.linkedin.com/in/danielorfeu/')}
                 </View>
 
                 <View className='pb-4 items-center'>
-                    <Text className='font-semibold text-lg'>Design e correções</Text>
-                    <TouchableOpacity
-                        onPress={() => {
-                            Linking.openURL('https://www.linkedin.com/in/danielorfeu/');
-                        }}
-                    >
-                        <Text className='text-lg'>Daniel Orfeu</Text>
-                    </TouchableOpacity>
-                    <Text className='text-lg'>Cíntia Silveira</Text>
+                    <Text className='font-semibold text-lg'>Correções de design</Text>
+                    {linkedName('Daniel Orfeu', 'https://www.linkedin.com/in/danielorfeu/')}
+                    {linkedName('Cíntia Silveira', 'https://www.linkedin.com/in/cintiasilveira/')}
+                    {linkedName('Joice Paz', 'https://www.linkedin.com/in/joicepaz')}
                 </View>
 
                 <View className='pb-4 items-center'>
                     <Text className='font-semibold text-lg'>Beta Testers</Text>
                     <Text className='text-lg'>Amanda Moraes</Text>
-                    <Text className='text-lg'>Cíntia Silveira</Text>
-                    <Text className='text-lg'>Wellington Jorge</Text>
-                    <Text className='text-lg'>Joice Paz</Text>
+                    {linkedName('Cíntia Silveira', 'https://www.linkedin.com/in/cintiasilveira/')}
+                    {linkedName('Wellington Jorge', 'https://www.linkedin.com/in/wellington-jorge/')}
+                    {linkedName('Joice Paz', 'https://www.linkedin.com/in/joicepaz')}
                 </View>
             </View>
         </ScrollView>
     );
 }
+
+
+
+

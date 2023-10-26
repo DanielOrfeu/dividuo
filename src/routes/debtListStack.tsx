@@ -1,11 +1,12 @@
+import { FontAwesome } from '@expo/vector-icons'
+import CustomDrawer from '@components/CustomDrawer'
+import { SimpleLineIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { createDrawerNavigator } from '@react-navigation/drawer'
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-import CustomDrawer from '../components/CustomDrawer'
-import DebtList from '../screens/DebtList'
-import Profile from '../screens/Profile'
-import EditPersons from '../screens/EditPersons';
+
+import Profile from '@screens/Profile'
+import DebtList from '@screens/DebtList'
+import EditPersons from '@screens/EditPersons'
 
 const { Navigator, Screen } = createDrawerNavigator()
 

@@ -1,4 +1,4 @@
-import moment from "moment"
+import moment from 'moment'
 
 export function NormalizeDate(date: string | Date): string {
     return moment(new Date(date)).format('DD/MM/YYYY')

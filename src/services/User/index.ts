@@ -1,6 +1,4 @@
 import auth from '@react-native-firebase/auth'
-import firestore from '@react-native-firebase/firestore';
-import { Alert } from 'react-native'
 
 export default class UserService {
     static async Login(email: string, pass: string) {

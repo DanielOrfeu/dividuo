@@ -1,8 +1,5 @@
-import { useState } from 'react';
-import { Text, TextInput, View, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-
-import * as Utils from '../../Utils';
+import { Picker } from '@react-native-picker/picker'
+import { Text, TextInput, View, TouchableOpacity } from 'react-native'
 
 interface Item {
     label: string
@@ -69,7 +66,6 @@ export default function DropdownInput(props: Props) {
                 {
                     props.data?.length > 0 
                     ? 
-                
                         buildList()
                     : <Picker.Item 
                         enabled={false}

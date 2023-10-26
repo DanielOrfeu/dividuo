@@ -1,9 +1,10 @@
-import Modal from "react-native-modal";
+import { ReactNode } from 'react'
+import Modal from 'react-native-modal'
+import { Text, TouchableOpacity, View } from 'react-native'
 
-import { Text, TouchableOpacity, View } from 'react-native';
-import Button from "../Button";
-import InvertedButton from "../InvertedButton";
-import { ReactNode } from "react";
+import Button from '@components/Buttons/Button'
+import InvertedButton from '@components/Buttons/InvertedButton'
+
 
 interface OwnProps {
     title: string

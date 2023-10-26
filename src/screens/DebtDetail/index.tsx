@@ -1,22 +1,27 @@
-import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Debt, PaymentHistory } from '../../@types/Debt';
-import { useEffect, useState } from 'react';
-import * as Utils from '../../Utils';
-import Button from '../../components/Button';
-import DebtService from '../../services/Debt';
-import ActionModal from '../../components/ActionModal';
-import Loading from '../../components/Loading';
-import Input from '../../components/Input';
-import { AuthErrorTypes } from '../../@types/Firebase';
-import { useDebtStore } from '../../store/DebtStore';
-import { useUserStore } from '../../store/UserStore';
-import { useCategoryStore } from '../../store/CategoryStore';
-import { AntDesign, Feather } from '@expo/vector-icons';
 import moment from 'moment'
-import { Person } from '../../@types/Person';
-import PersonService from '../../services/Person';
-import { usePersonStore } from '../../store/PersonStore';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { useEffect, useState } from 'react'
+import { FontAwesome5 } from '@expo/vector-icons'
+import { AntDesign, Feather } from '@expo/vector-icons'
+import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
+
+import Input from '@components/Inputs/Input'
+import Button from '@components/Buttons/Button'
+import Loading from '@components/Loading'
+import ActionModal from '@components/ActionModal'
+
+import DebtService from '@services/Debt'
+import PersonService from '@services/Person'
+
+import { useDebtStore } from '@store/Debt'
+import { useUserStore } from '@store/User'
+import { Person } from '@store/Person/types'
+import { usePersonStore } from '@store/Person'
+import { useCategoryStore } from '@store/Category'
+import { AuthErrorTypes } from '@store/Firebase/types'
+import { Debt, PaymentHistory } from '@store/Debt/types'
+
+import * as utils from '@utils/index'
+
 
 enum EditAction {
     add,
@@ -25,16 +30,32 @@ enum EditAction {
 }
 
 export default function DebtDetail({ navigation, route }) {
+    const [user] = useUserStore((state) => [state.user])
+    const [category] = useCategoryStore((state) => [state.category])
+    const [selectedPersonID] = usePersonStore((state) => [state.selectedPersonID])
+    const [
+        debt, 
+        setDebt, 
+        loadDebt, 
+        getDebtByID, 
+        getMyDebtsToPay, 
+        getMyDebtsToReceive
+    ] 
+    = useDebtStore((state) => [   
+        state.debt, 
+        state.setDebt,
+        state.loadDebt, 
+        state.getDebtByID, 
+        state.getMyDebtsToPay, 
+        state.getMyDebtsToReceive
+    ])
+    
     const [payValue, setpayValue] = useState<number>(0);
     const [paymentModalOpen, setpaymentModalOpen] = useState<boolean>(false);
     const [deleteDebtModalOpen, setdeleteDebtModalOpen] = useState<boolean>(false);
-    const [user] = useUserStore((state) => [state.user])
-    const [category] = useCategoryStore((state) => [state.category])
     const [action, setaction] = useState<EditAction>();
     const [index, setindex] = useState<number>();
     const [person, setperson] = useState<Person>();
-    const [setDebt, debt, getDebtByID, loadDebt, getMyDebtsToPay, getMyDebtsToReceive] = useDebtStore((state) => [state.setDebt ,state.debt, state.getDebtByID, state.loadDebt, state.getMyDebtsToPay, state.getMyDebtsToReceive])
-    const [selectedPersonID] = usePersonStore((state) => [state.selectedPersonID])
     const [screenLoad, setscreenLoad] = useState<boolean>(true);
     
     const getPerson = async (debt: Debt) => {
@@ -85,7 +106,8 @@ export default function DebtDetail({ navigation, route }) {
             valueRemaning: debt.value - valuePaid,
             valuePaid,
             paymentHistory: payments,
-            active: valuePaid < debt.value
+            active: valuePaid < debt.value,
+            settleDate: valuePaid < debt.value ? null : moment().format()
         })
             .then(async () => {
                 user.uid === debt.receiverID
@@ -93,12 +115,14 @@ export default function DebtDetail({ navigation, route }) {
                     : getMyDebtsToPay(user.uid, category, selectedPersonID)
                 await getDebtByID(debt.id)
                 setpaymentModalOpen(false)
-                if (valuePaid >= debt.value) {
-                    navigation.navigate('DebtList')
-                    Alert.alert('Sucesso!', `Débito foi totalmente pago. Ele não será mais exibido na lista`)
-                } else [
-                    Alert.alert('Sucesso!', `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`)
-                ]
+                let message = `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`
+                if (debt.valuePaid >= debt.value) {
+                    message = `${message} \nNota: O valor atual é menor ou igual ao valor já pago. Dívida automaticamente configurada como quitada.`
+                }
+                Alert.alert('Sucesso!', message, [{
+                    text: 'OK',
+                    onPress: () => { if(debt.valuePaid >= debt.value) navigation.navigate('DebtList')}
+                }])
             })
             .catch((err) => {
                 Alert.alert(`Erro ao ${action == EditAction.add ? 'adicionar' : action == EditAction.remove ? 'remover' : 'editar'} pagamento!`, AuthErrorTypes[err.code] || err.code)
@@ -115,8 +139,8 @@ export default function DebtDetail({ navigation, route }) {
         return (
             <View className='w-full bg-gray-200 rounded-3xl p-4 my-1 flex-row'>
                 <View className='w-[80%] items-center justify-center'>
-                    <Text className='text-md font-semibold'>Data: {Utils.NormalizeDateTime(item.payDate)}</Text>
-                    <Text className='text-md font-semibold'>Valor: {Utils.NumberToBRL(item.payValue)}</Text>
+                    <Text className='text-md font-semibold'>Data: {utils.NormalizeDateTime(item.payDate)}</Text>
+                    <Text className='text-md font-semibold'>Valor: {utils.NumberToBRL(item.payValue)}</Text>
                 </View>
                 <View className='w-[20%] items-center justify-evenly flex-row'>
                     <TouchableOpacity
@@ -161,24 +185,31 @@ export default function DebtDetail({ navigation, route }) {
                                     </View>
                                     <View className='w-full justify-between flex-row'>
                                         <Text className={`text-lg`}>Total: </Text>
-                                        <Text className={`text-lg`}>{Utils.NumberToBRL(debt.value)}</Text>
+                                        <Text className={`text-lg`}>{utils.NumberToBRL(debt.value)}</Text>
                                     </View>
                                     <View className='w-full justify-between flex-row'>
                                         <Text className={`text-lg`}>Valor pago: </Text>
-                                        <Text className={`text-lg`}>{Utils.NumberToBRL(debt.valuePaid)}</Text>
+                                        <Text className={`text-lg`}>{utils.NumberToBRL(debt.valuePaid)}</Text>
                                     </View>
                                     <View className='w-full justify-between flex-row'>
                                         <Text className={`text-lg`}>Restante: </Text>
-                                        <Text className={`text-lg`}>{Utils.NumberToBRL(debt.valueRemaning)}</Text>
+                                        <Text className={`text-lg`}>{utils.NumberToBRL(debt.valueRemaning)}</Text>
                                     </View>
                                     <View className='w-full justify-between flex-row'>
                                         <Text className={`text-lg`}>Criado em: </Text>
-                                        <Text className={`text-lg`}>{Utils.NormalizeDate(debt.createDate)}</Text>
+                                        <Text className={`text-lg`}>{utils.NormalizeDate(debt.createDate)}</Text>
                                     </View>
                                     <View className='w-full justify-between flex-row'>
-                                        <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento: </Text>
-                                        <Text className={`${moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>{Utils.NormalizeDate(debt.dueDate)}</Text>
+                                        <Text className={`${!debt.active ? 'text-gray-500' : moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>Vencimento: </Text>
+                                        <Text className={`${!debt.active ? 'text-gray-500' : moment().isAfter(moment(new Date(debt.dueDate))) ? `text-red-600 font-bold` : ''} text-lg`}>{utils.NormalizeDate(debt.dueDate)}</Text>
                                     </View>
+                                    {
+                                        debt.settleDate &&
+                                        <View className='w-full justify-between flex-row'>
+                                            <Text className={`text-lg`}>Quitado em: </Text>
+                                            <Text className={`text-lg`}>{utils.NormalizeDate(debt.settleDate)}</Text>
+                                        </View>
+                                    }
                                 </View>
                                 <View className="w-full flex-row justify-center items-center py-4">
                                     <View className="w-4/12 items-center">
@@ -249,7 +280,7 @@ export default function DebtDetail({ navigation, route }) {
                     title={`${action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'} pagamento`}
                     actionText={action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'}
                     isVisible={paymentModalOpen}
-                    disableAction={!payValue || loadDebt}
+                    disableAction={loadDebt || (action !== EditAction.remove && !payValue)}
                     closeModal={() => {
                         setpaymentModalOpen(false)
                     }}
@@ -264,7 +295,7 @@ export default function DebtDetail({ navigation, route }) {
                                         ? <Text className='text-center text-lg'>Deseja realmente excluir o pagamento?</Text>
                                         : <Input
                                             title='Valor do pagamento'
-                                            value={payValue ? Utils.NumberToBRL(payValue) : null}
+                                            value={payValue ? utils.NumberToBRL(payValue) : null}
                                             numeric
                                             onChangeText={(txt) => {
                                                 let value = (+txt.replace(/[^0-9]/g, '') / 100)

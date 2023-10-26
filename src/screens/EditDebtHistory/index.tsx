@@ -1,10 +1,12 @@
-import { FlatList, Text, View } from 'react-native';
-import { useDebtStore } from '../../store/DebtStore';
-import { EditHistory } from '../../@types/Debt';
-import * as Utils from '../../Utils';
-import { Fragment, useEffect } from 'react';
-import { AntDesign } from '@expo/vector-icons';
-import { useUserStore } from '../../store/UserStore';
+import { Fragment } from 'react'
+import { AntDesign } from '@expo/vector-icons'
+import { FlatList, Text, View } from 'react-native'
+
+import { useDebtStore } from '@store/Debt'
+import { useUserStore } from '@store/User'
+import { EditHistory } from '@store/Debt/types'
+
+import * as utils from '@utils/index'
 
 export default function EditDebtHistory({ navigation }) {
     const [debt] = useDebtStore((state) => [state.debt])
@@ -15,9 +17,9 @@ export default function EditDebtHistory({ navigation }) {
         case 'description':
             return `Nome: ${item}`;
         case 'value':
-            return `Valor: ${Utils.NumberToBRL(item)}`;
+            return `Valor: ${utils.NumberToBRL(item)}`;
         case 'dueDate': 
-            return `Data de vencimento: ${Utils.NormalizeDate(item)}`;
+            return `Data de vencimento: ${utils.NormalizeDate(item)}`;
         default:
             return `${prop}: ${item}`;
         }
@@ -62,7 +64,7 @@ export default function EditDebtHistory({ navigation }) {
                             `Editor: ${item.editorID == user.uid ? user.displayName || user.email : item.editorID}`}
                         </Text>
                     }
-                    <Text className='text-md font-semibold'>Data da edição: {Utils.NormalizeDateTime(item.editDate)}</Text>
+                    <Text className='text-md font-semibold'>Data da edição: {utils.NormalizeDateTime(item.editDate)}</Text>
                 </View>
             </View>
         )
