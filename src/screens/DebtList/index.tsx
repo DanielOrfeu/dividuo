@@ -6,7 +6,6 @@ import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'r
 import Loading from '@components/Loading'
 import Button from '@components/Buttons/Button'
 import DropdownInput from '@components/Inputs/DropdownInput'
-import InvertedButton from '@components/Buttons/InvertedButton'
 
 import { useUserStore } from '@store/User'
 import { useDebtStore } from '@store/Debt'
@@ -56,11 +55,25 @@ export default function Home({ navigation }) {
         state.getPersonsByCreator,
         state.setSelectedPersonID, 
     ])
+    const [totalToReceive, settotalToReceive] = useState<number>(0);
+    const [totalToPay, settotalToPay] = useState<number>(0);
 
     const getDebts = async (personID?: string) => {
         getMyDebtsToPay(user.uid, category, personID)
         getMyDebtsToReceive(user.uid, category, personID)
     }
+    
+    useEffect(() => {
+        settotalToPay(debtsToPay.reduce((acc, crr) => {
+            return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc
+        }, 0))
+    }, [debtsToPay]);
+
+    useEffect(() => {
+        settotalToPay(debtsToReceive.reduce((acc, crr) => {
+            return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc
+        }, 0))
+    }, [debtsToReceive]);
 
     useEffect(() => {
         getPersonsByCreator(user.uid)
@@ -204,6 +217,14 @@ export default function Home({ navigation }) {
                 </View>
             </View>
             <View className='w-full pt-2 mt-2'>
+                <View className='w-full flex-row'>
+                    <View className='w-6/12 items-center'>
+                        <Text>Total a receber: {utils.NumberToBRL(totalToPay)}</Text>
+                    </View>
+                    <View className='w-6/12 items-center'>
+                        <Text>Total a pagar: {utils.NumberToBRL(totalToReceive)}</Text>
+                    </View>
+                </View>
                 <Button
                     text={'Criar Débito'}
                     onPress={() => {
