@@ -100,28 +100,36 @@ export default function DebtDetail({ navigation, route }) {
         let valuePaid = payments.reduce((total, p) => {
             return total += p.payValue
         }, 0)
-
-        await DebtService.EditDebtByID({
+        
+        let updatedDebt: Debt = {
             ...debt,
             valueRemaning: debt.value - valuePaid,
             valuePaid,
             paymentHistory: payments,
             active: valuePaid < debt.value,
             settleDate: valuePaid < debt.value ? null : moment().format()
-        })
+        }
+
+        let isSettled = updatedDebt.valuePaid >= updatedDebt.value
+
+
+        await DebtService.EditDebtByID(updatedDebt)
             .then(async () => {
                 user.uid === debt.receiverID
                     ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
                     : getMyDebtsToPay(user.uid, category, selectedPersonID)
-                await getDebtByID(debt.id)
+                getDebtByID(debt.id)
                 setpaymentModalOpen(false)
                 let message = `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`
-                if (debt.valuePaid >= debt.value) {
-                    message = `${message} \nNota: O valor atual é menor ou igual ao valor já pago. Dívida automaticamente configurada como quitada.`
+                if (isSettled) {
+                    message = `${message} \nNota: O valor pago é maior ou igual ao valor da dívida. Dívida automaticamente configurada como quitada.`
                 }
                 Alert.alert('Sucesso!', message, [{
                     text: 'OK',
-                    onPress: () => { if(debt.valuePaid >= debt.value) navigation.navigate('DebtList')}
+                    onPress: () => { 
+                        if(isSettled) 
+                            navigation.navigate('DebtList')
+                    }
                 }])
             })
             .catch((err) => {

@@ -109,7 +109,6 @@ export default function EditDebt({ navigation, route }) {
                                     }
                                 })
 
-                                console.log(editHistory)
                                 let valueRemaning = debt.value - debt.valuePaid
                                 await DebtService.EditDebtByID({
                                     ...debt,
@@ -125,7 +124,7 @@ export default function EditDebt({ navigation, route }) {
 
                                     let message = 'Débito editado com sucesso!'
                                     if (debt.valuePaid >= debt.value) {
-                                        message = `${message} \nNota: O valor atual é menor ou igual ao valor já pago. Dívida automaticamente configurada como quitada.`
+                                        message = `${message} \nNota: O valor pago é maior ou igual ao valor da dívida. Dívida automaticamente configurada como quitada.`
                                     }
 
                                     Alert.alert('Sucesso!', message, [{
