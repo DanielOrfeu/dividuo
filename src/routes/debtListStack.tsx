@@ -5,8 +5,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 
 import Profile from '@screens/Profile'
-import DebtList from '@screens/DebtList'
 import EditPersons from '@screens/EditPersons'
+import DebtListTab from '@routes/debtListTab'
 
 const { Navigator, Screen } = createDrawerNavigator()
 
@@ -28,8 +28,8 @@ export default function DebtListStack() {
             }}
         >
             <Screen 
-                name='DebtList' 
-                component={DebtList}
+                name='DebtListTab' 
+                component={DebtListTab}
                 options={{
                     title: 'Despesas',
                     drawerIcon: ({color, size}) => (

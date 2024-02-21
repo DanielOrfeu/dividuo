@@ -128,7 +128,7 @@ export default function DebtDetail({ navigation, route }) {
                     text: 'OK',
                     onPress: () => { 
                         if(isSettled) 
-                            navigation.navigate('DebtList')
+                            navigation.navigate('DebtListStack')
                     }
                 }])
             })
@@ -334,7 +334,7 @@ export default function DebtDetail({ navigation, route }) {
                             Alert.alert('Sucesso!', `Débito deletado com sucesso`, [{
                                 text: 'OK',
                                 onPress: () => {
-                                    navigation.navigate('DebtList')
+                                    navigation.navigate('DebtListStack')
                                     setDebt(null)
                                 }
                             }])

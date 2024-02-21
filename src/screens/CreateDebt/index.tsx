@@ -24,7 +24,7 @@ import { AuthErrorTypes } from '@store/Firebase/types'
 
 import * as utils from '@utils/index';
 
-export default function CreateDebt({ navigation }) {
+export default function CreateDebt({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [
@@ -76,6 +76,7 @@ export default function CreateDebt({ navigation }) {
     
     useEffect(() => {
         getPersonsByCreator(user.uid)
+        setpersonType(`${route.params.persontype}ID`)
     }, []);
     
     return (

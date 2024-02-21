@@ -2,6 +2,7 @@ import moment from 'moment';
 import Checkbox from 'expo-checkbox'
 import { useEffect, useState } from 'react'
 import { Alert, Text, View, FlatList, TouchableOpacity, RefreshControl } from 'react-native'
+import { Ionicons } from '@expo/vector-icons';
 
 import Loading from '@components/Loading'
 import Button from '@components/Buttons/Button'
@@ -11,11 +12,11 @@ import { useUserStore } from '@store/User'
 import { useDebtStore } from '@store/Debt'
 import { usePersonStore } from '@store/Person'
 import { useCategoryStore } from '@store/Category'
-import { Debt, DebtCategory } from '@store/Debt/types'
+import { Debt } from '@store/Debt/types'
 
 import * as utils from '@utils/index'
 
-export default function Home({ navigation }) {
+export default function Home({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [
@@ -58,6 +59,9 @@ export default function Home({ navigation }) {
     const [totalToReceive, settotalToReceive] = useState<number>(0);
     const [totalToPay, settotalToPay] = useState<number>(0);
 
+    const [totalPaid, settotalPaid] = useState<number>(0);
+    const [totalReceived, settotalReceived] = useState<number>(0);
+
     const getDebts = async (personID?: string) => {
         getMyDebtsToPay(user.uid, category, personID)
         getMyDebtsToReceive(user.uid, category, personID)
@@ -67,11 +71,19 @@ export default function Home({ navigation }) {
         settotalToPay(debtsToPay.reduce((acc, crr) => {
             return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc
         }, 0))
+        
+        settotalPaid(debtsToPay.reduce((acc, crr) => {
+            return crr.valueRemaning <= 0 ? acc + crr.valuePaid : acc
+        }, 0))
     }, [debtsToPay]);
 
     useEffect(() => {
         settotalToReceive(debtsToReceive.reduce((acc, crr) => {
             return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc
+        }, 0))
+
+        settotalReceived(debtsToReceive.reduce((acc, crr) => {
+            return crr.valueRemaning <= 0 ? acc + crr.valuePaid : acc
         }, 0))
     }, [debtsToReceive]);
 
@@ -117,7 +129,18 @@ export default function Home({ navigation }) {
     const listToPay = () => {
         return (
             <View className='flex-1 items-center'>
-                <Text className={`text-red-600 text-lg font-semibold pb-1`}>A pagar</Text>
+                <View className='flex-row w-full justify-center'>
+                    <Text className={`text-red-600 text-lg font-semibold pb-1`}>A pagar</Text>
+                    <View className='w-12 flex absolute right-1 -top-5'>
+                        <Button
+                            text={'Criar Débito'}
+                            onPress={() => {
+                                navigation.navigate('CreateDebt', {persontype: 'debtor'})
+                            }}
+                            icon={<Ionicons name="add-circle" size={18} color="white" />}
+                        />
+                    </View>
+                </View>
                 {
                     loadDebtToPay 
                     ? <Loading/>
@@ -146,7 +169,18 @@ export default function Home({ navigation }) {
     const listToReceive = () => {
         return (
             <View className='flex-1 items-center'>
-                <Text className={`text-primary text-lg font-semibold pb-1`}>A receber</Text>
+                <View className='flex-row w-full justify-center'>
+                    <Text className={`text-primary text-lg font-semibold pb-1`}>A receber</Text>
+                    <View className='w-12 flex absolute right-1 -top-5'>
+                        <Button
+                            text={'Criar Débito'}
+                            onPress={() => {
+                                navigation.navigate('CreateDebt', {persontype: 'debtor'})
+                            }}
+                            icon={<Ionicons name="add-circle" size={18} color="white" />}
+                        />
+                    </View>
+                </View>
                 {
                     loadDebtToReceive 
                     ? <Loading/>
@@ -175,7 +209,7 @@ export default function Home({ navigation }) {
     }
 
     return (
-        <View className='flex-1 w-full p-4'>
+        <View className='flex-1 w-full p-4 pb-0'>
             <View className='flex-1 w-full'>
                 <DropdownInput 
                     title={'Filtro por pessoa'}
@@ -209,28 +243,36 @@ export default function Home({ navigation }) {
                 </TouchableOpacity>
                 <View className='flex-1 flex-row w-full mt-2'>
                     {
-                        listToReceive()
+                        route.name === 'DebtListToReceive' && listToReceive()
                     }
                     {
-                        listToPay()
+                        route.name === 'DebtListToPay' && listToPay()
                     }
                 </View>
             </View>
             <View className='w-full pt-2 mt-2'>
-                <View className='w-full flex-row'>
-                    <View className='w-6/12 items-center'>
-                        <Text>Total a receber: {utils.NumberToBRL(totalToReceive)}</Text>
-                    </View>
-                    <View className='w-6/12 items-center'>
-                        <Text>Total a pagar: {utils.NumberToBRL(totalToPay)}</Text>
-                    </View>
+                <View className='w-full items-center'>
+                    {
+                        route.name === 'DebtListToReceive' && 
+                        <View className='items-center'>
+                            <Text>Total a receber: {utils.NumberToBRL(totalToReceive)}</Text>
+                            {
+                                showPaidDebts &&
+                                <Text>Total recebido: {utils.NumberToBRL(totalReceived)}</Text>
+                            }
+                        </View>
+                    }
+                    {
+                        route.name === 'DebtListToPay' && 
+                        <View className='items-center'>
+                            <Text>Total a pagar: {utils.NumberToBRL(totalToPay)}</Text>
+                            {
+                                showPaidDebts &&
+                                <Text>Total pago: {utils.NumberToBRL(totalPaid)}</Text>
+                            }
+                        </View>
+                    }
                 </View>
-                <Button
-                    text={'Criar Débito'}
-                    onPress={() => {
-                        navigation.navigate('CreateDebt')
-                    }}
-                />
             </View>
         </View>
     );

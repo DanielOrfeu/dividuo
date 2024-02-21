@@ -42,7 +42,7 @@ export default function Input(props: Props) {
                 editable={!props.disabled}
             />
             {
-                props.isPassword || props.hasClearInput &&
+                (props.isPassword || props.hasClearInput) &&
                 <View className='absolute right-3 bottom-2'>
                     <TouchableOpacity
                         onPress={() => {
@@ -54,8 +54,7 @@ export default function Input(props: Props) {
                         }}
                     >
                         {
-                            props.isPassword 
-                            
+                            props.isPassword                   
                             ?
                                 hidePassword
                                 ? <Entypo name="eye" size={20} color='#00ab8c'/>
