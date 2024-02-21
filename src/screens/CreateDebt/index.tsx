@@ -72,7 +72,7 @@ export default function CreateDebt({ navigation }) {
         let tempDate = new Date(debt.dueDate)
         tempDate.setMonth(new Date(debt.dueDate).getMonth() + monthAmount)
         setfinalDate(tempDate)
-    }, [monthAmount]);
+    }, [monthAmount, debt.dueDate]);
     
     useEffect(() => {
         getPersonsByCreator(user.uid)
