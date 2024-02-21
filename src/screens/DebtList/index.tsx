@@ -70,7 +70,7 @@ export default function Home({ navigation }) {
     }, [debtsToPay]);
 
     useEffect(() => {
-        settotalToPay(debtsToReceive.reduce((acc, crr) => {
+        settotalToReceive(debtsToReceive.reduce((acc, crr) => {
             return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc
         }, 0))
     }, [debtsToReceive]);
@@ -219,10 +219,10 @@ export default function Home({ navigation }) {
             <View className='w-full pt-2 mt-2'>
                 <View className='w-full flex-row'>
                     <View className='w-6/12 items-center'>
-                        <Text>Total a receber: {utils.NumberToBRL(totalToPay)}</Text>
+                        <Text>Total a receber: {utils.NumberToBRL(totalToReceive)}</Text>
                     </View>
                     <View className='w-6/12 items-center'>
-                        <Text>Total a pagar: {utils.NumberToBRL(totalToReceive)}</Text>
+                        <Text>Total a pagar: {utils.NumberToBRL(totalToPay)}</Text>
                     </View>
                 </View>
                 <Button
