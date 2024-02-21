@@ -140,6 +140,11 @@ export default function CreateDebt({ navigation }) {
                 setSelectedItems={(list) => {
                     setselectedPersons(list)
                 }}
+                showAddButton
+                handleClickAddButton={(name) => {
+                    setpersonName(name)
+                    setcreatePersonModalOpen(true)
+                }}
             />  
             <DatepickerInput
                 title='Data de vencimento'
@@ -165,21 +170,13 @@ export default function CreateDebt({ navigation }) {
                 {
                     loading 
                     ? <Loading/>
-                    : <>
-                        <Button 
-                            text={"Criar devedor/recebedor"} 
-                            onPress={() => {
-                                setcreatePersonModalOpen(true)
-                            }}            
-                        />
-                        <Button 
-                            disabled={!debt.description || !debt.value || !debt.dueDate || selectedPersons.length <= 0}
-                            text={"Criar débito(s)"} 
-                            onPress={() => { 
-                                setcreateInfosModal(true)
-                            }}            
-                        />
-                    </>
+                    : <Button 
+                        disabled={!debt.description || !debt.value || !debt.dueDate || selectedPersons.length <= 0}
+                        text={"Criar débito(s)"} 
+                        onPress={() => { 
+                            setcreateInfosModal(true)
+                        }}            
+                    />
                 }
             </View>
             <ActionModal 

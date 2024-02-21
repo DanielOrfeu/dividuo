@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import colors from 'tailwindcss/colors'
 import { Entypo } from '@expo/vector-icons'
+import { AntDesign } from '@expo/vector-icons';
 import { Text, TextInput, View, TouchableOpacity } from 'react-native'
 
 interface OwnProps {
@@ -13,6 +14,9 @@ interface OwnProps {
     disabled?: boolean,
     onChangeText(s:string): void,
     w?: string
+    hideTitle?: boolean
+    hasClearInput?: boolean
+    handleClearInput?: () => void
 }
 
 type Props = OwnProps
@@ -23,7 +27,9 @@ export default function Input(props: Props) {
     
     return (
         <View className={`my-2 ${width}`}>
-            <Text className='text-primary font-medium text-sm pl-1'>{props.title}</Text>
+            { !props.hideTitle &&
+                <Text className='text-primary font-medium text-sm pl-1'>{props.title}</Text>
+            }
             <TextInput
                 className={`w-full h-10 rounded-xl px-4 border-2 border-gray-300 focus:border-primary`}
                 placeholder={props.placeholder ? props.placeholder : props.title}
@@ -36,17 +42,25 @@ export default function Input(props: Props) {
                 editable={!props.disabled}
             />
             {
-                props.isPassword &&
+                props.isPassword || props.hasClearInput &&
                 <View className='absolute right-3 bottom-2'>
                     <TouchableOpacity
                         onPress={() => {
-                            sethidePassword(!hidePassword)
+                            if (props.isPassword) {
+                                sethidePassword(!hidePassword)
+                            } else {
+                                props.handleClearInput()
+                            }
                         }}
                     >
                         {
-                            hidePassword
-                            ? <Entypo name="eye" size={20} color={colors.emerald['500']} />
-                            : <Entypo name="eye-with-line" size={20} color={colors.emerald['500']} />
+                            props.isPassword 
+                            
+                            ?
+                                hidePassword
+                                ? <Entypo name="eye" size={20} color='#00ab8c'/>
+                                : <Entypo name="eye-with-line" size={20} color='#00ab8c' />
+                            : <AntDesign name="closecircle" size={24} color='#00ab8c' />
                         }
                     </TouchableOpacity>
                 </View>
