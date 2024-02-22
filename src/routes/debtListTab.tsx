@@ -12,7 +12,7 @@ const { Navigator, Screen } = createBottomTabNavigator();
 const TabButton = (props) => {
     return (
         <TouchableOpacity 
-            className='flex flex-row flex-1 justify-center'
+            className='flex flex-1 items-center'
             onPress={() => {props.onPress()}}
         >
             <View className={clsx('flex flex-row flex-1 justify-center items-center mx-12 my-2', {
@@ -31,9 +31,7 @@ export default function DebtListTab(){
             screenOptions={{
                 tabBarStyle: {
                     backgroundColor: '#00ab8c',
-                    margin: 8,
-                    borderRadius: 16
-                    
+                    height: 70
                 }
             }}
         >

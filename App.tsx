@@ -3,7 +3,7 @@ import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-c
 import Routes from './src/routes';
 import { useEffect } from 'react';
 import moment from 'moment-timezone';
-import { LogBox } from 'react-native';
+import { LogBox, StatusBar } from 'react-native';
 
 export default function App() {
   useEffect(() => {
@@ -15,6 +15,7 @@ export default function App() {
   
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <StatusBar barStyle='light-content' />
       <Routes/>
     </SafeAreaProvider>
   );
