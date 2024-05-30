@@ -77,6 +77,9 @@ export default function CreateDebt({ navigation, route }) {
     useEffect(() => {
         getPersonsByCreator(user.uid)
         setpersonType(`${route.params.persontype}ID`)
+        if(selectedPersonID && persons.find(person => person.id === selectedPersonID)) { 
+            setselectedPersons([...selectedPersons, selectedPersonID])
+        }
     }, []);
     
     return (
@@ -228,7 +231,7 @@ export default function CreateDebt({ navigation, route }) {
                 closeModal={() => {
                     setcreateInfosModal(false)
                 }}
-                startAction={async() => {
+                startAction={async () => {
                     setcreateInfosModal(false)
                     setloading(true)
 

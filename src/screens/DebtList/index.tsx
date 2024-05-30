@@ -73,7 +73,7 @@ export default function Home({ navigation, route }) {
         }, 0))
         
         settotalPaid(debtsToPay.reduce((acc, crr) => {
-            return crr.valueRemaning <= 0 ? acc + crr.valuePaid : acc
+            return acc + crr.valuePaid
         }, 0))
     }, [debtsToPay]);
 
@@ -83,7 +83,7 @@ export default function Home({ navigation, route }) {
         }, 0))
 
         settotalReceived(debtsToReceive.reduce((acc, crr) => {
-            return crr.valueRemaning <= 0 ? acc + crr.valuePaid : acc
+            return acc + crr.valuePaid
         }, 0))
     }, [debtsToReceive]);
 
@@ -175,7 +175,7 @@ export default function Home({ navigation, route }) {
                         <Button
                             text={'Criar Débito'}
                             onPress={() => {
-                                navigation.navigate('CreateDebt', {persontype: 'debtor'})
+                                navigation.navigate('CreateDebt', {persontype: 'receiver'})
                             }}
                             icon={<Ionicons name="add-circle" size={18} color="white" />}
                         />
