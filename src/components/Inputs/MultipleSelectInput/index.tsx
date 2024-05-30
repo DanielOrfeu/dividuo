@@ -89,7 +89,7 @@ export default function MultipleSelectInput(props: Props) {
                             {
                                 props.showAddButton &&
                                 <View className='flex items-center w-full pb-3'>
-                                    <TouchableOpacity className='bg-primary w-4/12 rounded-lg'
+                                    <TouchableOpacity className='bg-primary w-5/12 rounded-lg'
                                         onPress={() => {
                                             props.handleClickAddButton(searchQuery)
                                         }}

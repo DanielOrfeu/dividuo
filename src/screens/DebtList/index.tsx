@@ -63,8 +63,8 @@ export default function Home({ navigation, route }) {
     const [totalReceived, settotalReceived] = useState<number>(0);
 
     const getDebts = async (personID?: string) => {
-        getMyDebtsToPay(user.uid, category, personID)
-        getMyDebtsToReceive(user.uid, category, personID)
+        if (route.name === 'DebtListToPay') getMyDebtsToPay(user.uid, category, personID)
+        if (route.name === 'DebtListToReceive') getMyDebtsToReceive(user.uid, category, personID)
     }
     
     useEffect(() => {
@@ -88,14 +88,14 @@ export default function Home({ navigation, route }) {
     }, [debtsToReceive]);
 
     useEffect(() => {
+        if (route.name === 'DebtListToPay') getMyDebtsToPay(user.uid, category, selectedPersonID || null)
+        if (route.name === 'DebtListToReceive') getMyDebtsToReceive(user.uid, category, selectedPersonID || null)
+    }, [showPaidDebts]);
+    
+    useEffect(() => {
         getPersonsByCreator(user.uid)
         getDebts()
     }, []);
-
-    useEffect(() => {
-        getMyDebtsToPay(user.uid, category, selectedPersonID || null)
-        getMyDebtsToReceive(user.uid, category, selectedPersonID || null)
-    }, [showPaidDebts]);
 
     const debtItem = (debt: Debt, personType: string) => {
         const color = !debt.active ? 'gray-500' : personType === 'receiverID' ? 'primary' : 'red-600'
@@ -277,3 +277,4 @@ export default function Home({ navigation, route }) {
         </View>
     );
 }
+

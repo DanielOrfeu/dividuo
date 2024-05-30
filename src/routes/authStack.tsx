@@ -22,7 +22,8 @@ export default function AuthStack() {
         headerStyle: {
             backgroundColor: '#00ab8c',
         },
-        headerTintColor: '#fff'
+        headerTintColor: '#fff',
+        headerBackTitle: ' ',
     }                  
     return (
         <Navigator>
