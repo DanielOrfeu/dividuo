@@ -41,16 +41,6 @@
           }
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "b94c07b6-032e-4130-bdc7-fc2b1d1b5d95"
-      }
-    },
-    "owner": "dividuo",
-    "runtimeVersion": "1.0.0",
-    "updates": {
-      "url": "https://u.expo.dev/b94c07b6-032e-4130-bdc7-fc2b1d1b5d95"
-    }
+    ]
   }
 }
