@@ -63,8 +63,8 @@ export default function Home({ navigation, route }) {
     const [totalReceived, settotalReceived] = useState<number>(0);
 
     const getDebts = async () => {
-        if (route.name === 'DebtListToPay') getDebtsToPay()
-        if (route.name === 'DebtListToReceive') getDebtsToReceive()
+        getDebtsToPay()
+        getDebtsToReceive()
     }
     
     useEffect(() => {
@@ -88,9 +88,8 @@ export default function Home({ navigation, route }) {
     }, [debtsToReceive]);
 
     useEffect(() => {
-        if (route.name === 'DebtListToPay') getDebtsToPay()
-        if (route.name === 'DebtListToReceive') getDebtsToReceive()
-    }, [showPaidDebts]);
+        getDebts()
+    }, [showPaidDebts, selectedPersonID]);
     
     useEffect(() => {
         getPersonsByCreator()
@@ -222,10 +221,7 @@ export default function Home({ navigation, route }) {
                         };
                     }) || []}
                     selectedItem={selectedPersonID}
-                    setSelectedItem={(item) => {
-                        setSelectedPersonID(item);
-                        getDebts()
-                    }}          
+                    setSelectedItem={setSelectedPersonID}          
                 />
                 <TouchableOpacity className='flex-row gap-2 items-center justify-center m-2'
                     onPress={() => {
