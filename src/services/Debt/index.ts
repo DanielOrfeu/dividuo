@@ -50,7 +50,7 @@ export default class DebtService {
             .update(debt)
     }
 
-    static async GetMyDebtsToReceive(userID: string, category: number, showPaidDebts: boolean, personID?: string | null) {
+    static async GetDebtsToReceive(userID: string, category: number, showPaidDebts: boolean, personID?: string | null) {
         let query = firestore()
             .collection('Debts')
             .where('category', '==', category)
@@ -78,7 +78,7 @@ export default class DebtService {
             })
     }
 
-    static async GetMyDebtsToPay(userID: string, category: number, showPaidDebts: boolean, personID?: string | null) {
+    static async GetDebtsToPay(userID: string, category: number, showPaidDebts: boolean, personID?: string | null) {
         let query = firestore()
             .collection('Debts')
             .where('category', '==', category)

@@ -27,14 +27,14 @@ export default function EditDebt({ navigation, route }) {
         debt, 
         setDebt, 
         getDebtByID,
-        getMyDebtsToPay, 
-        getMyDebtsToReceive, 
+        getDebtsToPay, 
+        getDebtsToReceive, 
     ] = useDebtStore((state) => [
         state.debt, 
         state.setDebt, 
         state.getDebtByID,
-        state.getMyDebtsToPay, 
-        state.getMyDebtsToReceive, 
+        state.getDebtsToPay, 
+        state.getDebtsToReceive, 
     ])
 
     const [loading, setloading] = useState<boolean>(false);
@@ -129,8 +129,8 @@ export default function EditDebt({ navigation, route }) {
                                 })
                                 .then(() => {
                                     user.uid === debt.receiverID
-                                    ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-                                    : getMyDebtsToPay(user.uid, category, selectedPersonID)
+                                    ? getDebtsToReceive()
+                                    : getDebtsToPay()
 
                                     let message = 'Débito editado com sucesso!'
                                     if (debt.valuePaid >= debt.value) {

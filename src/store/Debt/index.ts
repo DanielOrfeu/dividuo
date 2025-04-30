@@ -5,6 +5,9 @@ import DebtService from '@services/Debt'
 
 import { Debt } from '@store/Debt/types'
 import { AuthErrorTypes } from '@store/Firebase/types'
+import { usePersonStore } from '@store/Person'
+import { useUserStore } from '@store/User'
+import { useCategoryStore } from '@store/Category'
 
 type DebtStore = {
     showPaidDebts: boolean
@@ -14,13 +17,13 @@ type DebtStore = {
     loadDebtToPay: boolean
     setDebtsToPay: (dc: Debt[]) => void
     setLoadDebtsToPay: (l: boolean) => void
-    getMyDebtsToPay: (userID: string, category: number, personId?: string | null) => void
+    getDebtsToPay:  () => void
 
     debtsToReceive: Debt[]
     loadDebtToReceive: boolean
     setDebtsToReceive: (dc: Debt[]) => void
     setLoadDebtsToReceive: (l: boolean) => void
-    getMyDebtsToReceive: (userID: string, category: number, personId?: string | null) => void
+    getDebtsToReceive: () => void
 
     debt: Debt | null
     loadDebt: boolean
@@ -38,9 +41,13 @@ export const useDebtStore = create<DebtStore>((set, get) => {
         loadDebtToPay: false,
         setDebtsToPay: (dp) => set({debtsToPay: dp}),
         setLoadDebtsToPay: (l) => set({loadDebtToPay: l}),
-        getMyDebtsToPay: async (userID, category, personId) => {
+        getDebtsToPay: async () => {
+            const {user} = useUserStore.getState()
+            const {category} = useCategoryStore.getState()
+            const {selectedPersonID} = usePersonStore.getState()
+
             set({loadDebtToPay: true})
-            await DebtService.GetMyDebtsToPay(userID, category, get().showPaidDebts, personId)
+            await DebtService.GetDebtsToPay(user.uid, category, get().showPaidDebts, selectedPersonID)
             .then(res => {
                 set({debtsToPay: res})
             })
@@ -55,9 +62,13 @@ export const useDebtStore = create<DebtStore>((set, get) => {
         loadDebtToReceive: false,
         setDebtsToReceive: (dr) => set({debtsToReceive: dr}),
         setLoadDebtsToReceive: (l) => set({loadDebtToReceive: l}),
-        getMyDebtsToReceive: async (userID, category, personId) => {
+        getDebtsToReceive: async () => {
+            const {user} = useUserStore.getState()
+            const {category} = useCategoryStore.getState()
+            const {selectedPersonID} = usePersonStore.getState()
+
             set({loadDebtToReceive: true})
-            await DebtService.GetMyDebtsToReceive(userID, category, get().showPaidDebts, personId)
+            await DebtService.GetDebtsToReceive(user.uid, category, get().showPaidDebts, selectedPersonID)
             .then(res => {
                 set({debtsToReceive: res})
             })

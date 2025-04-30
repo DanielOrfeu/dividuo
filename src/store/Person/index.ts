@@ -5,12 +5,13 @@ import PersonService from '@services/Person'
 
 import { Person } from '@store/Person/types'
 import { AuthErrorTypes } from '@store/Firebase/types'
+import { useUserStore } from '@store/User'
 
 type PersonStore = {
     persons: Person[]
     selectedPersonID: string | null
     loadingPersons: boolean
-    getPersonsByCreator: (userID: string) => void
+    getPersonsByCreator: () => void
     setSelectedPersonID: (p: string) => void
 }
 
@@ -22,9 +23,11 @@ export const usePersonStore = create<PersonStore>((set) => {
         setSelectedPersonID: (personID) => {
             set({selectedPersonID: personID})
         },
-        getPersonsByCreator: async (userID) => {
+        getPersonsByCreator: async () => {
+            const {user} = useUserStore.getState()
+
             set({loadingPersons: true})
-            await PersonService.GetPersonByCreator(userID)
+            await PersonService.GetPersonByCreator(user.uid)
             .then((res) => {
                 set({persons: res})
             })

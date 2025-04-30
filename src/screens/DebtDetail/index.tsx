@@ -38,16 +38,16 @@ export default function DebtDetail({ navigation, route }) {
         setDebt, 
         loadDebt, 
         getDebtByID, 
-        getMyDebtsToPay, 
-        getMyDebtsToReceive
+        getDebtsToPay, 
+        getDebtsToReceive
     ] 
     = useDebtStore((state) => [   
         state.debt, 
         state.setDebt,
         state.loadDebt, 
         state.getDebtByID, 
-        state.getMyDebtsToPay, 
-        state.getMyDebtsToReceive
+        state.getDebtsToPay, 
+        state.getDebtsToReceive
     ])
     
     const [payValue, setpayValue] = useState<number>(0);
@@ -116,8 +116,8 @@ export default function DebtDetail({ navigation, route }) {
         await DebtService.EditDebtByID(updatedDebt)
             .then(async () => {
                 user.uid === debt.receiverID
-                    ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-                    : getMyDebtsToPay(user.uid, category, selectedPersonID)
+                    ? getDebtsToReceive()
+                    : getDebtsToPay()
                 getDebtByID(debt.id)
                 setpaymentModalOpen(false)
                 let message = `Pagamento ${action == EditAction.add ? 'adicionado' : action == EditAction.remove ? 'removido' : 'editado'} com sucesso`
@@ -328,8 +328,8 @@ export default function DebtDetail({ navigation, route }) {
                         await DebtService.DeleteDebtByID(debt.id)
                         .then(async () => {
                             user.uid === debt.receiverID
-                            ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-                            : getMyDebtsToPay(user.uid, category, selectedPersonID)
+                            ? getDebtsToReceive()
+                            : getDebtsToPay()
                             setdeleteDebtModalOpen(false)
                             Alert.alert('Sucesso!', `Débito deletado com sucesso`, [{
                                 text: 'OK',

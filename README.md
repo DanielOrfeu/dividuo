@@ -17,7 +17,7 @@ Guia rápido para execução local do projeto, usando um dispositivo virtual ou 
 
 #### Com Yarn:
 ```
-cd gestoquei
+cd dividuo
 yarn install
 yarn prebuild
 yarn android ou yarn android ou yarn dev-clear
@@ -25,7 +25,7 @@ yarn android ou yarn android ou yarn dev-clear
 
 #### Com NPM:
 ```
-cd gestoquei
+cd dividuo
 npm i
 npm prebuild
 yarn android ou yarn android ou yarn dev-clear

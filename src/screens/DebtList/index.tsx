@@ -20,11 +20,11 @@ export default function Home({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [
-        getMyDebtsToPay, 
-        getMyDebtsToReceive
+        getDebtsToPay, 
+        getDebtsToReceive
     ] = useDebtStore((state) => [
-        state.getMyDebtsToPay, 
-        state.getMyDebtsToReceive
+        state.getDebtsToPay, 
+        state.getDebtsToReceive
     ])
     const [debtsToPay, 
         debtsToReceive
@@ -62,9 +62,9 @@ export default function Home({ navigation, route }) {
     const [totalPaid, settotalPaid] = useState<number>(0);
     const [totalReceived, settotalReceived] = useState<number>(0);
 
-    const getDebts = async (personID?: string) => {
-        if (route.name === 'DebtListToPay') getMyDebtsToPay(user.uid, category, personID)
-        if (route.name === 'DebtListToReceive') getMyDebtsToReceive(user.uid, category, personID)
+    const getDebts = async () => {
+        if (route.name === 'DebtListToPay') getDebtsToPay()
+        if (route.name === 'DebtListToReceive') getDebtsToReceive()
     }
     
     useEffect(() => {
@@ -88,12 +88,12 @@ export default function Home({ navigation, route }) {
     }, [debtsToReceive]);
 
     useEffect(() => {
-        if (route.name === 'DebtListToPay') getMyDebtsToPay(user.uid, category, selectedPersonID || null)
-        if (route.name === 'DebtListToReceive') getMyDebtsToReceive(user.uid, category, selectedPersonID || null)
+        if (route.name === 'DebtListToPay') getDebtsToPay()
+        if (route.name === 'DebtListToReceive') getDebtsToReceive()
     }, [showPaidDebts]);
     
     useEffect(() => {
-        getPersonsByCreator(user.uid)
+        getPersonsByCreator()
         getDebts()
     }, []);
 
@@ -153,7 +153,7 @@ export default function Home({ navigation, route }) {
                             <RefreshControl
                                 refreshing={loadDebtToPay}
                                 onRefresh={() => {
-                                    getMyDebtsToPay(user.uid, category, selectedPersonID)
+                                    getDebtsToPay()
                                 }}
                             />
                         }
@@ -195,7 +195,7 @@ export default function Home({ navigation, route }) {
                             <RefreshControl
                                 refreshing={loadDebtToReceive}
                                 onRefresh={() => {
-                                    getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                                    getDebtsToReceive()
                                 }}
                             />
                         }
@@ -224,7 +224,7 @@ export default function Home({ navigation, route }) {
                     selectedItem={selectedPersonID}
                     setSelectedItem={(item) => {
                         setSelectedPersonID(item);
-                        getDebts(item)
+                        getDebts()
                     }}          
                 />
                 <TouchableOpacity className='flex-row gap-2 items-center justify-center m-2'

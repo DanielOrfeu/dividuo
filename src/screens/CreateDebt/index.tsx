@@ -28,11 +28,11 @@ export default function CreateDebt({ navigation, route }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [
-        getMyDebtsToPay, 
-        getMyDebtsToReceive
+        getDebtsToPay, 
+        getDebtsToReceive
     ] = useDebtStore((state) => [
-        state.getMyDebtsToPay, 
-        state.getMyDebtsToReceive
+        state.getDebtsToPay, 
+        state.getDebtsToReceive
     ])
     const [
         persons, 
@@ -75,7 +75,7 @@ export default function CreateDebt({ navigation, route }) {
     }, [monthAmount, debt.dueDate]);
     
     useEffect(() => {
-        getPersonsByCreator(user.uid)
+        getPersonsByCreator()
         setpersonType(`${route.params.persontype}ID`)
         if(selectedPersonID && persons.find(person => person.id === selectedPersonID)) { 
             setselectedPersons([...selectedPersons, selectedPersonID])
@@ -198,8 +198,8 @@ export default function CreateDebt({ navigation, route }) {
                         name: personName,
                         creatorID: user.uid
                     })
-                    .then((res) => {
-                        getPersonsByCreator(user.uid)
+                    .then((_) => {
+                        getPersonsByCreator()
                         Alert.alert('Sucesso!', 'Devedor/recebedor criado com sucesso')
                     })
                     .catch((err) => {
@@ -253,8 +253,8 @@ export default function CreateDebt({ navigation, route }) {
                     await DebtService.CreateMultipleDebts(newDebts)
                     .then((res) => {
                         personType === 'receiverID'
-                        ? getMyDebtsToReceive(user.uid, category, selectedPersonID)
-                        : getMyDebtsToPay(user.uid, category, selectedPersonID)
+                        ? getDebtsToReceive()
+                        : getDebtsToPay()
             
                         Alert.alert('Sucesso!', 'Débito(s) criado(s) com sucesso! \nDeseja continuar criando débitos?', [
                             {

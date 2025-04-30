@@ -27,11 +27,11 @@ export default function EditPersons({ navigation }) {
     const [user] = useUserStore((state) => [state.user])
     const [category] = useCategoryStore((state) => [state.category])
     const [
-        getMyDebtsToPay, 
-        getMyDebtsToReceive
+        getDebtsToPay, 
+        getDebtsToReceive
     ] = useDebtStore((state) => [
-        state.getMyDebtsToPay, 
-        state.getMyDebtsToReceive
+        state.getDebtsToPay, 
+        state.getDebtsToReceive
     ])
     const [
         persons, 
@@ -63,7 +63,7 @@ export default function EditPersons({ navigation }) {
                     Alert.alert('Sucesso!', 'Devedor/recebedor criado com sucesso', [{
                         text: 'OK',
                         onPress: () => {
-                            getPersonsByCreator(user.uid)
+                            getPersonsByCreator()
                             setpersonModalOpen(false)
                         }
                     }])
@@ -83,10 +83,10 @@ export default function EditPersons({ navigation }) {
                         text: 'OK',
                         onPress: () => {
                             setpersonModalOpen(false)
-                            getPersonsByCreator(user.uid)
+                            getPersonsByCreator()
                             if (persons[index].id === selectedPersonID) {
-                                getMyDebtsToPay(user.uid, category, selectedPersonID)
-                                getMyDebtsToReceive(user.uid, category, selectedPersonID)
+                                getDebtsToPay()
+                                getDebtsToReceive()
                             } 
                         }
                     }])
@@ -110,11 +110,11 @@ export default function EditPersons({ navigation }) {
                     text: 'OK',
                     onPress: () => {
                         setpersonModalOpen(false)
-                        getPersonsByCreator(user.uid)
+                        getPersonsByCreator()
                         if (persons[index].id === selectedPersonID) {
-                            getMyDebtsToPay(user.uid, category, null)
-                            getMyDebtsToReceive(user.uid, category, null)
                             setSelectedPersonID(null)
+                            getDebtsToPay()
+                            getDebtsToReceive()
                         }                        
                     }
                 }])
@@ -159,7 +159,7 @@ export default function EditPersons({ navigation }) {
     }
 
     useEffect(() => {
-        getPersonsByCreator(user.uid)
+        getPersonsByCreator()
     }, []);
 
     return (
@@ -177,7 +177,7 @@ export default function EditPersons({ navigation }) {
                                     <RefreshControl
                                         refreshing={loading}
                                         onRefresh={() => {
-                                            getPersonsByCreator(user.uid)
+                                            getPersonsByCreator()
                                         }}
                                     />
                                 }
