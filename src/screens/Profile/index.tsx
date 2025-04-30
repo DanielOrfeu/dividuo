@@ -1,5 +1,5 @@
 import { Entypo } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Alert, Text, View } from 'react-native'
 
 import Input from '@components/Inputs/Input'
@@ -70,7 +70,7 @@ export default function Profile({ navigation }) {
     }, [user]);
 
     return (
-        <>
+        <Fragment>
         {
         loading
         ? <View className='flex-1 w-full p-4 justify-center'>
@@ -315,6 +315,6 @@ export default function Profile({ navigation }) {
             />
         </View>
         }
-        </>
+        </Fragment>
     )
 }

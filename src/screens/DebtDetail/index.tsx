@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { FontAwesome5 } from '@expo/vector-icons'
 import { AntDesign, Feather } from '@expo/vector-icons'
 import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
@@ -176,7 +176,7 @@ export default function DebtDetail({ navigation, route }) {
     }
 
     return (
-        <>
+        <Fragment>
         {
             screenLoad || !person
             ? <View className='flex-1 w-full p-4 justify-center'>
@@ -185,7 +185,7 @@ export default function DebtDetail({ navigation, route }) {
             : <View className='flex-1 w-screen justify-center items-center p-4'>
                 {
                     debt
-                        ? <>
+                        ? <Fragment>
                             <View className='w-full items-center flex-1'>
                                 <View className='w-9/12 items-center gap-1'>
                                     <View className='w-full justify-center items-center flex-row mb-2'>
@@ -280,7 +280,7 @@ export default function DebtDetail({ navigation, route }) {
                                     }
                                 />
                             </View>
-                        </>
+                        </Fragment>
                         : <Text className='text-gray-500 text-lg'>Não foi possível carregar dados do débito</Text>
                 }
                 <ActionModal
@@ -354,6 +354,6 @@ export default function DebtDetail({ navigation, route }) {
                 />
             </View>
         }
-        </>
+        </Fragment>
     );
 }

@@ -9,6 +9,8 @@
       "@services/*": ["src/services/*"],
       "@store/*": ["src/store/*"],
       "@utils/*": ["src/utils/*"],
+      "@enums/*": ["src/enums/*"],
+      "@constants/*": ["src/enums/*"],
     }
   }
 }

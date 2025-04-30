@@ -46,10 +46,11 @@ export default class PersonService {
         .doc(personID)
         .get()
         .then(res => {
+            if (!res.exists) return {}
             return {
                 id: res.id,
                 ...res.data()
-            } as Person || {}
+            } as Person
         })
     }
 

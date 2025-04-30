@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity } from 'react-native'
-import { ReactNode, useEffect, useState } from 'react'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
+import { INVERTED_BUTTON_BG_COLOR, INVERTED_BUTTON_COLOR } from '@enums/colors'
 
 interface OwnProps {
     w?: string,
@@ -34,35 +35,20 @@ export default function Button(props: Props) {
     const switchColor = () => {
         if (props.disabled) {
             setpallet({
-                color: '#6b7280',
-                bgColor: '#ffffff'
+                bgColor: INVERTED_BUTTON_BG_COLOR['disabled'],
+                color: INVERTED_BUTTON_COLOR['disabled']
             })
         } else {
-            switch (props.type) {
-                case 'warning':
-                    setpallet({
-                        color: '#eab308',
-                        bgColor: '#ffffff'
-                    })
-                    break;
-                case 'alert':
-                    setpallet({
-                        color: '#dc2626',
-                        bgColor: '#ffffff'
-                    })
-                    break;
-                case 'info':
-                    setpallet({
-                        color: '#3b82f6',
-                        bgColor: '#ffffff'
-                    })
-                    break;
-                default:
-                    setpallet({
-                        color: '#00ab8c',
-                        bgColor: '#ffffff'
-                    })
-                    break;
+            if (props.type) {
+                setpallet({
+                    bgColor: INVERTED_BUTTON_BG_COLOR[props.type],
+                    color: INVERTED_BUTTON_COLOR[props.type]
+                })
+            } else {
+                setpallet({
+                    bgColor: INVERTED_BUTTON_BG_COLOR['default'],
+                    color: INVERTED_BUTTON_COLOR['default']
+                })
             }
         }
     }
@@ -83,9 +69,9 @@ export default function Button(props: Props) {
         >
             {   
                 props.icon
-                    ? <>
+                    ? <Fragment>
                         {props.icon}
-                    </>
+                    </Fragment>
                     : props.text
                         ? <Text
                             className='font-bold'

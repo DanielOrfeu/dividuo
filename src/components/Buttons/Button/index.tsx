@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity } from 'react-native'
-import { ReactNode, useEffect, useState } from 'react'
+import { Fragment, ReactNode, useEffect, useState } from 'react'
+import { BUTTON_BG_COLOR, BUTTON_COLOR } from '@enums/colors'
 
 interface OwnProps {
     w?: string,
@@ -19,8 +20,8 @@ type Props = OwnProps
 
 export default function Button(props: Props) {
     const [pallet, setpallet] = useState<colorPallet>({
-        bgColor: '#00ab8c',
-        color: '#ffffff'
+        bgColor: BUTTON_BG_COLOR['default'],
+        color: BUTTON_COLOR['default']
     });
 
     useEffect(() => {
@@ -34,35 +35,20 @@ export default function Button(props: Props) {
     const switchColor = () => {
         if (props.disabled) {
             setpallet({
-                bgColor: '#6b7280',
-                color: '#ffffff'
+                bgColor: BUTTON_BG_COLOR['disabled'],
+                color: BUTTON_COLOR['disabled']
             })
         } else {
-            switch (props.type) {
-                case 'warning':
-                    setpallet({
-                        bgColor: '#eab308',
-                        color: '#000000'
-                    })
-                    break;
-                case 'alert':
-                    setpallet({
-                        bgColor: '#dc2626',
-                        color: '#ffffff'
-                    })
-                    break;
-                case 'info':
-                    setpallet({
-                        bgColor: '#3b82f6',
-                        color: '#ffffff'
-                    })
-                    break;
-                default:
-                    setpallet({
-                        bgColor: '#00ab8c',
-                        color: '#ffffff'
-                    })
-                    break;
+            if (props.type) {
+                setpallet({
+                    bgColor: BUTTON_BG_COLOR[props.type],
+                    color: BUTTON_COLOR[props.type]
+                })
+            } else {
+                setpallet({
+                    bgColor: BUTTON_BG_COLOR['default'],
+                    color: BUTTON_COLOR['default']
+                })
             }
         }
     }
@@ -83,9 +69,9 @@ export default function Button(props: Props) {
         >
             {   
                 props.icon
-                    ? <>
+                    ? <Fragment>
                         {props.icon}
-                    </>
+                    </Fragment>
                     : props.text
                         ? <Text
                             className='font-bold'
