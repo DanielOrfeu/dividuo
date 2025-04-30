@@ -39,6 +39,7 @@ export default function EditDebt({ navigation, route }) {
 
     const [loading, setloading] = useState<boolean>(false);
     const [oldInfo, setoldInfo] = useState<HistoryItem>();
+    const [sameInfos, setsameInfos] = useState<boolean>(true);
 
     useEffect(() => {
         setoldInfo({
@@ -47,6 +48,15 @@ export default function EditDebt({ navigation, route }) {
             value: debt.value
         })
     }, []);
+
+    useEffect(() => {
+        setsameInfos(_ => {
+            if (!oldInfo) return true
+            return Object.entries(oldInfo).every(([key, value]) => {
+                return debt[key] === value
+            })
+        })
+    }, [debt]);
 
     return (
         <View
@@ -93,7 +103,7 @@ export default function EditDebt({ navigation, route }) {
                     ? <Loading/>
                     : <>
                         <Button 
-                            disabled={!debt.description || !debt.value || !debt.dueDate}
+                            disabled={!debt.description || !debt.value || !debt.dueDate || sameInfos}
                             text={'Editar débito'} 
                             onPress={async () => {
                                 setloading(true)

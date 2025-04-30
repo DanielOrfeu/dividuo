@@ -209,7 +209,7 @@ export default function EditPersons({ navigation }) {
                 title={`${action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'} devedor/recebedor`}
                 actionText={action === EditAction.remove ? 'Excluir' : action === EditAction.edit ? 'Editar' : 'Adicionar'}
                 isVisible={personModalOpen}
-                disableAction={false}
+                disableAction={action === EditAction.edit && personName === persons[index].name}
                 closeModal={() => {
                     setpersonModalOpen(false)
                 }}
