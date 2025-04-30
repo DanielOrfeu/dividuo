@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Dividuo",
-    "slug": "dividuo",
+    "slug": "dividuo-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -41,6 +41,16 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "508cf40c-b79c-424a-b618-21c70fcf56fe"
+      }
+    },
+    "owner": "dividuo",
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/508cf40c-b79c-424a-b618-21c70fcf56fe"
+    }
   }
 }
