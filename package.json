@@ -34,6 +34,7 @@
     "expo-radio-button": "^1.0.8",
     "expo-splash-screen": "~0.20.5",
     "expo-status-bar": "~1.6.0",
+    "expo-updates": "~0.18.19",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "nativewind": "^2.0.11",
