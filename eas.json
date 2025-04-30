@@ -1,9 +1,11 @@
 {
   "cli": {
-    "version": ">= 5.4.0"
+    "version": ">= 16.3.3",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
+      "developmentClient": true,
       "distribution": "internal",
       "android": {
         "gradleCommand": ":app:assembleDebug"
@@ -18,9 +20,12 @@
         "buildType": "apk"
       }
     },
-    "production": {}
+    "production": {
+      "autoIncrement": true
+    }
   },
   "submit": {
     "production": {}
-  }
+  },
+  "owner": "danielorfeu"
 }
