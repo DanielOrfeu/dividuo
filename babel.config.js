@@ -1,10 +1,10 @@
-module.exports = function(api) {
+module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: ["babel-preset-expo"],
     plugins: [
-      'nativewind/babel',
-      'react-native-reanimated/plugin',
+      "nativewind/babel",
+      "react-native-reanimated/plugin",
       [
         "module-resolver",
         {
@@ -27,10 +27,11 @@ module.exports = function(api) {
             "@store": "./src/store",
             "@utils": "./src/utils",
             "@enums": "./src/enums",
-            "@constants": "./src/constants"
+            "@constants": "./src/constants",
+            "@interfaces": "./src/interfaces",
           },
-        }
-      ]
+        },
+      ],
     ],
   };
 };
