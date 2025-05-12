@@ -15,56 +15,56 @@ import { COLOR } from "@enums/colors";
 const { Navigator, Screen } = createDrawerNavigator();
 
 export default function MainMenuStack() {
-  return (
-    <Navigator
-      drawerContent={(props) => <CustomDrawer {...props} />}
-      screenOptions={{
-        drawerLabelStyle: {
-          marginLeft: -25,
-        },
-        drawerActiveBackgroundColor: COLOR.primary,
-        drawerActiveTintColor: COLOR.white,
-        drawerInactiveTintColor: COLOR.primary,
-        headerTintColor: COLOR.white,
-        headerStyle: {
-          backgroundColor: COLOR.primary,
-        },
-      }}
-    >
-      <Screen
-        name="DebtListTab"
-        component={DebtListTab}
-        options={{
-          title: "Despesas",
-          drawerIcon: ({ color, size }) => (
-            <MaterialCommunityIcons
-              name="account-cash"
-              size={size}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          title: "Meu perfil",
-          drawerIcon: ({ color, size }) => (
-            <SimpleLineIcons name="user" size={size} color={color} />
-          ),
-        }}
-      />
-      <Screen
-        name="EditPersons"
-        component={EditPersons}
-        options={{
-          title: "Devedores/recebedores",
-          drawerIcon: ({ color, size }) => (
-            <FontAwesome name="users" size={size} color={color} />
-          ),
-        }}
-      />
-    </Navigator>
-  );
+	return (
+		<Navigator
+			drawerContent={(props) => <CustomDrawer {...props} />}
+			screenOptions={{
+				drawerLabelStyle: {
+					marginLeft: -25,
+				},
+				drawerActiveBackgroundColor: COLOR.primary,
+				drawerActiveTintColor: COLOR.white,
+				drawerInactiveTintColor: COLOR.primary,
+				headerTintColor: COLOR.white,
+				headerStyle: {
+					backgroundColor: COLOR.primary,
+				},
+			}}
+		>
+			<Screen
+				name="DebtListTab"
+				component={DebtListTab}
+				options={{
+					title: "Despesas",
+					drawerIcon: ({ color, size }) => (
+						<MaterialCommunityIcons
+							name="account-cash"
+							size={size}
+							color={color}
+						/>
+					),
+				}}
+			/>
+			<Screen
+				name="Profile"
+				component={Profile}
+				options={{
+					title: "Meu perfil",
+					drawerIcon: ({ color, size }) => (
+						<SimpleLineIcons name="user" size={size} color={color} />
+					),
+				}}
+			/>
+			<Screen
+				name="EditPersons"
+				component={EditPersons}
+				options={{
+					title: "Devedores/recebedores",
+					drawerIcon: ({ color, size }) => (
+						<FontAwesome name="users" size={size} color={color} />
+					),
+				}}
+			/>
+		</Navigator>
+	);
 }

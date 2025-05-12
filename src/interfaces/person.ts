@@ -1,5 +1,5 @@
 export interface Person {
-    id?: string
-    name: string
-    creatorID: string
+	id?: string
+	name: string
+	creatorID: string
 }
