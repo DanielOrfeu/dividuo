@@ -2,30 +2,33 @@ import firestore from '@react-native-firebase/firestore';
 
 import { Person } from '@interfaces/person';
 
+import { COLLECTION } from '@enums/collections';
+
+
 export default class PersonService {
 	static async CreatePerson(person: Person) {
 		return firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.add(person)
 	}
 
 	static async EditPerson(person: Person) {
 		return firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.doc(person.id)
 			.update(person)
 	}
 
 	static async DeletePerson(person: Person) {
 		return firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.doc(person.id)
 			.delete()
 	}
 
 	static async GetPersonByCreator(creatorID: string) {
 		return firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.orderBy('name')
 			.where('creatorID', '==', creatorID)
 			.get()
@@ -42,7 +45,7 @@ export default class PersonService {
 
 	static async GetPersonByID(personID: string) {
 		return firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.doc(personID)
 			.get()
 			.then(res => {
@@ -58,7 +61,7 @@ export default class PersonService {
 		const batch = firestore().batch();
 
 		const queryUserIsCreator = await firestore()
-			.collection('Persons')
+			.collection(COLLECTION.Persons)
 			.where('creatorID', '==', userID)
 			.get()
 			.then((res) => {

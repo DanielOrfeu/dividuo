@@ -7,6 +7,7 @@ import CustomDrawer from "@components/customDrawer";
 
 import Profile from "@screens/profile";
 import EditPersons from "@screens/editPersons";
+import MyMonthyBudget from "@screens/myMonthyBudget";
 
 import DebtListTab from "@routes/debtListTab";
 
@@ -42,6 +43,16 @@ export default function MainMenuStack() {
 							size={size}
 							color={color}
 						/>
+					),
+				}}
+			/>
+			<Screen
+				name="MonthlyBudget"
+				component={MyMonthyBudget}
+				options={{
+					title: "Meu orçamento mensal",
+					drawerIcon: ({ color, size }) => (
+						<SimpleLineIcons name="calendar" size={size} color={color} />
 					),
 				}}
 			/>

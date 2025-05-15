@@ -27,11 +27,11 @@ export default class UserService {
 			.signOut()
 	}
 
-	static async EditUser(name: string) {
+	static async EditUser(displayName: string) {
 		return auth()
 			.currentUser
 			.updateProfile({
-				displayName: name,
+				displayName,
 			})
 	}
 

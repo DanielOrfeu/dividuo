@@ -9,5 +9,6 @@ export function NormalizeDateTime(date: string | Date): string {
 }
 
 export function NumberToBRL(value: number): string {
+	if (isNaN(value)) value = 0
 	return value.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
 }
