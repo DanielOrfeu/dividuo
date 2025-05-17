@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity } from "react-native";
 import { Fragment, ReactNode, useEffect, useState } from "react";
-import { BUTTON_BG_COLOR, BUTTON_COLOR } from "@enums/colors";
+import { BUTTON_BG_COLOR, BUTTON_COLOR, COLOR } from "@enums/colors";
+import Loading from "./loading";
 
 interface OwnProps {
 	w?: string;
@@ -8,6 +9,7 @@ interface OwnProps {
 	icon?: ReactNode;
 	type?: string;
 	disabled?: boolean;
+	loading?: boolean;
 	onPress(): void;
 }
 
@@ -24,6 +26,7 @@ export default function Button({
 	icon,
 	type,
 	disabled,
+	loading = false,
 	onPress,
 }: ButtonProps) {
 	const [pallet, setpallet] = useState<colorPallet>({
@@ -33,14 +36,14 @@ export default function Button({
 
 	useEffect(() => {
 		switchColor();
-	}, [type, disabled]);
+	}, [type, disabled || loading]);
 
 	useEffect(() => {
 		switchColor();
 	}, []);
 
 	const switchColor = () => {
-		if (disabled) {
+		if (disabled || loading) {
 			setpallet({
 				bgColor: BUTTON_BG_COLOR.disabled,
 				color: BUTTON_COLOR.disabled,
@@ -63,7 +66,7 @@ export default function Button({
 	const className = `w-${w ? w : "full"} rounded-xl p-3 my-1 justify-center items-center`;
 	return (
 		<TouchableOpacity
-			disabled={disabled}
+			disabled={disabled || loading}
 			onPress={() => {
 				onPress();
 			}}
@@ -74,18 +77,28 @@ export default function Button({
 				borderWidth: 2,
 			}}
 		>
-			{icon ? (
-				<Fragment>{icon}</Fragment>
-			) : text ? (
-				<Text
-					className="font-bold"
-					style={{
-						color: pallet.color,
-					}}
-				>
-					{text}
-				</Text>
-			) : null}
-		</TouchableOpacity>
+			{
+				loading ? (
+					<Loading size={20} color={COLOR.white} />
+				) : (
+					<>
+						{
+							icon ? (
+								<Fragment>{icon}</Fragment>
+							) : text ? (
+								<Text
+									className="font-bold"
+									style={{
+										color: pallet.color,
+									}}
+								>
+									{text}
+								</Text>
+							) : null
+						}
+					</>
+				)
+			}
+		</TouchableOpacity >
 	);
 }

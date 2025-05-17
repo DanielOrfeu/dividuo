@@ -12,6 +12,7 @@ export interface MonthlyBudget {
 	totalAccumulatedReserve: number
 	daysReport: DayReport[]
 	monthlyBudgetControlType: MonthlyBudgetType
+	hasPreviousMonthBudget?: boolean
 }
 
 export enum MonthlyBudgetType {

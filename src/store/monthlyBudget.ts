@@ -10,8 +10,10 @@ import { useUserStore } from '@store/user'
 import { MonthlyBudget } from '@interfaces/monthlyBudget'
 
 type MonthlyBudgetStore = {
-	monthlyBudgets: MonthlyBudget[]
+	monthYearReference: string
+	setMonthYearReference: (my: string) => void
 
+	monthlyBudgets: MonthlyBudget[]
 	getBudgetByMonthYear: (my: string) => void
 
 	selectedMonthlyBudget: MonthlyBudget | null
@@ -22,6 +24,11 @@ type MonthlyBudgetStore = {
 
 export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set, get) => {
 	return {
+		monthYearReference: '',
+		setMonthYearReference: (my) => {
+			set({ monthYearReference: my })
+		},
+
 		monthlyBudgets: [],
 		getBudgetByMonthYear: async (mb) => {
 			set({ loadingMonthlyBudget: true })
@@ -29,9 +36,11 @@ export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set, get) => {
 
 			await MonthlyBudgetService.GetBudgetByMonthYear(mb, user.uid)
 				.then((res) => {
+					if (!res) return
 					if (get().monthlyBudgets.length == 0) {
 						set({ monthlyBudgets: [res] })
-						//TODO: ver lógica de associação
+					} else {
+						set({ monthlyBudgets: [...get().monthlyBudgets, res] })
 					}
 					set({ selectedMonthlyBudget: res })
 				})

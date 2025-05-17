@@ -7,7 +7,7 @@ import { COLLECTION } from '@enums/collections';
 
 export default class MonthlyBudgetService {
 
-	static async CreateMonthlyBudget(mb?: MonthlyBudget) {
+	static async CreateMonthlyBudget(mb: MonthlyBudget) {
 		return firestore()
 			.collection(COLLECTION.MonthlyBudgets)
 			.add(mb)
