@@ -8,14 +8,15 @@ Aplicativo android e ios. Em breve disponível nas respectivas lojas.
 
 ### Requisitos de desenvolvimento
 
-* Ambiente configurado para desenvolvimento mobile 
-* Node@16 ou maior instalado
+- Ambiente configurado para desenvolvimento mobile
+- Node@16 ou maior instalado
 
 ### Executando o projeto:
 
 Guia rápido para execução local do projeto, usando um dispositivo virtual ou real via ADB (após o clone do projeto)
 
 #### Com Yarn:
+
 ```
 cd dividuo
 yarn install
@@ -24,6 +25,7 @@ yarn android ou yarn android ou yarn dev-clear
 ```
 
 #### Com NPM:
+
 ```
 cd dividuo
 npm i
@@ -33,10 +35,10 @@ yarn android ou yarn android ou yarn dev-clear
 
 ### Dependências usadas
 
-* React Navigation
-* Firebase
-* Expo
-* Zustand
-* Nativewind
-* Moment
-* entre outras..
+- React Navigation
+- Firebase
+- Expo
+- Zustand
+- Nativewind
+- Moment
+- entre outras..

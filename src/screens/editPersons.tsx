@@ -1,12 +1,12 @@
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import {
-	Alert,
-	FlatList,
-	RefreshControl,
-	Text,
-	TouchableOpacity,
-	View,
+  Alert,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import Input from "@components/input";
@@ -21,254 +21,253 @@ import { useDebtStore } from "@store/debt";
 import { useUserStore } from "@store/user";
 import { usePersonStore } from "@store/person";
 
-
 import { Person } from "@interfaces/person";
 
 import { FIREBASE_ERROR } from "@enums/firebase";
 import { COLOR } from "@enums/colors";
 
 enum EditAction {
-	add,
-	edit,
-	remove,
+  add,
+  edit,
+  remove,
 }
 
 export default function EditPersons() {
-	const [user] = useUserStore((state) => [state.user]);
-	const [getDebtsToPay, getDebtsToReceive] = useDebtStore((state) => [
-		state.getDebtsToPay,
-		state.getDebtsToReceive,
-	]);
-	const [
-		persons,
-		loading,
-		selectedPersonID,
-		getPersonsByCreator,
-		setSelectedPersonID,
-	] = usePersonStore((state) => [
-		state.persons,
-		state.loadingPersons,
-		state.selectedPersonID,
-		state.getPersonsByCreator,
-		state.setSelectedPersonID,
-	]);
+  const [user] = useUserStore((state) => [state.user]);
+  const [getDebtsToPay, getDebtsToReceive] = useDebtStore((state) => [
+    state.getDebtsToPay,
+    state.getDebtsToReceive,
+  ]);
+  const [
+    persons,
+    loading,
+    selectedPersonID,
+    getPersonsByCreator,
+    setSelectedPersonID,
+  ] = usePersonStore((state) => [
+    state.persons,
+    state.loadingPersons,
+    state.selectedPersonID,
+    state.getPersonsByCreator,
+    state.setSelectedPersonID,
+  ]);
 
-	const [index, setindex] = useState<number>();
-	const [action, setaction] = useState<EditAction>();
-	const [personName, setpersonName] = useState<string>("");
-	const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
+  const [index, setindex] = useState<number>();
+  const [action, setaction] = useState<EditAction>();
+  const [personName, setpersonName] = useState<string>("");
+  const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
 
-	const editPersonlist = async () => {
-		if (action === EditAction.add) {
-			await PersonService.CreatePerson({
-				name: personName,
-				creatorID: user.uid,
-			})
-				.then(() => {
-					Alert.alert("Sucesso!", "Devedor/recebedor criado com sucesso", [
-						{
-							text: "OK",
-							onPress: () => {
-								getPersonsByCreator();
-								setpersonModalOpen(false);
-							},
-						},
-					]);
-				})
-				.catch((err) => {
-					Alert.alert(
-						"Erro ao criar usuário!",
-						FIREBASE_ERROR[err.code] || err.code
-					);
-				});
-		}
+  const editPersonlist = async () => {
+    if (action === EditAction.add) {
+      await PersonService.CreatePerson({
+        name: personName,
+        creatorID: user.uid,
+      })
+        .then(() => {
+          Alert.alert("Sucesso!", "Devedor/recebedor criado com sucesso", [
+            {
+              text: "OK",
+              onPress: () => {
+                getPersonsByCreator();
+                setpersonModalOpen(false);
+              },
+            },
+          ]);
+        })
+        .catch((err) => {
+          Alert.alert(
+            "Erro ao criar usuário!",
+            FIREBASE_ERROR[err.code] || err.code
+          );
+        });
+    }
 
-		if (action === EditAction.edit) {
-			await PersonService.EditPerson({
-				...persons[index],
-				name: personName,
-			})
-				.then(() => {
-					Alert.alert("Sucesso!", "Devedor/recebedor editado com sucesso", [
-						{
-							text: "OK",
-							onPress: () => {
-								setpersonModalOpen(false);
-								getPersonsByCreator();
-								if (persons[index].id === selectedPersonID) {
-									getDebtsToPay();
-									getDebtsToReceive();
-								}
-							},
-						},
-					]);
-				})
-				.catch((err) => {
-					Alert.alert(
-						"Erro ao editar devedor/recebedor!",
-						FIREBASE_ERROR[err.code] || err.code
-					);
-				});
-		}
+    if (action === EditAction.edit) {
+      await PersonService.EditPerson({
+        ...persons[index],
+        name: personName,
+      })
+        .then(() => {
+          Alert.alert("Sucesso!", "Devedor/recebedor editado com sucesso", [
+            {
+              text: "OK",
+              onPress: () => {
+                setpersonModalOpen(false);
+                getPersonsByCreator();
+                if (persons[index].id === selectedPersonID) {
+                  getDebtsToPay();
+                  getDebtsToReceive();
+                }
+              },
+            },
+          ]);
+        })
+        .catch((err) => {
+          Alert.alert(
+            "Erro ao editar devedor/recebedor!",
+            FIREBASE_ERROR[err.code] || err.code
+          );
+        });
+    }
 
-		if (action === EditAction.remove) {
-			const deletePerson = await PersonService.DeletePerson({
-				...persons[index],
-				name: personName,
-			});
-			const deletePersonDebts = await DebtService.DeleteAllDebtsByPersonID(
-				persons[index].id
-			);
+    if (action === EditAction.remove) {
+      const deletePerson = await PersonService.DeletePerson({
+        ...persons[index],
+        name: personName,
+      });
+      const deletePersonDebts = await DebtService.DeleteAllDebtsByPersonID(
+        persons[index].id
+      );
 
-			Promise.all([deletePerson, deletePersonDebts])
-				.then(() => {
-					Alert.alert(
-						"Sucesso!",
-						"Devedor/recebedor e todos débitos associados deletados com sucesso",
-						[
-							{
-								text: "OK",
-								onPress: () => {
-									setpersonModalOpen(false);
-									getPersonsByCreator();
-									if (persons[index].id === selectedPersonID) {
-										setSelectedPersonID(null);
-										getDebtsToPay();
-										getDebtsToReceive();
-									}
-								},
-							},
-						]
-					);
-				})
-				.catch((err) => {
-					Alert.alert(
-						"Erro ao deletar devedor/recebedor e débitos associados",
-						FIREBASE_ERROR[err.code] || err.code
-					);
-				});
-		}
+      Promise.all([deletePerson, deletePersonDebts])
+        .then(() => {
+          Alert.alert(
+            "Sucesso!",
+            "Devedor/recebedor e todos débitos associados deletados com sucesso",
+            [
+              {
+                text: "OK",
+                onPress: () => {
+                  setpersonModalOpen(false);
+                  getPersonsByCreator();
+                  if (persons[index].id === selectedPersonID) {
+                    setSelectedPersonID(null);
+                    getDebtsToPay();
+                    getDebtsToReceive();
+                  }
+                },
+              },
+            ]
+          );
+        })
+        .catch((err) => {
+          Alert.alert(
+            "Erro ao deletar devedor/recebedor e débitos associados",
+            FIREBASE_ERROR[err.code] || err.code
+          );
+        });
+    }
 
-		setpersonName("");
-	};
+    setpersonName("");
+  };
 
-	const personItem = (person: Person, index: number) => {
-		return (
-			<View className="w-full bg-gray-200 rounded-3xl p-4 my-1 flex-row">
-				<View className="w-[80%] items-center justify-center">
-					<Text className="text-md font-semibold">Nome: {person.name}</Text>
-				</View>
-				<View className="w-[20%] items-center justify-evenly flex-row">
-					<TouchableOpacity
-						onPress={() => {
-							setindex(index);
-							setpersonName(person.name);
-							setaction(EditAction.edit);
-							setpersonModalOpen(true);
-						}}
-					>
-						<Feather name="edit-3" size={24} color={COLOR.black} />
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => {
-							setindex(index);
-							setaction(EditAction.remove);
-							setpersonModalOpen(true);
-						}}
-					>
-						<Feather name="trash-2" size={24} color={COLOR.red} />
-					</TouchableOpacity>
-				</View>
-			</View>
-		);
-	};
+  const personItem = (person: Person, index: number) => {
+    return (
+      <View className="w-full bg-gray-200 rounded-3xl p-4 my-1 flex-row">
+        <View className="w-[80%] items-center justify-center">
+          <Text className="text-md font-semibold">Nome: {person.name}</Text>
+        </View>
+        <View className="w-[20%] items-center justify-evenly flex-row">
+          <TouchableOpacity
+            onPress={() => {
+              setindex(index);
+              setpersonName(person.name);
+              setaction(EditAction.edit);
+              setpersonModalOpen(true);
+            }}
+          >
+            <Feather name="edit-3" size={24} color={COLOR.black} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setindex(index);
+              setaction(EditAction.remove);
+              setpersonModalOpen(true);
+            }}
+          >
+            <Feather name="trash-2" size={24} color={COLOR.red} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
 
-	useEffect(() => {
-		getPersonsByCreator();
-	}, []);
+  useEffect(() => {
+    getPersonsByCreator();
+  }, []);
 
-	return (
-		<View className="flex-1 w-screens justify-center items-center p-4">
-			<View className="w-full items-center flex-1">
-				<Text className="text-primary font-bold text-xl mb-1">
-					Lista de Devedores/recebedores
-				</Text>
-				{persons.length > 0 ? (
-					<View className="flex-1 w-full">
-						<FlatList
-							data={persons}
-							renderItem={({ item, index }) => personItem(item, index)}
-							keyExtractor={(item) => item.id}
-							refreshControl={
-								<RefreshControl
-									refreshing={loading}
-									onRefresh={() => {
-										getPersonsByCreator();
-									}}
-								/>
-							}
-						/>
-					</View>
-				) : (
-					<View className="flex-1 justify-center">
-						<Text className="text-gray-500">
-							Não há devedor/recebedor cadastrado para esse usuário
-						</Text>
-					</View>
-				)}
-			</View>
-			<View className="w-full items-center">
-				<Button
-					disabled={loading}
-					text={"Adicionar devedor/recebedor"}
-					onPress={() => {
-						setaction(EditAction.add);
-						setpersonModalOpen(true);
-					}}
-					icon={loading ? <Loading color={COLOR.white} size={20} /> : null}
-				/>
-			</View>
-			<ActionModal
-				type={action === EditAction.remove ? "alert" : ""}
-				title={`${action === EditAction.remove ? "Excluir" : action === EditAction.edit ? "Editar" : "Adicionar"} devedor/recebedor`}
-				actionText={
-					action === EditAction.remove
-						? "Excluir"
-						: action === EditAction.edit
-							? "Editar"
-							: "Adicionar"
-				}
-				isVisible={personModalOpen}
-				disableAction={
-					action === EditAction.edit && personName === persons[index].name
-				}
-				closeModal={() => {
-					setpersonModalOpen(false);
-				}}
-				startAction={async () => {
-					await editPersonlist();
-				}}
-				content={
-					<View className="w-full">
-						<View className="w-full flex-row justify-evenly items-center ">
-							{action === EditAction.remove ? (
-								<Text className="text-center text-lg">
-									Excluir o devedor/recebedor deletará também todas as dívidas
-									relacionadas ao perfil selecionado! Continuar?
-								</Text>
-							) : (
-								<Input
-									title="Nome"
-									value={personName}
-									onChangeText={(txt) => {
-										setpersonName(txt);
-									}}
-								/>
-							)}
-						</View>
-					</View>
-				}
-			/>
-		</View>
-	);
+  return (
+    <View className="flex-1 w-screens justify-center items-center p-4">
+      <View className="w-full items-center flex-1">
+        <Text className="text-primary font-bold text-xl mb-1">
+          Lista de Devedores/recebedores
+        </Text>
+        {persons.length > 0 ? (
+          <View className="flex-1 w-full">
+            <FlatList
+              data={persons}
+              renderItem={({ item, index }) => personItem(item, index)}
+              keyExtractor={(item) => item.id}
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={() => {
+                    getPersonsByCreator();
+                  }}
+                />
+              }
+            />
+          </View>
+        ) : (
+          <View className="flex-1 justify-center">
+            <Text className="text-gray-500">
+              Não há devedor/recebedor cadastrado para esse usuário
+            </Text>
+          </View>
+        )}
+      </View>
+      <View className="w-full items-center">
+        <Button
+          disabled={loading}
+          text={"Adicionar devedor/recebedor"}
+          onPress={() => {
+            setaction(EditAction.add);
+            setpersonModalOpen(true);
+          }}
+          icon={loading ? <Loading color={COLOR.white} size={20} /> : null}
+        />
+      </View>
+      <ActionModal
+        type={action === EditAction.remove ? "alert" : ""}
+        title={`${action === EditAction.remove ? "Excluir" : action === EditAction.edit ? "Editar" : "Adicionar"} devedor/recebedor`}
+        actionText={
+          action === EditAction.remove
+            ? "Excluir"
+            : action === EditAction.edit
+              ? "Editar"
+              : "Adicionar"
+        }
+        isVisible={personModalOpen}
+        disableAction={
+          action === EditAction.edit && personName === persons[index].name
+        }
+        closeModal={() => {
+          setpersonModalOpen(false);
+        }}
+        startAction={async () => {
+          await editPersonlist();
+        }}
+        content={
+          <View className="w-full">
+            <View className="w-full flex-row justify-evenly items-center ">
+              {action === EditAction.remove ? (
+                <Text className="text-center text-lg">
+                  Excluir o devedor/recebedor deletará também todas as dívidas
+                  relacionadas ao perfil selecionado! Continuar?
+                </Text>
+              ) : (
+                <Input
+                  title="Nome"
+                  value={personName}
+                  onChangeText={(txt) => {
+                    setpersonName(txt);
+                  }}
+                />
+              )}
+            </View>
+          </View>
+        }
+      />
+    </View>
+  );
 }
