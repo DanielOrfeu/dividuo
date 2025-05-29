@@ -11,9 +11,10 @@ import CreateDebt from "@screens/createDebt";
 import DebtDetail from "@screens/debtDetail";
 import SelectCategory from "@screens/selectCategory";
 import EditDebtHistory from "@screens/editDebtHistory";
+import CreateMonthlyBudget from "@screens/createMonthlyBudget";
+import EditMonthlyBudget from "@screens/editMonthlyBudget";
 
 import { COLOR } from "@enums/colors";
-import CreateMonthlyBudget from "@screens/createMonthlyBudget";
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -101,6 +102,14 @@ export default function AuthStack() {
         component={CreateMonthlyBudget}
         options={{
           title: "Criar orçamento diário",
+          ...defaultHeaderPattern,
+        }}
+      />
+      <Screen
+        name="EditMonthlyBudget"
+        component={EditMonthlyBudget}
+        options={{
+          title: "Editar orçamento diário",
           ...defaultHeaderPattern,
         }}
       />

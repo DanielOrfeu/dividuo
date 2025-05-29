@@ -36,13 +36,30 @@ export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set, get) => {
 
 			await MonthlyBudgetService.GetBudgetByMonthYear(mb, user.uid)
 				.then((res) => {
+					set({ selectedMonthlyBudget: res || null })
 					if (!res) return
-					if (get().monthlyBudgets.length == 0) {
-						set({ monthlyBudgets: [res] })
+
+					const budgets = [...get().monthlyBudgets || []] 
+
+					const indexForUpdate = budgets.findIndex(
+						(item) => item.monthYear === res.monthYear
+					);
+
+					if (indexForUpdate !== -1) {
+						budgets[indexForUpdate] = res;
 					} else {
-						set({ monthlyBudgets: [...get().monthlyBudgets, res] })
+						budgets.push(res);
 					}
-					set({ selectedMonthlyBudget: res })
+
+					budgets.sort((a, b) => {
+						const [monthA, yearA] = a.monthYear.split("/").map(Number);
+						const [monthB, yearB] = b.monthYear.split("/").map(Number);
+
+						if (yearA !== yearB) return yearA - yearB;
+						return monthA - monthB;
+					});
+
+					set({ monthlyBudgets: budgets })
 				})
 				.catch((err) => {
 					Alert.alert('Erro ao buscar lista de pessoas', FIREBASE_ERROR[err.code] || err.code)

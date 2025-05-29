@@ -14,6 +14,7 @@ interface OwnProps {
   disableAction: boolean;
   closeModal(): void;
   startAction(): void;
+  hideCancelButton?: boolean;
 }
 
 type ActionModalProps = OwnProps;
@@ -27,6 +28,7 @@ export default function ActionModal({
   disableAction,
   closeModal,
   startAction,
+  hideCancelButton = false,
 }: ActionModalProps) {
   return (
     <Modal
@@ -56,12 +58,14 @@ export default function ActionModal({
             }}
           />
           <View className="p-1" />
-          <InvertedButton
-            text={"Cancelar"}
-            onPress={() => {
-              closeModal();
-            }}
-          />
+          {!hideCancelButton && (
+            <InvertedButton
+              text={"Cancelar"}
+              onPress={() => {
+                closeModal();
+              }}
+            />
+          )}
         </View>
       </View>
     </Modal>

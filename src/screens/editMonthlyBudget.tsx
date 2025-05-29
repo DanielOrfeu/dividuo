@@ -1,20 +1,14 @@
-import moment from "moment";
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import RadioButtonGroup, { RadioButtonItem } from "expo-radio-button";
-
-import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
 
 import Input from "@components/input";
 import Button from "@components/button";
 import Loading from "@components/loading";
-import ActionModal from "@components/actionModal";
-import InvertedButton from "@components/invertedButton";
 
 import MonthlyBudgetService from "@services/monthlyBudget";
 
-import { useUserStore } from "@store/user";
 import { useMonthlyBudgetStore } from "@store/monthlyBudget";
 
 import { MonthlyBudget, ReserveType } from "@interfaces/monthlyBudget";
@@ -24,79 +18,23 @@ import { FIREBASE_ERROR } from "@enums/firebase";
 
 import * as utils from "@utils/index";
 
-export default function CreateMonthlyBudget({ navigation }) {
-  const [createLoading, setcreateLoading] = useState<boolean>(false);
-  const [openPrevModal, setopenPrevModal] = useState<boolean>(false);
-  const [openEconomyModal, setopenEconomyModal] = useState<boolean>(false);
-  const [previousMb, setpreviousMb] = useState<MonthlyBudget | null>(null);
+export default function EditMonthlyBudget({ navigation }) {
+  const [editLoading, seteditLoading] = useState<boolean>(false);
 
-  const previousMonthYear = moment(new Date(), "MM/YYYY")
-    .subtract(1, "month")
-    .format("MM/YYYY");
-  const [user] = useUserStore((state) => [state.user]);
   const [
     loading,
-    monthlyBudgets,
     setSelectedMonthlyBudget,
-    getBudgetByMonthYear,
-    monthYearReference,
+    selectedMonthlyBudget,
     setMonthYearReference,
   ] = useMonthlyBudgetStore((state) => [
     state.loadingMonthlyBudget,
-    state.monthlyBudgets,
     state.setSelectedMonthlyBudget,
-    state.getBudgetByMonthYear,
-    state.monthYearReference,
+    state.selectedMonthlyBudget,
     state.setMonthYearReference,
   ]);
-  const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget>({
-    creatorID: user.uid,
-    monthYear: monthYearReference,
-    grossSalary: 0,
-    deductions: 0,
-    fixedExpenses: 0,
-    extraValuesToSpend: 0,
-    extraValuesToReserve: 0,
-    reserveValue: 0,
-    reserveType: 0,
-    totalAccumulatedReserve: 0,
-    daysReport: [],
-    monthlyBudgetControlType: 0,
-    hasPreviousMonthBudget: false,
-  });
-
-  const { totalAvaliableToSpend } = useBudgetDetails(previousMb);
-
-  const checkPreviousMonthBudget = () => {
-    const prev = monthlyBudgets.find(
-      (mb) => mb?.monthYear === previousMonthYear
-    );
-    if (prev) {
-      setpreviousMb(prev);
-      setmonthlyBudget({
-        ...monthlyBudget,
-        hasPreviousMonthBudget: true,
-        totalAccumulatedReserve: prev.totalAccumulatedReserve,
-      });
-      setopenPrevModal(true);
-    }
-  };
-
-  useEffect(() => {
-    checkPreviousMonthBudget();
-
-    if (!previousMb) {
-      getBudgetByMonthYear(previousMonthYear);
-    }
-  }, []);
-
-  useEffect(() => {
-    checkPreviousMonthBudget();
-  }, [monthlyBudgets]);
-
-  useEffect(() => {
-    if (!openPrevModal && totalAvaliableToSpend) setopenEconomyModal(true);
-  }, [openPrevModal]);
+  const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget>(
+    selectedMonthlyBudget
+  );
 
   return (
     <View className="flex-1 items-center p-4 bg-white w-screen">
@@ -292,17 +230,17 @@ export default function CreateMonthlyBudget({ navigation }) {
                 !monthlyBudget.fixedExpenses ||
                 !monthlyBudget.reserveValue
               }
-              loading={createLoading}
-              text={"Criar orçamento mensal"}
+              loading={editLoading}
+              text={"Editar orçamento mensal"}
               onPress={() => {
-                setcreateLoading(true);
-                MonthlyBudgetService.CreateMonthlyBudget(monthlyBudget)
+                seteditLoading(true);
+                MonthlyBudgetService.EditMonthlyBudgetByID(monthlyBudget)
                   .then(() => {
                     setSelectedMonthlyBudget(monthlyBudget);
                     setMonthYearReference(monthlyBudget.monthYear);
                     Alert.alert(
                       "Sucesso!",
-                      "Orçamento mensal criado com sucesso!",
+                      "Orçamento mensal editado com sucesso!",
                       [
                         {
                           text: "OK",
@@ -317,90 +255,11 @@ export default function CreateMonthlyBudget({ navigation }) {
                     Alert.alert("Erro!", FIREBASE_ERROR[err.code] || err.code);
                   })
                   .finally(() => {
-                    setcreateLoading(false);
+                    seteditLoading(false);
                   });
               }}
             />
           </View>
-
-          {openPrevModal && (
-            <ActionModal
-              title={"Orçamento anterior encontrado"}
-              actionText={"Sim, usar"}
-              isVisible={openPrevModal}
-              content={
-                <View>
-                  <Text className="text-base text-center">
-                    Usar informações básicas do orçamento anterior como base
-                    para criação desse novo orçamento?
-                  </Text>
-                </View>
-              }
-              disableAction={false}
-              closeModal={() => setopenPrevModal(false)}
-              startAction={() => {
-                setmonthlyBudget((prev) => {
-                  const {
-                    creatorID,
-                    extraValuesToReserve,
-                    extraValuesToSpend,
-                    daysReport,
-                    monthYear,
-                  } = prev;
-                  return {
-                    ...previousMb,
-                    creatorID,
-                    extraValuesToReserve,
-                    extraValuesToSpend,
-                    daysReport,
-                    monthYear,
-                  };
-                });
-                setopenPrevModal(false);
-              }}
-            />
-          )}
-
-          {openEconomyModal && (
-            <ActionModal
-              hideCancelButton
-              title={"Você economizou!"}
-              actionText={"Colocar na reserva"}
-              isVisible={openEconomyModal}
-              content={
-                <View className="w-full">
-                  <Text className="text-base text-center">
-                    Como você terminou o mês anterior com saldo positivo de{" "}
-                    {utils.NumberToBRL(totalAvaliableToSpend)} sobre o quanto
-                    podia gastar, agora você decide o que fazer com esse valor
-                    extra:
-                  </Text>
-                  <InvertedButton
-                    type="info"
-                    text="Colocar no saldo disponível para uso"
-                    onPress={() => {
-                      setmonthlyBudget({
-                        ...monthlyBudget,
-                        extraValuesToSpend: totalAvaliableToSpend,
-                      });
-                      setopenEconomyModal(false);
-                    }}
-                  />
-                </View>
-              }
-              disableAction={false}
-              closeModal={() => setopenEconomyModal(false)}
-              startAction={() => {
-                setmonthlyBudget({
-                  ...monthlyBudget,
-                  totalAccumulatedReserve:
-                    totalAvaliableToSpend +
-                    monthlyBudget.totalAccumulatedReserve,
-                });
-                setopenEconomyModal(false);
-              }}
-            />
-          )}
         </>
       )}
     </View>

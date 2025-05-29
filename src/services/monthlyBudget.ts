@@ -58,13 +58,4 @@ export default class MonthlyBudgetService {
 			.doc(mbID)
 			.delete()
 	}
-
-
-	/*
-		TODO: 
-		- CreateMonthlyBudget recuperando informações do mês passado
-		- Verificar se vai poder editar/crirar mês passado ou futuro
-		- Integrar divida da feature principal com essa nova
-	*/
-
 }

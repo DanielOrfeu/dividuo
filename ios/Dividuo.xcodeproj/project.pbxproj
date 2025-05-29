@@ -14,8 +14,8 @@
 		96905EF65AED1B983A6B3ABC /* libPods-Dividuo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 58EEBF8E8E6FB1BC6CAF49B5 /* libPods-Dividuo.a */; };
 		B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		96E709D14FE04FF192523B0F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71F71040C19E4629A94294E8 /* GoogleService-Info.plist */; };
-		2EC2A6093F4B41B79FFFAD86 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB4CC3DD3BC46B99988588A /* noop-file.swift */; };
+		25F466EB74F5450AA00F57DB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 85BBCA39D4E647379F27918B /* GoogleService-Info.plist */; };
+		CA6411A0BF60433DA984BC20 /* noop-file.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E41361ACA0147A297C8534B /* noop-file.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,9 +32,9 @@
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FAC715A2D49A985799AEE119 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Dividuo/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		71F71040C19E4629A94294E8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "Dividuo/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
-		4EB4CC3DD3BC46B99988588A /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "Dividuo/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
-		AF90F7976E564E9BBF19FD47 /* Dividuo-Bridging-Header.h */ = {isa = PBXFileReference; name = "Dividuo-Bridging-Header.h"; path = "Dividuo/Dividuo-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		85BBCA39D4E647379F27918B /* GoogleService-Info.plist */ = {isa = PBXFileReference; name = "GoogleService-Info.plist"; path = "Dividuo/GoogleService-Info.plist"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = text.plist.xml; explicitFileType = undefined; includeInIndex = 0; };
+		6E41361ACA0147A297C8534B /* noop-file.swift */ = {isa = PBXFileReference; name = "noop-file.swift"; path = "Dividuo/noop-file.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		7F5A7F82F023414E89F2BF76 /* Dividuo-Bridging-Header.h */ = {isa = PBXFileReference; name = "Dividuo-Bridging-Header.h"; path = "Dividuo/Dividuo-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,9 +59,9 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				71F71040C19E4629A94294E8 /* GoogleService-Info.plist */,
-				4EB4CC3DD3BC46B99988588A /* noop-file.swift */,
-				AF90F7976E564E9BBF19FD47 /* Dividuo-Bridging-Header.h */,
+				85BBCA39D4E647379F27918B /* GoogleService-Info.plist */,
+				6E41361ACA0147A297C8534B /* noop-file.swift */,
+				7F5A7F82F023414E89F2BF76 /* Dividuo-Bridging-Header.h */,
 			);
 			name = Dividuo;
 			sourceTree = "<group>";
@@ -202,8 +202,8 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				96E709D14FE04FF192523B0F /* GoogleService-Info.plist in Resources */,
-				F5712A88F24E481AAB6D4CE5 /* Dividuo-Bridging-Header.h in Resources */,
+				25F466EB74F5450AA00F57DB /* GoogleService-Info.plist in Resources */,
+				2B7CAEFE72F94CADBBE38A1E /* Dividuo-Bridging-Header.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,7 +297,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				B18059E884C0ABDD17F3DC3D /* ExpoModulesProvider.swift in Sources */,
-				2EC2A6093F4B41B79FFFAD86 /* noop-file.swift in Sources */,
+				CA6411A0BF60433DA984BC20 /* noop-file.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,8 +5,8 @@ export interface MonthlyBudget {
 	grossSalary: number
 	deductions: number
 	fixedExpenses: number
-	extraSalaryIncome: number
-	extraReserveIncome: number
+	extraValuesToSpend: number
+	extraValuesToReserve: number
 	reserveValue: number
 	reserveType: ReserveType
 	totalAccumulatedReserve: number
@@ -34,4 +34,14 @@ export interface DayReport {
 export interface DailyExpense {
 	description?: string
 	amount: number
+}
+
+export interface MonthlyBudgetDetailedValues {
+	netSalary: number
+	monthlySpendingLimit: number
+	dailySpendingLimit: number
+	reserveAmount: number
+	totalAvaliableToSpend: number
+	totalSpending: number
+	averageDailySpending: number
 }

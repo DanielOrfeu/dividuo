@@ -29,6 +29,7 @@ module.exports = function (api) {
             "@enums": "./src/enums",
             "@constants": "./src/constants",
             "@interfaces": "./src/interfaces",
+            "@hooks": "./src/hooks",
           },
         },
       ],
