@@ -30,11 +30,11 @@ export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set, get) => {
 		},
 
 		monthlyBudgets: [],
-		getBudgetByMonthYear: async (mb) => {
+		getBudgetByMonthYear: async (my) => {
 			set({ loadingMonthlyBudget: true })
 			const { user } = useUserStore.getState()
 
-			await MonthlyBudgetService.GetBudgetByMonthYear(mb, user.uid)
+			await MonthlyBudgetService.GetBudgetByMonthYear(my, user.uid)
 				.then((res) => {
 					set({ selectedMonthlyBudget: res || null })
 					if (!res) return

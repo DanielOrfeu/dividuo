@@ -101,7 +101,9 @@ export default function CreateMonthlyBudget({ navigation }) {
   return (
     <View className="flex-1 items-center p-4 bg-white w-screen">
       {loading ? (
-        <Loading />
+        <View className="h-full justify-center">
+          <Loading size={80} />
+        </View>
       ) : (
         <>
           <Text className="text-3xl text-primary font-semibold">

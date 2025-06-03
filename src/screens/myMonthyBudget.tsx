@@ -42,12 +42,9 @@ export default function MyMonthyBudget() {
   useEffect(() => {
     if (!monthYearReference) {
       setMonthYearReference(moment(new Date()).format("MM/YYYY"));
+      getBudgetByMonthYear(moment(new Date()).format("MM/YYYY"));
     }
   }, []);
-
-  useEffect(() => {
-    getBudgetByMonthYear(monthYearReference);
-  }, [monthYearReference]);
 
   const renderLine = (label: string, value: string | number) => {
     const val = typeof value === "number" ? utils.NumberToBRL(value) : value;
@@ -62,11 +59,12 @@ export default function MyMonthyBudget() {
   return (
     <View className="flex-1 w-screen items-center p-4">
       {loading ? (
-        <Loading />
+        <View className="h-full justify-center">
+          <Loading size={80} />
+        </View>
       ) : (
         <>
           <MonthlyCalendar />
-
           {selectedMonthlyBudget ? (
             <>
               {renderLine("Salário bruto", selectedMonthlyBudget?.grossSalary)}
@@ -140,11 +138,11 @@ export default function MyMonthyBudget() {
 						</View> */}
             </>
           ) : (
-            <>
-              <Text className="text-2xl text-center font-bold text-primary">
-                Sem informações de orçamento para o mês escolhido!
+            <View className="flex-1 justify-center">
+              <Text className="text-xl text-center text-gray-400">
+                Sem informações de orçamento para o mês escolhido
               </Text>
-            </>
+            </View>
           )}
         </>
       )}

@@ -10,7 +10,7 @@ export interface MonthlyBudget {
 	reserveValue: number
 	reserveType: ReserveType
 	totalAccumulatedReserve: number
-	daysReport: DayReport[]
+	daysReport?: DayReport[]
 	monthlyBudgetControlType: MonthlyBudgetType
 	hasPreviousMonthBudget?: boolean
 }

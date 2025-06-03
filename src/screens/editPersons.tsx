@@ -25,12 +25,7 @@ import { Person } from "@interfaces/person";
 
 import { FIREBASE_ERROR } from "@enums/firebase";
 import { COLOR } from "@enums/colors";
-
-enum EditAction {
-  add,
-  edit,
-  remove,
-}
+import { ACTIONS } from "@enums/actions";
 
 export default function EditPersons() {
   const [user] = useUserStore((state) => [state.user]);
@@ -53,12 +48,12 @@ export default function EditPersons() {
   ]);
 
   const [index, setindex] = useState<number>();
-  const [action, setaction] = useState<EditAction>();
+  const [action, setaction] = useState<ACTIONS>();
   const [personName, setpersonName] = useState<string>("");
   const [personModalOpen, setpersonModalOpen] = useState<boolean>(false);
 
   const editPersonlist = async () => {
-    if (action === EditAction.add) {
+    if (action === ACTIONS.add) {
       await PersonService.CreatePerson({
         name: personName,
         creatorID: user.uid,
@@ -82,7 +77,7 @@ export default function EditPersons() {
         });
     }
 
-    if (action === EditAction.edit) {
+    if (action === ACTIONS.edit) {
       await PersonService.EditPerson({
         ...persons[index],
         name: personName,
@@ -110,7 +105,7 @@ export default function EditPersons() {
         });
     }
 
-    if (action === EditAction.remove) {
+    if (action === ACTIONS.remove) {
       const deletePerson = await PersonService.DeletePerson({
         ...persons[index],
         name: personName,
@@ -162,7 +157,7 @@ export default function EditPersons() {
             onPress={() => {
               setindex(index);
               setpersonName(person.name);
-              setaction(EditAction.edit);
+              setaction(ACTIONS.edit);
               setpersonModalOpen(true);
             }}
           >
@@ -171,7 +166,7 @@ export default function EditPersons() {
           <TouchableOpacity
             onPress={() => {
               setindex(index);
-              setaction(EditAction.remove);
+              setaction(ACTIONS.remove);
               setpersonModalOpen(true);
             }}
           >
@@ -221,25 +216,25 @@ export default function EditPersons() {
           disabled={loading}
           text={"Adicionar devedor/recebedor"}
           onPress={() => {
-            setaction(EditAction.add);
+            setaction(ACTIONS.add);
             setpersonModalOpen(true);
           }}
           icon={loading ? <Loading color={COLOR.white} size={20} /> : null}
         />
       </View>
       <ActionModal
-        type={action === EditAction.remove ? "alert" : ""}
-        title={`${action === EditAction.remove ? "Excluir" : action === EditAction.edit ? "Editar" : "Adicionar"} devedor/recebedor`}
+        type={action === ACTIONS.remove ? "alert" : ""}
+        title={`${action === ACTIONS.remove ? "Excluir" : action === ACTIONS.edit ? "Editar" : "Adicionar"} devedor/recebedor`}
         actionText={
-          action === EditAction.remove
+          action === ACTIONS.remove
             ? "Excluir"
-            : action === EditAction.edit
+            : action === ACTIONS.edit
               ? "Editar"
               : "Adicionar"
         }
         isVisible={personModalOpen}
         disableAction={
-          action === EditAction.edit && personName === persons[index].name
+          action === ACTIONS.edit && personName === persons[index].name
         }
         closeModal={() => {
           setpersonModalOpen(false);
@@ -250,7 +245,7 @@ export default function EditPersons() {
         content={
           <View className="w-full">
             <View className="w-full flex-row justify-evenly items-center ">
-              {action === EditAction.remove ? (
+              {action === ACTIONS.remove ? (
                 <Text className="text-center text-lg">
                   Excluir o devedor/recebedor deletará também todas as dívidas
                   relacionadas ao perfil selecionado! Continuar?

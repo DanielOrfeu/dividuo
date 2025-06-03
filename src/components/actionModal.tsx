@@ -11,10 +11,11 @@ interface OwnProps {
   actionText: string;
   isVisible: boolean;
   content: ReactNode;
-  disableAction: boolean;
+  disableAction?: boolean;
   closeModal(): void;
   startAction(): void;
   hideCancelButton?: boolean;
+  cancelButtonText?: string;
 }
 
 type ActionModalProps = OwnProps;
@@ -25,10 +26,11 @@ export default function ActionModal({
   actionText,
   isVisible,
   content,
-  disableAction,
+  disableAction = false,
   closeModal,
   startAction,
   hideCancelButton = false,
+  cancelButtonText,
 }: ActionModalProps) {
   return (
     <Modal
@@ -60,7 +62,7 @@ export default function ActionModal({
           <View className="p-1" />
           {!hideCancelButton && (
             <InvertedButton
-              text={"Cancelar"}
+              text={cancelButtonText || "Cancelar"}
               onPress={() => {
                 closeModal();
               }}

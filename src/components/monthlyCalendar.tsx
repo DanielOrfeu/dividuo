@@ -11,12 +11,15 @@ import { useMonthlyBudgetStore } from "@store/monthlyBudget";
 import Input from "@components/input";
 import ActionModal from "@components/actionModal";
 
-import { DailyExpense } from "@interfaces/monthlyBudget";
+import { DailyExpense, MonthlyBudget } from "@interfaces/monthlyBudget";
 
 import { COLOR } from "@enums/colors";
+import { ACTIONS } from "@enums/actions";
 
 import * as utils from "@utils/index";
 import { ptBR } from "@utils/localeCalendar";
+
+import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
 
 LocaleConfig.locales["pt-br"] = ptBR;
 LocaleConfig.defaultLocale = "pt-br";
@@ -27,23 +30,29 @@ export default function MonthlyCalendar() {
     selectedMonthlyBudget,
     monthYearReference,
     setMonthYearReference,
+    getBudgetByMonthYear,
   ] = useMonthlyBudgetStore((state) => [
     state.loadingMonthlyBudget,
     state.selectedMonthlyBudget,
     state.monthYearReference,
     state.setMonthYearReference,
+    state.getBudgetByMonthYear,
   ]);
+  const { dailySpendingLimit } = useBudgetDetails(selectedMonthlyBudget);
 
   const [day, setday] = useState<DateData | null>(null);
-  const [onEditing, setonEditing] = useState<boolean>(false);
-  const [dailyExpenses, setdailyExpenses] = useState<DailyExpense[] | null[]>(
-    []
+  const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget | null>(
+    null
   );
+  const [expense, setexpense] = useState<DailyExpense | null>(null);
+  const [action, setaction] = useState<ACTIONS>(ACTIONS.none);
+  const [indexToModify, setindexToModify] = useState<number>(-1);
+  const [expenseModalOpen, setexpenseModalOpen] = useState<boolean>(false);
+  const [deleteExpenseIndex, setdeleteExpenseIndex] = useState<number>(-1);
 
   useEffect(() => {
-    setday(null);
-    setdailyExpenses([]);
-  }, [monthYearReference]);
+    setmonthlyBudget(selectedMonthlyBudget);
+  }, [selectedMonthlyBudget]);
 
   return (
     <>
@@ -65,7 +74,7 @@ export default function MonthlyCalendar() {
           current={moment(monthYearReference, "MM/YYYY").toISOString()}
           enableSwipeMonths
           hideExtraDays
-          disabledByDefault={!selectedMonthlyBudget}
+          disabledByDefault={!monthlyBudget}
           markedDates={
             day && {
               [day.dateString]: {
@@ -88,7 +97,9 @@ export default function MonthlyCalendar() {
                     } else {
                       newMYRef.add(1, "month");
                     }
+                    getBudgetByMonthYear(newMYRef.format("MM/YYYY"));
                     setMonthYearReference(newMYRef.format("MM/YYYY"));
+                    setday(null);
                   }
                 }}
               />
@@ -112,11 +123,11 @@ export default function MonthlyCalendar() {
                 backgroundColor: "",
               },
               text: {
-                color: selectedMonthlyBudget ? COLOR.black : COLOR.gray,
+                color: monthlyBudget ? COLOR.black : COLOR.gray,
               },
             };
 
-            if (!selectedMonthlyBudget) {
+            if (!monthlyBudget) {
               return (
                 <TouchableOpacity
                   className={`w-7 h-7 rounded-full flex-row justify-center items-center`}
@@ -137,11 +148,11 @@ export default function MonthlyCalendar() {
               style.text.color = COLOR.primary;
             }
 
-            const foundDayReport = selectedMonthlyBudget?.daysReport.find(
+            const foundDayReport = monthlyBudget?.daysReport.find(
               (dr) => dr.day === date?.day
             );
 
-            if (foundDayReport) {
+            if (foundDayReport && foundDayReport.dailyExpenses.length > 0) {
               const amounts = foundDayReport.dailyExpenses.map(
                 (item) => item.amount
               );
@@ -177,11 +188,12 @@ export default function MonthlyCalendar() {
                 }}
                 onPress={() => {
                   setday(date);
-                  setdailyExpenses(
-                    selectedMonthlyBudget?.daysReport.find(
-                      (dr) => dr.day === date.day
-                    )?.dailyExpenses || []
-                  );
+                  if (
+                    !monthlyBudget.daysReport.find((dr) => dr.day === date?.day)
+                  ) {
+                    setaction(ACTIONS.add);
+                    setexpenseModalOpen(true);
+                  }
                 }}
               >
                 <Text className={`text-sm font-semibold`} style={style.text}>
@@ -192,137 +204,200 @@ export default function MonthlyCalendar() {
           }}
         />
       )}
-      {/* TODO: Editar lógica de criação de despesa */}
-      {day && (
-        <ActionModal
-          title={`Despesas dia ${day?.day}`}
-          actionText={"Criar despesa"}
-          isVisible={!!day?.day}
-          content={
-            <FlatList
-              className="w-full"
-              data={dailyExpenses}
-              renderItem={({ item, index }) => {
-                return (
-                  <View className="flex-row w-full justify-between bg-gray-200 rounded-3xl px-4 my-1">
-                    <View className="flex-row flex-1 gap-2">
-                      <Text className="self-center text-md font-semibold">
-                        {item.description || "Sem descrição"}
+
+      <ActionModal
+        title={`Despesas dia ${day?.day}`}
+        actionText={"Criar despesa"}
+        isVisible={monthlyBudget?.daysReport.some((dr) => dr.day === day?.day)}
+        content={
+          <FlatList
+            className="w-full"
+            data={
+              monthlyBudget?.daysReport.find((dr) => dr.day === day?.day)
+                ?.dailyExpenses || []
+            }
+            renderItem={({ item, index }) => {
+              return (
+                <View className="flex-row w-full justify-between bg-gray-200 rounded-3xl px-4 my-1">
+                  <View className="flex-row flex-1 gap-2">
+                    <Text className="self-center text-md font-semibold">
+                      {item.description || "Sem descrição"}
+                    </Text>
+                    <View className="items-center justify">
+                      <Text className="text-md font-semibold my-5">
+                        {utils.NumberToBRL(item.amount)}
                       </Text>
-                      <View className="items-center justify">
-                        {onEditing ? (
-                          <Input
-                            hideTitle
-                            title={""}
-                            value={
-                              item.amount
-                                ? utils.NumberToBRL(item.amount)
-                                : null
-                            }
-                            onChangeText={(txt) => {
-                              const value = +txt.replace(/[^0-9]/g, "") / 100;
-                              setdailyExpenses((prev) => {
-                                return prev.map((de, i) => {
-                                  if (i === index) {
-                                    return {
-                                      ...de,
-                                      amount: value,
-                                    };
-                                  }
-                                });
-                              });
-                            }}
-                          />
-                        ) : (
-                          <Text className="text-md font-semibold my-5">
-                            {utils.NumberToBRL(item.amount)}
-                          </Text>
-                        )}
-                      </View>
-                    </View>
-                    <View className="items-center justify-evenly flex-row gap-1">
-                      {!onEditing ? (
-                        <>
-                          <TouchableOpacity
-                            onPress={() => {
-                              setonEditing(true);
-                            }}
-                          >
-                            <Feather
-                              name="edit-3"
-                              size={24}
-                              color={COLOR.black}
-                            />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => {
-                              setdailyExpenses(
-                                dailyExpenses.filter((de, i) => i !== index)
-                              );
-                            }}
-                          >
-                            <Feather
-                              name="trash-2"
-                              size={24}
-                              color={COLOR.red}
-                            />
-                          </TouchableOpacity>
-                        </>
-                      ) : (
-                        <>
-                          <TouchableOpacity
-                            onPress={() => {
-                              setdailyExpenses(
-                                dailyExpenses.filter((de, i) => i !== index)
-                              );
-                            }}
-                          >
-                            <Feather
-                              name="save"
-                              size={24}
-                              color={COLOR.primary}
-                            />
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => {
-                              setonEditing(false);
-                            }}
-                          >
-                            <Feather
-                              name="x-circle"
-                              size={24}
-                              color={COLOR.red}
-                            />
-                          </TouchableOpacity>
-                        </>
-                      )}
                     </View>
                   </View>
-                );
-              }}
-              keyExtractor={(item, i) => item.description + i}
-              ListEmptyComponent={
-                <View className="items-center">
-                  <Text className="text-md">Sem despesesas registradas</Text>
+                  <View className="items-center justify-evenly flex-row gap-1">
+                    <>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const { description, amount } = item;
+                          setexpense({
+                            description,
+                            amount,
+                          });
+                          setaction(ACTIONS.edit);
+                          setexpenseModalOpen(true);
+                          setindexToModify(index);
+                        }}
+                      >
+                        <Feather name="edit-3" size={24} color={COLOR.black} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setindexToModify(index);
+                          setaction(ACTIONS.remove);
+                          setdeleteExpenseIndex(index);
+                        }}
+                      >
+                        <Feather name="trash-2" size={24} color={COLOR.red} />
+                      </TouchableOpacity>
+                    </>
+                  </View>
                 </View>
-              }
+              );
+            }}
+            keyExtractor={(item, i) => item.description + i}
+            ListEmptyComponent={
+              <View className="items-center">
+                <Text className="text-md">Sem despesesas registradas</Text>
+              </View>
+            }
+          />
+        }
+        disableAction={false}
+        closeModal={() => {
+          setday(null);
+        }}
+        startAction={() => {
+          setaction(ACTIONS.add);
+          setindexToModify(-1);
+          setexpenseModalOpen(true);
+        }}
+        cancelButtonText="Fechar"
+      />
+
+      <ActionModal
+        title={`${action === ACTIONS.edit ? "Editar" : "Criar"} despesa`}
+        actionText={action === ACTIONS.edit ? "Editar" : "Criar"}
+        isVisible={expenseModalOpen}
+        content={
+          <View className="w-full">
+            <Input
+              title="Descrição"
+              value={expense?.description}
+              onChangeText={(description) => {
+                setexpense({
+                  ...expense,
+                  description,
+                });
+              }}
             />
-          }
-          disableAction={false}
-          closeModal={() => {
+            <Input
+              numeric
+              title={"Valor"}
+              value={
+                expense?.amount ? utils.NumberToBRL(expense?.amount) : null
+              }
+              onChangeText={(txt) => {
+                const value = +txt.replace(/[^0-9]/g, "") / 100;
+                setexpense({
+                  ...expense,
+                  amount: value,
+                });
+              }}
+            />
+          </View>
+        }
+        disableAction={false}
+        closeModal={() => {
+          if (action === ACTIONS.add) {
             setday(null);
-          }}
-          startAction={() => {
-            setdailyExpenses([
-              ...dailyExpenses,
-              {
-                amount: 2,
-                description: `teste ${(Math.random() * 10).toFixed(2)}`,
-              },
-            ]);
-          }}
-        />
-      )}
+          }
+          setexpenseModalOpen(false);
+          setaction(ACTIONS.none);
+          setexpense(null);
+        }}
+        startAction={() => {
+          const dayHasReport = monthlyBudget?.daysReport.find(
+            (dr) => dr.day === day?.day
+          );
+
+          const reportIndex =
+            monthlyBudget?.daysReport.findIndex((dr) => dr.day === day?.day) ||
+            -1;
+
+          const dayReport = {
+            day: day?.day,
+            budget: dayHasReport ? dayHasReport.budget : dailySpendingLimit,
+            dailyExpenses: [
+              ...(monthlyBudget?.daysReport[reportIndex]?.dailyExpenses || []),
+            ],
+          };
+
+          if (indexToModify !== -1) {
+            dayReport.dailyExpenses[indexToModify] = {
+              description: expense?.description,
+              amount: expense?.amount,
+            };
+          } else {
+            dayReport.dailyExpenses.push({
+              description: expense?.description,
+              amount: expense?.amount,
+            });
+          }
+
+          setmonthlyBudget({
+            ...monthlyBudget,
+            daysReport: [
+              ...monthlyBudget.daysReport.filter((dr) => dr.day !== day?.day),
+              dayReport,
+            ],
+          });
+
+          setexpenseModalOpen(false);
+          setaction(ACTIONS.none);
+          setexpense(null);
+        }}
+      />
+
+      <ActionModal
+        title="Remover despesa"
+        actionText="Remover"
+        type="alert"
+        isVisible={deleteExpenseIndex !== -1}
+        content={
+          <View className="w-full ">
+            <Text className="text-md text-center">
+              Tem certeza que deseja remover essa despesa?
+            </Text>
+          </View>
+        }
+        closeModal={() => {
+          setdeleteExpenseIndex(-1);
+          setexpense(null);
+        }}
+        startAction={() => {
+          setexpense(null);
+          setmonthlyBudget({
+            ...monthlyBudget,
+            daysReport: monthlyBudget.daysReport.map((dr) => {
+              if (dr.day === day?.day) {
+                return {
+                  ...dr,
+                  dailyExpenses: dr.dailyExpenses.filter(
+                    (_, i) => i !== deleteExpenseIndex
+                  ),
+                };
+              }
+              return dr;
+            }),
+          });
+          setdeleteExpenseIndex(-1);
+        }}
+      />
     </>
   );
 }
