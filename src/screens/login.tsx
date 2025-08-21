@@ -14,8 +14,8 @@ import { COLOR } from "@enums/colors";
 import { EMAIL_REGEX } from "@constants/index";
 
 export default function Login({ navigation }) {
-  const [email, setemail] = useState<string>();
-  const [password, setpassword] = useState<string>();
+  const [email, setemail] = useState<string>("");
+  const [password, setpassword] = useState<string>("");
   const [loading, setloading] = useState<boolean>(false);
 
   return (
