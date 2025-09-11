@@ -1,6 +1,6 @@
+import clsx from "clsx";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Direction } from "react-native-modal";
 import { DayProps } from "react-native-calendars/src/calendar/day";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Calendar, DateData, LocaleConfig } from "react-native-calendars";
@@ -24,186 +24,189 @@ import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
 LocaleConfig.locales["pt-br"] = ptBR;
 LocaleConfig.defaultLocale = "pt-br";
 
-export default function MonthlyCalendar() {
-  const [
-    loading,
-    selectedMonthlyBudget,
-    monthYearReference,
-    setMonthYearReference,
-    getBudgetByMonthYear,
-  ] = useMonthlyBudgetStore((state) => [
-    state.loadingMonthlyBudget,
-    state.selectedMonthlyBudget,
-    state.monthYearReference,
-    state.setMonthYearReference,
-    state.getBudgetByMonthYear,
-  ]);
-  const { dailySpendingLimit } = useBudgetDetails(selectedMonthlyBudget);
+interface OwnProps {
+  monthlyBudget: MonthlyBudget | null;
+  monthYearReference: string;
+  setmonthlyBudget(monthlyBudget: MonthlyBudget): void;
+  setMonthYearReference(myr: string): void;
+}
 
+interface StyleDayProps {
+  touch: {
+    borderColor: string;
+    backgroundColor: string;
+    borderWidth: number;
+  };
+  text: {
+    color: string;
+  };
+}
+
+type Props = OwnProps;
+
+export default function MonthlyCalendar({
+  monthlyBudget,
+  monthYearReference,
+  setmonthlyBudget,
+  setMonthYearReference,
+}: Props) {
+  const { dailySpendingLimit } = useBudgetDetails(monthlyBudget);
+  const [setLoadingMonthlyBudget] = useMonthlyBudgetStore((state) => [
+    state.setLoadingMonthlyBudget,
+  ]);
   const [day, setday] = useState<DateData | null>(null);
-  const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget | null>(
-    null
-  );
   const [expense, setexpense] = useState<DailyExpense | null>(null);
   const [action, setaction] = useState<ACTIONS>(ACTIONS.none);
   const [indexToModify, setindexToModify] = useState<number>(-1);
   const [expenseModalOpen, setexpenseModalOpen] = useState<boolean>(false);
   const [deleteExpenseIndex, setdeleteExpenseIndex] = useState<number>(-1);
-
-  useEffect(() => {
-    setmonthlyBudget(selectedMonthlyBudget);
-  }, [selectedMonthlyBudget]);
+  const month = moment(monthYearReference, "MM/YYYY").format("MMMM");
+  const year = moment(monthYearReference, "MM/YYYY").format("YYYY");
+  const todayMYRef = moment(new Date()).format("MM/YYYY");
+  const disabledFuture = moment(monthYearReference, "MM/YYYY").isSameOrAfter(
+    moment(todayMYRef, "MM/YYYY")
+  );
 
   return (
     <>
-      {monthYearReference && (
-        <Calendar
-          className="w-screen rounded-xl bg-transparent p-4"
-          headerStyle={{
-            borderBottomWidth: 2,
-            borderBottomColor: COLOR.primary,
-            marginBottom: 10,
-          }}
-          theme={{
-            monthTextColor: COLOR.black,
-            textSectionTitleColor: COLOR.primary,
-            arrowColor: COLOR.primary,
-            calendarBackground: "transparent",
-            textDisabledColor: COLOR.blue,
-          }}
-          current={moment(monthYearReference, "MM/YYYY").toISOString()}
-          enableSwipeMonths
-          hideExtraDays
-          disabledByDefault={!monthlyBudget}
-          markedDates={
-            day && {
-              [day.dateString]: {
-                selected: true,
-                selectedColor: COLOR.primary,
-              },
-            }
-          }
-          renderArrow={(direction: Direction) => {
-            return (
-              <Feather
-                name={direction === "left" ? "arrow-left" : "arrow-right"}
-                size={24}
-                color={COLOR.primary}
+      <Calendar
+        className="w-screen rounded-xl bg-transparent px-3"
+        headerStyle={{
+          borderBottomWidth: 2,
+          borderBottomColor: COLOR.primary,
+          marginBottom: 10,
+        }}
+        theme={{
+          textSectionTitleColor: COLOR.primary,
+          calendarBackground: "transparent",
+          textDisabledColor: COLOR.gray,
+          todayButtonTextColor: COLOR.primary,
+          monthTextColor: "transparent",
+          dayTextColor: monthlyBudget ? COLOR.black : COLOR.lightGray,
+        }}
+        current={moment(monthYearReference, "MM/YYYY").toISOString()}
+        hideExtraDays
+        hideArrows
+        disabledByDefault={!monthlyBudget}
+        renderHeader={() => {
+          return (
+            <View className="flex-row w-full justify-evenly items-center pb-4 gap-2">
+              <TouchableOpacity
+                className=" bg-primary rounded-full p-2"
                 onPress={() => {
-                  if (!loading) {
-                    const newMYRef = moment(monthYearReference, "MM/YYYY");
-                    if (direction === "left") {
-                      newMYRef.subtract(1, "month");
-                    } else {
-                      newMYRef.add(1, "month");
-                    }
-                    getBudgetByMonthYear(newMYRef.format("MM/YYYY"));
-                    setMonthYearReference(newMYRef.format("MM/YYYY"));
-                    setday(null);
-                  }
+                  setLoadingMonthlyBudget(true);
+                  const newMYRef = moment(monthYearReference, "MM/YYYY")
+                    .subtract(1, "month")
+                    .format("MM/YYYY");
+                  setMonthYearReference(newMYRef);
                 }}
-              />
-            );
-          }}
-          dayComponent={(props: DayProps & { date?: DateData }) => {
-            const { date, state } = props;
-            interface StyleDayProps {
-              touch: {
-                borderColor: string;
-                backgroundColor: string;
-              };
-              text: {
-                color: string;
-              };
-            }
+              >
+                <Feather name={"arrow-left"} size={20} color={COLOR.white} />
+              </TouchableOpacity>
+              <View className="flex-col justify-between items-center">
+                <Text className="text-2xl text-primary font-bold pt-3">
+                  {month.charAt(0).toUpperCase() + month.slice(1)}
+                </Text>
+                <Text className="text-lg text-primary">{year}</Text>
+              </View>
+              <TouchableOpacity
+                disabled={disabledFuture}
+                className={clsx(
+                  "rounded-full p-2",
+                  disabledFuture ? "bg-gray-500" : "bg-primary"
+                )}
+                onPress={() => {
+                  setLoadingMonthlyBudget(true);
+                  const newMYRef = moment(monthYearReference, "MM/YYYY")
+                    .add(1, "month")
+                    .format("MM/YYYY");
+                  setMonthYearReference(newMYRef);
+                }}
+              >
+                <Feather name={"arrow-right"} size={20} color={COLOR.white} />
+              </TouchableOpacity>
+            </View>
+          );
+        }}
+        markedDates={
+          day && {
+            [day.dateString]: {
+              selected: true,
+              selectedColor: COLOR.primary,
+            },
+          }
+        }
+        dayComponent={(props: DayProps & { date?: DateData }) => {
+          const { date, state } = props;
+          const disabled = !monthlyBudget;
+          const today = state === "today";
 
-            const style: StyleDayProps = {
-              touch: {
-                borderColor: "",
-                backgroundColor: "",
-              },
-              text: {
-                color: monthlyBudget ? COLOR.black : COLOR.gray,
-              },
-            };
+          let baseColor = disabled ? COLOR.gray : COLOR.primary;
 
-            if (!monthlyBudget) {
-              return (
-                <TouchableOpacity
-                  className={`w-7 h-7 rounded-full flex-row justify-center items-center`}
-                  style={{
-                    ...style.touch,
-                    borderWidth: 0,
-                  }}
-                >
-                  <Text className={`text-sm font-semibold`} style={style.text}>
-                    {date.day}
-                  </Text>
-                </TouchableOpacity>
-              );
-            }
+          const foundDayReport = monthlyBudget?.daysReport.find(
+            (dr) => dr.day === date?.day
+          );
 
-            if (state === "today") {
-              style.touch.borderColor = COLOR.primary;
-              style.text.color = COLOR.primary;
-            }
-
-            const foundDayReport = monthlyBudget?.daysReport.find(
-              (dr) => dr.day === date?.day
-            );
-
+          if (!disabled) {
             if (foundDayReport && foundDayReport.dailyExpenses.length > 0) {
               const amounts = foundDayReport.dailyExpenses.map(
                 (item) => item.amount
               );
               const total = amounts.reduce((acc, val) => acc + val, 0);
-              const exceededLimit = foundDayReport.budget < total;
+              const exceededLimit = total > dailySpendingLimit;
 
               if (exceededLimit) {
-                style.touch.borderColor = COLOR.red;
-                style.text.color = COLOR.red;
+                baseColor = COLOR.red;
               } else {
-                style.touch.borderColor = COLOR.blue;
-                style.text.color = COLOR.blue;
-              }
-
-              if (state !== "today") {
-                style.text.color = COLOR.white;
-                style.touch.backgroundColor = style.touch.borderColor;
-                style.touch.borderColor = "";
+                baseColor = COLOR.blue;
               }
             }
+          }
 
-            if (date?.dateString === day?.dateString) {
-              style.text.color = COLOR.white;
-              style.touch.backgroundColor = COLOR.primary;
-            }
+          const style: StyleDayProps = {
+            touch: {
+              borderWidth: today ? 2 : 0,
+              borderColor: today ? baseColor : "transparent",
+              backgroundColor:
+                today || disabled || !foundDayReport
+                  ? "transparent"
+                  : baseColor,
+            },
+            text: {
+              color:
+                today || disabled || !foundDayReport ? baseColor : COLOR.white,
+            },
+          };
 
-            return (
-              <TouchableOpacity
-                className={`w-7 h-7 rounded-full flex-row justify-center items-center`}
-                style={{
-                  ...style.touch,
-                  borderWidth: state === "today" ? 2 : 0,
-                }}
-                onPress={() => {
+          return (
+            <TouchableOpacity
+              className={`w-7 h-7 rounded-full flex-row justify-center items-center`}
+              style={style.touch}
+              disabled={disabled}
+              onPress={() => {
+                if (!disabled) {
                   setday(date);
                   if (
-                    !monthlyBudget.daysReport.find((dr) => dr.day === date?.day)
+                    !monthlyBudget?.daysReport.find(
+                      (dr) => dr.day === date?.day
+                    )
                   ) {
                     setaction(ACTIONS.add);
                     setexpenseModalOpen(true);
+                  } else {
+                    setaction(ACTIONS.edit);
+                    setexpenseModalOpen(true);
                   }
-                }}
-              >
-                <Text className={`text-sm font-semibold`} style={style.text}>
-                  {date.day}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      )}
+                }
+              }}
+            >
+              <Text className={`text-sm font-semibold`} style={style.text}>
+                {date?.day}
+              </Text>
+            </TouchableOpacity>
+          );
+        }}
+      />
 
       <ActionModal
         title={`Despesas dia ${day?.day}`}
@@ -331,7 +334,6 @@ export default function MonthlyCalendar() {
 
           const dayReport = {
             day: day?.day,
-            budget: dayHasReport ? dayHasReport.budget : dailySpendingLimit,
             dailyExpenses: [
               ...(monthlyBudget?.daysReport[reportIndex]?.dailyExpenses || []),
             ],
@@ -381,20 +383,20 @@ export default function MonthlyCalendar() {
         }}
         startAction={() => {
           setexpense(null);
-          setmonthlyBudget({
-            ...monthlyBudget,
-            daysReport: monthlyBudget.daysReport.map((dr) => {
-              if (dr.day === day?.day) {
-                return {
-                  ...dr,
-                  dailyExpenses: dr.dailyExpenses.filter(
-                    (_, i) => i !== deleteExpenseIndex
-                  ),
-                };
-              }
-              return dr;
-            }),
-          });
+          // setmonthlyBudget({
+          //   ...monthlyBudget,
+          //   daysReport: monthlyBudget.daysReport.map((dr) => {
+          //     if (dr.day === day?.day) {
+          //       return {
+          //         ...dr,
+          //         dailyExpenses: dr.dailyExpenses.filter(
+          //           (_, i) => i !== deleteExpenseIndex
+          //         ),
+          //       };
+          //     }
+          //     return dr;
+          //   }),
+          // });
           setdeleteExpenseIndex(-1);
         }}
       />

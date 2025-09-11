@@ -6,7 +6,7 @@ interface OwnProps {
   w?: string;
   text?: string;
   icon?: ReactNode;
-  type?: string;
+  type?: "default" | "info" | "alert" | "warning" | "disabled";
   disabled?: boolean;
   onPress(): void;
 }

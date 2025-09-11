@@ -161,55 +161,6 @@ export default function EditMonthlyBudget({ navigation }) {
               />
             </RadioButtonGroup>
           </View>
-          <View className="flex-row w-full items-center">
-            <Text className="text-sm text-primary font-semibold mr-1">
-              Tipo de controle diário
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                Alert.alert(
-                  "Tipo de controle diário",
-                  `Após o a criação do orçamento, o sistema calcula quantos reais por dia você pode gastar, para alcaçar o objetivo da reserva do mês. O controle diário pode ser feito de duas formas:\n\n1 - Fixado: No fixado, o sistema leva em conta o valor diário fixo o mês inteiro.\n\n2 - Baseado nos dias remanescentes: Com essa escolha, o sistema recalcula todo dia os valores disponíveis para gastar nos dias que faltam no mês\n\nOBS: Toda vez que houver a troca do tipo de controle diário, o sistema irá travar os dias anteriores ao atual.`,
-                  [
-                    {
-                      text: "OK",
-                      onPress: () => {},
-                    },
-                  ]
-                );
-              }}
-              children={
-                <Feather name="help-circle" size={24} color={COLOR.primary} />
-              }
-            />
-          </View>
-          <View className="flex-row p-2 w-full justify-center">
-            <RadioButtonGroup
-              selected={monthlyBudget.reserveType}
-              size={22}
-              containerStyle={{ gap: 10, with: "100%", flexDirection: "row" }}
-              onSelected={(value) =>
-                setmonthlyBudget({
-                  ...monthlyBudget,
-                  reserveType: value,
-                })
-              }
-              radioBackground={COLOR.primary}
-            >
-              <RadioButtonItem
-                value={ReserveType.percentage}
-                label={<Text className="text-primary">Fixado</Text>}
-              />
-              <RadioButtonItem
-                value={ReserveType.amount}
-                label={
-                  <Text className="text-primary">
-                    Baseado nos dias restantes
-                  </Text>
-                }
-              />
-            </RadioButtonGroup>
-          </View>
           <Input
             title="Reserva acumulada até o momento"
             disabled
@@ -219,7 +170,7 @@ export default function EditMonthlyBudget({ navigation }) {
               const value = +txt.replace(/[^0-9]/g, "") / 100;
               setmonthlyBudget({
                 ...monthlyBudget,
-                reserveValue: value,
+                totalAccumulatedReserve: value,
               });
             }}
           />

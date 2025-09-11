@@ -4,14 +4,15 @@ import { MonthlyBudget, MonthlyBudgetDetailedValues, ReserveType } from "@interf
 
 export function useBudgetDetails(selectedMonthlyBudget?: MonthlyBudget) {
   const [details, setDetails] = useState<MonthlyBudgetDetailedValues>({
-	netSalary: 0,
-	monthlySpendingLimit: 0,
-	dailySpendingLimit: 0,
-	reserveAmount: 0,
-	totalAvaliableToSpend: 0,
-	totalSpending: 0,
-	averageDailySpending: 0,
-});
+    netSalary: 0,
+    monthlySpendingLimit: 0,
+    dailySpendingLimit: 0,
+    reserveAmount: 0,
+    totalAvaliableToSpend: 0,
+    totalSpending: 0,
+    averageDailySpending: 0,
+    remainingDaysAverageSpending: 0
+  });
 
   useEffect(() => {
     if (!selectedMonthlyBudget) return;
@@ -24,6 +25,7 @@ export function useBudgetDetails(selectedMonthlyBudget?: MonthlyBudget) {
       reserveValue,
       daysReport,
       monthYear,
+      customDailySpendingLimit
     } = selectedMonthlyBudget;
 
     const netSalary = grossSalary - deductions - fixedExpenses;
@@ -37,9 +39,6 @@ export function useBudgetDetails(selectedMonthlyBudget?: MonthlyBudget) {
 
     const monthlySpendingLimit = netSalary - reserveAmount;
 
-    const dailySpendingLimit =
-      monthlySpendingLimit / moment(monthYear, "MM/YYYY").daysInMonth();
-
     const totalSpending = daysReport.reduce((total, dayReport) => {
       const dailyTotal = dayReport.dailyExpenses.reduce(
         (sum, expense) => sum + expense.amount,
@@ -50,7 +49,16 @@ export function useBudgetDetails(selectedMonthlyBudget?: MonthlyBudget) {
 
     const totalAvaliableToSpend = monthlySpendingLimit - totalSpending
 
-    const averageDailySpending = totalSpending / moment(selectedMonthlyBudget.monthYear,"MM/YYYY").daysInMonth()
+    const dailySpendingLimit = customDailySpendingLimit > 0 ? customDailySpendingLimit :
+      monthlySpendingLimit / moment(monthYear, "MM/YYYY").daysInMonth();
+
+    const averageDailySpending = totalSpending / moment(selectedMonthlyBudget.monthYear, "MM/YYYY").daysInMonth()
+
+    const today = moment();
+    const endOfMonth = moment().endOf("month");
+    const remaningDays = endOfMonth.diff(today, "days") + 1;
+
+    const remainingDaysAverageSpending = totalAvaliableToSpend / remaningDays
 
     setDetails({
       netSalary,
@@ -60,6 +68,7 @@ export function useBudgetDetails(selectedMonthlyBudget?: MonthlyBudget) {
       totalAvaliableToSpend,
       totalSpending,
       averageDailySpending,
+      remainingDaysAverageSpending
     });
   }, [selectedMonthlyBudget]);
 

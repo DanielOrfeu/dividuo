@@ -1,149 +1,218 @@
+import { useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import moment from "moment";
-import { useEffect } from "react";
-import { View, Text } from "react-native";
 
-import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
-
-// import MonthlyBudgetService from "@services/monthlyBudget";
+import { MonthlyBudget } from "@interfaces/monthlyBudget";
 
 import { useMonthlyBudgetStore } from "@store/monthlyBudget";
+import { useUserLastBudgetStore } from "@store/userLastBudget";
 
-import Loading from "@components/loading";
+import Button from "@components/button";
 import MonthlyCalendar from "@components/monthlyCalendar";
-// import Button from "@components/button";
+import Loading from "@components/loading";
+
+import { COLOR } from "@enums/colors";
 
 import * as utils from "@utils/index";
 
-export default function MyMonthyBudget() {
+import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
+
+export default function MyMonthlyBudget({ navigation }) {
   const [
-    loading,
-    // monthlyBudgets,
-    selectedMonthlyBudget,
-    getBudgetByMonthYear,
     monthYearReference,
     setMonthYearReference,
+    getMonthyBudgetByMonthYear,
+    selectedMonthlyBudget,
+    setSelectedMonthlyBudget,
+    loadingMonthlyBudget,
+    setLoadingMonthlyBudget,
   ] = useMonthlyBudgetStore((state) => [
-    state.loadingMonthlyBudget,
-    // state.monthlyBudgets,
-    state.selectedMonthlyBudget,
-    state.getBudgetByMonthYear,
     state.monthYearReference,
     state.setMonthYearReference,
+    state.getMonthyBudgetByMonthYear,
+    state.selectedMonthlyBudget,
+    state.setSelectedMonthlyBudget,
+    state.loadingMonthlyBudget,
+    state.setLoadingMonthlyBudget,
   ]);
-  const {
-    reserveAmount,
-    monthlySpendingLimit,
-    dailySpendingLimit,
-    totalAvaliableToSpend,
-    totalSpending,
-    averageDailySpending,
-  } = useBudgetDetails(selectedMonthlyBudget);
+  const [userLastBudget, getUserLastBudgetByCreator] = useUserLastBudgetStore(
+    (state) => [state.userLastBudget, state.getUserLastBudgetByCreator]
+  );
+  const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget | null>(
+    null
+  );
 
-  useEffect(() => {
-    if (!monthYearReference) {
-      setMonthYearReference(moment(new Date()).format("MM/YYYY"));
-      getBudgetByMonthYear(moment(new Date()).format("MM/YYYY"));
+  const [isError, setisError] = useState<boolean>(false);
+  const [isAbleToCreate, setisAbleToCreate] = useState<boolean>(false);
+  const [isAbleToEdit, setisAbleToEdit] = useState<boolean>(false);
+  const { reserveAmount, remainingDaysAverageSpending, totalAvaliableToSpend } =
+    useBudgetDetails(monthlyBudget);
+
+  const checkAvailability = (budget: MonthlyBudget | null) => {
+    let ableToCreate = false;
+    let ableToEdit = false;
+
+    const today = moment(new Date());
+    const selectedMonthYear = moment(monthYearReference, "MM/YYYY");
+    const lastBudgetCreated = userLastBudget?.reference
+      ? moment(userLastBudget.reference, "MM/YYYY")
+      : today;
+
+    if (!budget) {
+      ableToCreate =
+        !userLastBudget?.reference ||
+        (selectedMonthYear.isAfter(lastBudgetCreated) &&
+          selectedMonthYear.isSameOrBefore(today));
+    } else {
+      ableToEdit = selectedMonthYear.isSame(lastBudgetCreated);
     }
-  }, []);
 
-  const renderLine = (label: string, value: string | number) => {
-    const val = typeof value === "number" ? utils.NumberToBRL(value) : value;
-    return (
-      <View className="w-full justify-between flex-row">
-        <Text className={`text-lg`}>{label}</Text>
-        <Text className={`text-lg font-semibold`}>{val}</Text>
-      </View>
-    );
+    setisAbleToEdit(ableToEdit);
+    setisAbleToCreate(ableToCreate);
   };
 
+  const getBudget = () => {
+    setLoadingMonthlyBudget(true);
+    getMonthyBudgetByMonthYear(monthYearReference)
+      .then((budget) => {
+        checkAvailability(budget);
+        setisError(false);
+        setmonthlyBudget(budget);
+        setSelectedMonthlyBudget(budget);
+      })
+      .catch((err) => {
+        setisAbleToCreate(false);
+        setisError(true);
+        setmonthlyBudget(null);
+        setSelectedMonthlyBudget(null);
+        setisAbleToEdit(false);
+        setisAbleToCreate(false);
+      })
+      .finally(() => {
+        setLoadingMonthlyBudget(false);
+      });
+  };
+
+  useEffect(() => {
+    getBudget();
+  }, [monthYearReference]);
+
+  useEffect(() => {
+    setLoadingMonthlyBudget(true);
+    if (!monthYearReference) {
+      setMonthYearReference(moment(new Date()).format("MM/YYYY"));
+    }
+    getUserLastBudgetByCreator();
+  }, []);
+
   return (
-    <View className="flex-1 w-screen items-center p-4">
-      {loading ? (
-        <View className="h-full justify-center">
-          <Loading size={80} />
-        </View>
+    <View className="flex-1 w-screen justify-evenly items-center py-4">
+      {loadingMonthlyBudget ? (
+        <Loading size={50} />
       ) : (
         <>
-          <MonthlyCalendar />
-          {selectedMonthlyBudget ? (
-            <>
-              {renderLine("Salário bruto", selectedMonthlyBudget?.grossSalary)}
-              {renderLine(
-                "Descontos (impostos etc.)",
-                selectedMonthlyBudget?.deductions
-              )}
-              {renderLine(
-                "Despesas fixas",
-                selectedMonthlyBudget?.fixedExpenses
-              )}
-              {renderLine(
-                "Reserva acumulada",
-                selectedMonthlyBudget?.totalAccumulatedReserve
-              )}
-              {renderLine("Reserva planejada para o mês", reserveAmount)}
-              {renderLine("Limite de gastos do mês", monthlySpendingLimit)}
-              {renderLine("Limite de gastos diários", dailySpendingLimit)}
-              {renderLine("Valor disponível para gasto", totalAvaliableToSpend)}
-              {renderLine("Total gasto até o momento", totalSpending)}
-              {renderLine("Média diária de gastos", averageDailySpending)}
-              {/* <View className="">
-							<Button
-								text="Adicionar despesa"
-								type="info"
-								onPress={function (): void {
-									throw new Error("Function not implemented.");
-								}} />
-							<Button
-								text="Adicionar Entrada"
+          <View className="mid flex-col items-center">
+            {monthYearReference && (
+              <MonthlyCalendar
+                monthlyBudget={monthlyBudget}
+                monthYearReference={monthYearReference}
+                setmonthlyBudget={setmonthlyBudget}
+                setMonthYearReference={(my) => {
+                  setMonthYearReference(my);
+                }}
+              />
+            )}
+          </View>
+          <View className="actions p-4 flex-1 items-center justify-evenly w-full">
+            {monthlyBudget && (
+              <>
+                <Text className="text-lg text-center text-black">
+                  Você ainda pode gastar{" "}
+                  <Text className="px-4 font-semibold color-primary">
+                    {utils.NumberToBRL(totalAvaliableToSpend)}
+                  </Text>{" "}
+                  esse mês ({utils.NumberToBRL(remainingDaysAverageSpending)}{" "}
+                  por dia) se quiser adicionar os{" "}
+                  {utils.NumberToBRL(reserveAmount)} planejados à sua reserva.
+                </Text>
+                <Text className="text-lg text-center text-black">
+                  Até o momento você juntou{" "}
+                  <Text className="px-4 font-semibold color-primary">
+                    {utils.NumberToBRL(monthlyBudget.totalAccumulatedReserve)}
+                  </Text>{" "}
+                  parabéns!
+                </Text>
+                <View className="flex-col items-center w-full">
+                  <Button
+                    type="default"
+                    text="Ver mais detalhes"
+                    onPress={() => {}}
+                  />
+                  {isAbleToEdit && (
+                    <>
+                      <Button
+                        type="info"
+                        text="Editar orçamento"
+                        onPress={() => {}}
+                      />
+                      <Button
+                        type="alert"
+                        text="Deletar orçamento"
+                        onPress={() => {}}
+                      />
+                    </>
+                  )}
+                </View>
+              </>
+            )}
 
-								onPress={function (): void {
-									throw new Error("Function not implemented.");
-								}} />
-							<Button
-								text="Adicionar na reserva"
+            {isAbleToCreate && (
+              <>
+                <Text className="text-lg text-center text-gray-500 mb-4">
+                  Sem informações de orçamento para o mês escolhido
+                </Text>
 
-								onPress={function (): void {
-									throw new Error("Function not implemented.");
-								}} />
-							<Button
-								text="Editar orçamento mensal"
-								type="warning"
-								onPress={() => {
-									MonthlyBudgetService.EditMonthlyBudgetByID({
-										...selectedMonthlyBudget,
-										daysReport: [
-											{
-												day: 11,
-												budget: dailySpendingLimit,
-												dailyExpenses: [{
-													amount: 100,
-													description: "Teste"
-												}]
-											},
-											{
-												day: 8,
-												budget: dailySpendingLimit,
-												dailyExpenses: [{
-													amount: 20,
-													description: "Teste2"
-												},
-												{
-													amount: 31,
-													description: "Teste3"
-												}]
-											}
-										]
-									})
-								}} />
-						</View> */}
-            </>
-          ) : (
-            <View className="flex-1 justify-center">
-              <Text className="text-xl text-center text-gray-400">
-                Sem informações de orçamento para o mês escolhido
+                <Button
+                  text="Criar orçamento"
+                  w="w-1/2"
+                  icon={
+                    <Feather
+                      name={"plus-circle"}
+                      size={20}
+                      color={COLOR.white}
+                    />
+                  }
+                  onPress={() => {
+                    navigation.navigate("CreateMonthlyBudget");
+                  }}
+                ></Button>
+              </>
+            )}
+
+            {!isAbleToCreate && !monthlyBudget && (
+              <>
+                {moment(monthYearReference, "MM/YYYY").isBefore(
+                  moment(new Date(), "MM/YYYY")
+                ) ? (
+                  <Text className="text-lg text-center">
+                    Não é possível criar o orçamento de {monthYearReference}{" "}
+                    pois já existe um ou mais orçamentos a frente desse mês
+                  </Text>
+                ) : (
+                  <Text className="text-lg text-center">
+                    É possível apenas criar orçamentos passados ou presente
+                  </Text>
+                )}
+              </>
+            )}
+
+            {isError && (
+              <Text className="text-lg text-center text-red-500">
+                Ocorreu um erro ao carregar o orçamento
               </Text>
-            </View>
-          )}
+            )}
+          </View>
         </>
       )}
     </View>

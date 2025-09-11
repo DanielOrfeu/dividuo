@@ -1,47 +1,42 @@
 export interface MonthlyBudget {
-	id?: string
-	creatorID: string
-	monthYear: string
-	grossSalary: number
-	deductions: number
-	fixedExpenses: number
-	extraValuesToSpend: number
-	extraValuesToReserve: number
-	reserveValue: number
-	reserveType: ReserveType
-	totalAccumulatedReserve: number
-	daysReport?: DayReport[]
-	monthlyBudgetControlType: MonthlyBudgetType
-	hasPreviousMonthBudget?: boolean
-}
-
-export enum MonthlyBudgetType {
-	fixed,
-	remainingDays
+  id?: string
+  creatorID: string
+  monthYear: string
+  grossSalary: number
+  deductions: number
+  fixedExpenses: number
+  extraValuesToSpend: number
+  extraValuesToReserve: number
+  reserveValue: number
+  reserveType: ReserveType
+  totalAccumulatedReserve: number
+  daysReport?: DayReport[]
+  hasPreviousMonthBudget?: boolean
+  customDailySpendingLimit?: number
 }
 
 export enum ReserveType {
-	percentage,
-	amount
+  percentage,
+  amount
 }
 
 export interface DayReport {
-	day: number
-	budget: number
-	dailyExpenses: DailyExpense[]
+  day: number
+  dailyExpenses: DailyExpense[]
 }
 
 export interface DailyExpense {
-	description?: string
-	amount: number
+  description?: string
+  amount: number
 }
 
 export interface MonthlyBudgetDetailedValues {
-	netSalary: number
-	monthlySpendingLimit: number
-	dailySpendingLimit: number
-	reserveAmount: number
-	totalAvaliableToSpend: number
-	totalSpending: number
-	averageDailySpending: number
+  netSalary: number
+  monthlySpendingLimit: number
+  dailySpendingLimit: number
+  reserveAmount: number
+  totalAvaliableToSpend: number
+  totalSpending: number
+  averageDailySpending: number,
+  remainingDaysAverageSpending: number
 }

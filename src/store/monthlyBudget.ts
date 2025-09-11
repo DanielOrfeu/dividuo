@@ -10,69 +10,50 @@ import { useUserStore } from '@store/user'
 import { MonthlyBudget } from '@interfaces/monthlyBudget'
 
 type MonthlyBudgetStore = {
-	monthYearReference: string
-	setMonthYearReference: (my: string) => void
+  loadingMonthlyBudget: boolean
+  setLoadingMonthlyBudget: (loading: boolean) => void
 
-	monthlyBudgets: MonthlyBudget[]
-	getBudgetByMonthYear: (my: string) => void
+  monthYearReference: string
+  setMonthYearReference: (my: string) => void
 
-	selectedMonthlyBudget: MonthlyBudget | null
-	setSelectedMonthlyBudget: (mb: MonthlyBudget) => void
+  getMonthyBudgetByMonthYear: (my: string) => Promise<MonthlyBudget | null>
 
-	loadingMonthlyBudget: boolean
+  selectedMonthlyBudget: MonthlyBudget | null
+  setSelectedMonthlyBudget: (mb: MonthlyBudget) => void
 }
 
-export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set, get) => {
-	return {
-		monthYearReference: '',
-		setMonthYearReference: (my) => {
-			set({ monthYearReference: my })
-		},
+export const useMonthlyBudgetStore = create<MonthlyBudgetStore>((set) => {
+  return {
+    loadingMonthlyBudget: false,
+    setLoadingMonthlyBudget: (l) => {
+      set({ loadingMonthlyBudget: l })
+    },
 
-		monthlyBudgets: [],
-		getBudgetByMonthYear: async (my) => {
-			set({ loadingMonthlyBudget: true })
-			const { user } = useUserStore.getState()
+    monthYearReference: '',
+    setMonthYearReference: (my) => {
+      set({ monthYearReference: my })
+    },
 
-			await MonthlyBudgetService.GetBudgetByMonthYear(my, user.uid)
-				.then((res) => {
-					set({ selectedMonthlyBudget: res || null })
-					if (!res) return
+    getMonthyBudgetByMonthYear: async (my): Promise<MonthlyBudget | null> => {
 
-					const budgets = [...get().monthlyBudgets || []] 
 
-					const indexForUpdate = budgets.findIndex(
-						(item) => item.monthYear === res.monthYear
-					);
+      const { user } = useUserStore.getState()
 
-					if (indexForUpdate !== -1) {
-						budgets[indexForUpdate] = res;
-					} else {
-						budgets.push(res);
-					}
+      return await MonthlyBudgetService.GetMonthlyBudgetByMonthYearAndCreator(my, user.uid)
+        .then((res) => {
+          return res || null
+        })
+        .catch((err) => {
+          Alert.alert(`Erro ao buscar orcamento de ${my}`, FIREBASE_ERROR[err.code] || err.code)
+          return null
+        })
 
-					budgets.sort((a, b) => {
-						const [monthA, yearA] = a.monthYear.split("/").map(Number);
-						const [monthB, yearB] = b.monthYear.split("/").map(Number);
 
-						if (yearA !== yearB) return yearA - yearB;
-						return monthA - monthB;
-					});
+    },
 
-					set({ monthlyBudgets: budgets })
-				})
-				.catch((err) => {
-					Alert.alert('Erro ao buscar lista de pessoas', FIREBASE_ERROR[err.code] || err.code)
-					set({ monthlyBudgets: [] })
-				})
-				.finally(() => {
-					set({ loadingMonthlyBudget: false })
-				})
-		},
-		selectedMonthlyBudget: null,
-		loadingMonthlyBudget: false,
-		setSelectedMonthlyBudget: (monthlyBudget) => {
-			set({ selectedMonthlyBudget: monthlyBudget })
-		},
-	}
+    selectedMonthlyBudget: null,
+    setSelectedMonthlyBudget: (monthlyBudget) => {
+      set({ selectedMonthlyBudget: monthlyBudget })
+    },
+  }
 })

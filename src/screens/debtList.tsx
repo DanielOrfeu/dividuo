@@ -167,7 +167,6 @@ export default function Home({ navigation, route }) {
           </Text>
           <View className="w-12 flex absolute right-1 -top-5">
             <Button
-              text={"Criar Débito"}
               onPress={() => {
                 navigation.navigate("CreateDebt", { persontype: "debtor" });
               }}
@@ -213,7 +212,6 @@ export default function Home({ navigation, route }) {
           </Text>
           <View className="w-12 flex absolute right-1 -top-5">
             <Button
-              text={"Criar Débito"}
               onPress={() => {
                 navigation.navigate("CreateDebt", { persontype: "receiver" });
               }}

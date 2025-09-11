@@ -7,7 +7,7 @@ import { COLOR } from "@enums/colors";
 
 interface OwnProps {
   title: string;
-  type?: string;
+  type?: "default" | "alert" | "disabled" | "info" | "warning";
   actionText: string;
   isVisible: boolean;
   content: ReactNode;

@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Fragment, ReactNode, useEffect, useState } from "react";
 import { BUTTON_BG_COLOR, BUTTON_COLOR, COLOR } from "@enums/colors";
 import Loading from "./loading";
@@ -7,7 +7,7 @@ interface OwnProps {
   w?: string;
   text?: string;
   icon?: ReactNode;
-  type?: string;
+  type?: "default" | "info" | "alert" | "warning" | "disabled";
   disabled?: boolean;
   loading?: boolean;
   onPress(): void;
@@ -80,10 +80,9 @@ export default function Button({
       {loading ? (
         <Loading size={20} color={COLOR.white} />
       ) : (
-        <>
-          {icon ? (
-            <Fragment>{icon}</Fragment>
-          ) : text ? (
+        <View className="flex-row gap-1 justify-center items-center">
+          {icon && <View>{icon}</View>}
+          {text && !loading && (
             <Text
               className="font-bold"
               style={{
@@ -92,8 +91,8 @@ export default function Button({
             >
               {text}
             </Text>
-          ) : null}
-        </>
+          )}
+        </View>
       )}
     </TouchableOpacity>
   );
