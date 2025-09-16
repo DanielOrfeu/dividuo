@@ -133,7 +133,7 @@ export default function MyMonthlyBudget({ navigation }) {
                     {utils.NumberToBRL(totalAvaliableToSpend)}
                   </Text>{" "}
                   esse mês ({utils.NumberToBRL(remainingDaysAverageSpending)}{" "}
-                  por dia) se quiser adicionar os{" "}
+                  por dia contando a partir de hoje) se quiser adicionar os{" "}
                   {utils.NumberToBRL(reserveAmount)} planejados à sua reserva.
                 </Text>
                 <Text className="text-lg text-center text-black">

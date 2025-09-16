@@ -58,8 +58,12 @@ export default function MonthlyCalendar({
   const [expense, setexpense] = useState<DailyExpense | null>(null);
   const [action, setaction] = useState<ACTIONS>(ACTIONS.none);
   const [indexToModify, setindexToModify] = useState<number>(-1);
-  const [expenseModalOpen, setexpenseModalOpen] = useState<boolean>(false);
+  const [expensesListModalOpen, setexpensesListModalOpen] =
+    useState<boolean>(false);
+  const [expenseDetailModalOpen, setexpenseDetailModalOpen] =
+    useState<boolean>(false);
   const [deleteExpenseIndex, setdeleteExpenseIndex] = useState<number>(-1);
+
   const month = moment(monthYearReference, "MM/YYYY").format("MMMM");
   const year = moment(monthYearReference, "MM/YYYY").format("YYYY");
   const todayMYRef = moment(new Date()).format("MM/YYYY");
@@ -192,10 +196,9 @@ export default function MonthlyCalendar({
                     )
                   ) {
                     setaction(ACTIONS.add);
-                    setexpenseModalOpen(true);
+                    setexpenseDetailModalOpen(true);
                   } else {
-                    setaction(ACTIONS.edit);
-                    setexpenseModalOpen(true);
+                    setexpensesListModalOpen(true);
                   }
                 }
               }}
@@ -209,83 +212,9 @@ export default function MonthlyCalendar({
       />
 
       <ActionModal
-        title={`Despesas dia ${day?.day}`}
-        actionText={"Criar despesa"}
-        isVisible={monthlyBudget?.daysReport.some((dr) => dr.day === day?.day)}
-        content={
-          <FlatList
-            className="w-full"
-            data={
-              monthlyBudget?.daysReport.find((dr) => dr.day === day?.day)
-                ?.dailyExpenses || []
-            }
-            renderItem={({ item, index }) => {
-              return (
-                <View className="flex-row w-full justify-between bg-gray-200 rounded-3xl px-4 my-1">
-                  <View className="flex-row flex-1 gap-2">
-                    <Text className="self-center text-md font-semibold">
-                      {item.description || "Sem descrição"}
-                    </Text>
-                    <View className="items-center justify">
-                      <Text className="text-md font-semibold my-5">
-                        {utils.NumberToBRL(item.amount)}
-                      </Text>
-                    </View>
-                  </View>
-                  <View className="items-center justify-evenly flex-row gap-1">
-                    <>
-                      <TouchableOpacity
-                        onPress={() => {
-                          const { description, amount } = item;
-                          setexpense({
-                            description,
-                            amount,
-                          });
-                          setaction(ACTIONS.edit);
-                          setexpenseModalOpen(true);
-                          setindexToModify(index);
-                        }}
-                      >
-                        <Feather name="edit-3" size={24} color={COLOR.black} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          setindexToModify(index);
-                          setaction(ACTIONS.remove);
-                          setdeleteExpenseIndex(index);
-                        }}
-                      >
-                        <Feather name="trash-2" size={24} color={COLOR.red} />
-                      </TouchableOpacity>
-                    </>
-                  </View>
-                </View>
-              );
-            }}
-            keyExtractor={(item, i) => item.description + i}
-            ListEmptyComponent={
-              <View className="items-center">
-                <Text className="text-md">Sem despesesas registradas</Text>
-              </View>
-            }
-          />
-        }
-        disableAction={false}
-        closeModal={() => {
-          setday(null);
-        }}
-        startAction={() => {
-          setaction(ACTIONS.add);
-          setindexToModify(-1);
-          setexpenseModalOpen(true);
-        }}
-        cancelButtonText="Fechar"
-      />
-
-      <ActionModal
         title={`${action === ACTIONS.edit ? "Editar" : "Criar"} despesa`}
         actionText={action === ACTIONS.edit ? "Editar" : "Criar"}
-        isVisible={expenseModalOpen}
+        isVisible={expenseDetailModalOpen}
         content={
           <View className="w-full">
             <Input
@@ -316,10 +245,7 @@ export default function MonthlyCalendar({
         }
         disableAction={false}
         closeModal={() => {
-          if (action === ACTIONS.add) {
-            setday(null);
-          }
-          setexpenseModalOpen(false);
+          setexpenseDetailModalOpen(false);
           setaction(ACTIONS.none);
           setexpense(null);
         }}
@@ -328,41 +254,134 @@ export default function MonthlyCalendar({
             (dr) => dr.day === day?.day
           );
 
-          const reportIndex =
-            monthlyBudget?.daysReport.findIndex((dr) => dr.day === day?.day) ||
-            -1;
-
-          const dayReport = {
-            day: day?.day,
-            dailyExpenses: [
-              ...(monthlyBudget?.daysReport[reportIndex]?.dailyExpenses || []),
-            ],
-          };
-
-          if (indexToModify !== -1) {
-            dayReport.dailyExpenses[indexToModify] = {
-              description: expense?.description,
-              amount: expense?.amount,
-            };
+          if (!dayHasReport) {
+            setmonthlyBudget({
+              ...monthlyBudget,
+              daysReport: [
+                ...(monthlyBudget?.daysReport || []),
+                {
+                  day: day?.day,
+                  dailyExpenses: [
+                    {
+                      description: expense?.description,
+                      amount: expense?.amount,
+                    },
+                  ],
+                },
+              ],
+            });
           } else {
-            dayReport.dailyExpenses.push({
-              description: expense?.description,
-              amount: expense?.amount,
+            const reportIndex =
+              monthlyBudget?.daysReport.findIndex(
+                (dr) => dr.day === day?.day
+              ) || -1;
+
+            const dayReport = {
+              day: day?.day,
+              dailyExpenses: [
+                ...(monthlyBudget?.daysReport[reportIndex]?.dailyExpenses ||
+                  []),
+              ],
+            };
+            if (indexToModify !== -1) {
+              dayReport.dailyExpenses[indexToModify] = {
+                description: expense?.description,
+                amount: expense?.amount,
+              };
+            } else {
+              dayReport.dailyExpenses.push({
+                description: expense?.description,
+                amount: expense?.amount,
+              });
+            }
+
+            setmonthlyBudget({
+              ...monthlyBudget,
+              daysReport: [
+                ...monthlyBudget.daysReport.filter((dr) => dr.day !== day?.day),
+                dayReport,
+              ],
             });
           }
 
-          setmonthlyBudget({
-            ...monthlyBudget,
-            daysReport: [
-              ...monthlyBudget.daysReport.filter((dr) => dr.day !== day?.day),
-              dayReport,
-            ],
-          });
-
-          setexpenseModalOpen(false);
+          setexpenseDetailModalOpen(false);
           setaction(ACTIONS.none);
           setexpense(null);
         }}
+      />
+
+      <ActionModal
+        title={`Despesas dia ${day?.day}`}
+        actionText={"Criar despesa"}
+        isVisible={expensesListModalOpen}
+        content={
+          <FlatList
+            className="w-full"
+            data={
+              monthlyBudget?.daysReport.find((dr) => dr.day === day?.day)
+                ?.dailyExpenses || []
+            }
+            renderItem={({ item, index }) => {
+              return (
+                <View className="flex-row w-full justify-between bg-gray-200 rounded-3xl px-4 my-1">
+                  <View className="flex-row flex-1 gap-2">
+                    <Text className="self-center text-md font-semibold">
+                      {item.description || "Sem descrição"}
+                    </Text>
+                    <View className="items-center justify">
+                      <Text className="text-md font-semibold my-5">
+                        {utils.NumberToBRL(item.amount)}
+                      </Text>
+                    </View>
+                  </View>
+                  <View className="items-center justify-evenly flex-row gap-1">
+                    <>
+                      <TouchableOpacity
+                        onPress={() => {
+                          const { description, amount } = item;
+                          setexpense({
+                            description,
+                            amount,
+                          });
+                          setaction(ACTIONS.edit);
+                          setexpenseDetailModalOpen(true);
+                          setindexToModify(index);
+                        }}
+                      >
+                        <Feather name="edit-3" size={24} color={COLOR.black} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setaction(ACTIONS.remove);
+                          setdeleteExpenseIndex(index);
+                        }}
+                      >
+                        <Feather name="trash-2" size={24} color={COLOR.red} />
+                      </TouchableOpacity>
+                    </>
+                  </View>
+                </View>
+              );
+            }}
+            keyExtractor={(item, i) => item.description + i}
+            ListEmptyComponent={
+              <View className="items-center">
+                <Text className="text-md">Sem despesesas registradas</Text>
+              </View>
+            }
+          />
+        }
+        disableAction={false}
+        closeModal={() => {
+          setday(null);
+          setexpensesListModalOpen(false);
+        }}
+        startAction={() => {
+          setaction(ACTIONS.add);
+          setindexToModify(-1);
+          setexpenseDetailModalOpen(true);
+        }}
+        cancelButtonText="Fechar"
       />
 
       <ActionModal
@@ -383,20 +402,20 @@ export default function MonthlyCalendar({
         }}
         startAction={() => {
           setexpense(null);
-          // setmonthlyBudget({
-          //   ...monthlyBudget,
-          //   daysReport: monthlyBudget.daysReport.map((dr) => {
-          //     if (dr.day === day?.day) {
-          //       return {
-          //         ...dr,
-          //         dailyExpenses: dr.dailyExpenses.filter(
-          //           (_, i) => i !== deleteExpenseIndex
-          //         ),
-          //       };
-          //     }
-          //     return dr;
-          //   }),
-          // });
+          setmonthlyBudget({
+            ...monthlyBudget,
+            daysReport: monthlyBudget.daysReport.map((dr) => {
+              if (dr.day !== day?.day) {
+                return dr;
+              }
+              return {
+                ...dr,
+                dailyExpenses: dr.dailyExpenses.filter(
+                  (_, i) => i !== deleteExpenseIndex
+                ),
+              };
+            }),
+          });
           setdeleteExpenseIndex(-1);
         }}
       />
