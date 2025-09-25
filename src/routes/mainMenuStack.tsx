@@ -1,4 +1,4 @@
-import { Feather, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -12,17 +12,22 @@ import MyMonthyBudget from "@screens/myMonthyBudget";
 import DebtListTab from "@routes/debtListTab";
 
 import { COLOR } from "@enums/colors";
-import { TouchableOpacity, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { useMonthlyBudgetStore } from "@store/monthlyBudget";
+import React from "react";
 
 const { Navigator, Screen } = createDrawerNavigator();
+
+const DebtListTabMemo = React.memo(DebtListTab);
+const MyMonthyBudgetMemo = React.memo(MyMonthyBudget);
+const ProfileMemo = React.memo(Profile);
+const EditPersonsMemo = React.memo(EditPersons);
 
 export default function MainMenuStack() {
   return (
     <Navigator
       drawerContent={(props) => <CustomDrawer {...props} />}
       screenOptions={{
+        unmountOnBlur: false,
+        drawerType: "slide",
         drawerLabelStyle: {
           marginLeft: -25,
         },
@@ -32,12 +37,14 @@ export default function MainMenuStack() {
         headerTintColor: COLOR.white,
         headerStyle: {
           backgroundColor: COLOR.primary,
+          elevation: 0,
+          shadowOpacity: 0,
         },
       }}
     >
       <Screen
         name="DebtListTab"
-        component={DebtListTab}
+        component={DebtListTabMemo}
         options={{
           title: "Despesas",
           drawerIcon: ({ color, size }) => (
@@ -51,7 +58,7 @@ export default function MainMenuStack() {
       />
       <Screen
         name="MonthlyBudget"
-        component={MyMonthyBudget}
+        component={MyMonthyBudgetMemo}
         options={{
           title: "Meu orçamento mensal",
           drawerIcon: ({ color, size }) => (
@@ -71,7 +78,7 @@ export default function MainMenuStack() {
       />
       <Screen
         name="EditPersons"
-        component={EditPersons}
+        component={EditPersonsMemo}
         options={{
           title: "Devedores/recebedores",
           drawerIcon: ({ color, size }) => (
