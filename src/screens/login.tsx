@@ -4,7 +4,7 @@ import { Alert, Text, View, Image, TouchableOpacity } from "react-native";
 import Input from "@components/input";
 import Button from "@components/button";
 import Loading from "@components/loading";
-import InvertedButton from "@components/invertedButton";
+import OutlinedButton from "@components/outlinedButton";
 
 import UserService from "@services/user";
 
@@ -96,7 +96,7 @@ export default function Login({ navigation }) {
         </View>
         <View className="w-full items-center justify-center">
           <Text className="mb-2">Ainda não possui uma conta?</Text>
-          <InvertedButton
+          <OutlinedButton
             text={"Cadastre-se"}
             onPress={() => {
               navigation.navigate("SignUp");

@@ -10,7 +10,7 @@ import Input from "@components/input";
 import Button from "@components/button";
 import Loading from "@components/loading";
 import ActionModal from "@components/actionModal";
-import InvertedButton from "@components/invertedButton";
+import OutlinedButton from "@components/outlinedButton";
 
 import MonthlyBudgetService from "@services/monthlyBudget";
 
@@ -328,7 +328,7 @@ export default function CreateMonthlyBudget({ navigation }) {
                     podia gastar, agora você decide o que fazer com esse valor
                     extra:
                   </Text>
-                  <InvertedButton
+                  <OutlinedButton
                     type="info"
                     text="Colocar no saldo disponível para uso"
                     onPress={() => {

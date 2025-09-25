@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 import Modal from "react-native-modal";
 import { Text, View } from "react-native";
+
 import Button from "@components/button";
-import InvertedButton from "@components/invertedButton";
+import OutlinedButton from "@components/outlinedButton";
+
 import { COLOR } from "@enums/colors";
 
 interface OwnProps {
@@ -61,7 +63,7 @@ export default function ActionModal({
           />
           <View className="p-1" />
           {!hideCancelButton && (
-            <InvertedButton
+            <OutlinedButton
               text={cancelButtonText || "Cancelar"}
               onPress={() => {
                 closeModal();

@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View } from "react-native";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useMemo } from "react";
 import { BUTTON_BG_COLOR, BUTTON_COLOR, COLOR } from "@enums/colors";
 import Loading from "./loading";
 
@@ -24,52 +24,30 @@ export default function Button({
   w,
   text,
   icon,
-  type,
+  type = "default",
   disabled,
   loading = false,
   onPress,
 }: ButtonProps) {
-  const [pallet, setpallet] = useState<colorPallet>({
-    bgColor: BUTTON_BG_COLOR.default,
-    color: BUTTON_COLOR.default,
-  });
-
-  useEffect(() => {
-    switchColor();
-  }, [type, disabled || loading]);
-
-  useEffect(() => {
-    switchColor();
-  }, []);
-
-  const switchColor = () => {
+  const pallet = useMemo((): colorPallet => {
     if (disabled || loading) {
-      setpallet({
+      return {
         bgColor: BUTTON_BG_COLOR.disabled,
         color: BUTTON_COLOR.disabled,
-      });
-    } else {
-      if (type) {
-        setpallet({
-          bgColor: BUTTON_BG_COLOR[type],
-          color: BUTTON_COLOR[type],
-        });
-      } else {
-        setpallet({
-          bgColor: BUTTON_BG_COLOR.default,
-          color: BUTTON_COLOR.default,
-        });
-      }
+      };
     }
-  };
+
+    return {
+      bgColor: BUTTON_BG_COLOR[type],
+      color: BUTTON_COLOR[type],
+    };
+  }, [type, disabled, loading]);
 
   const className = `w-${w ? w : "full"} rounded-xl p-3 my-1 justify-center items-center`;
   return (
     <TouchableOpacity
       disabled={disabled || loading}
-      onPress={() => {
-        onPress();
-      }}
+      onPress={onPress}
       className={className}
       style={{
         backgroundColor: pallet.bgColor,
