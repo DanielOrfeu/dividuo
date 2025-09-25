@@ -12,7 +12,7 @@ import { useUserStore } from "@store/user";
 import { COLOR } from "@enums/colors";
 
 const CustomDrawer = React.memo((props: DrawerContentComponentProps) => {
-  const [user] = useUserStore((state) => [state.user]);
+  const { user } = useUserStore();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const navigation = useNavigation<any>();
 

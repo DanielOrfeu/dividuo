@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DayProps } from "react-native-calendars/src/calendar/day";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { Calendar, DateData, LocaleConfig } from "react-native-calendars";
@@ -50,10 +50,9 @@ export default function MonthlyCalendar({
   setmonthlyBudget,
   setMonthYearReference,
 }: Props) {
+  const { setLoadingMonthlyBudget } = useMonthlyBudgetStore();
   const { dailySpendingLimit } = useBudgetDetails(monthlyBudget);
-  const [setLoadingMonthlyBudget] = useMonthlyBudgetStore((state) => [
-    state.setLoadingMonthlyBudget,
-  ]);
+
   const [day, setday] = useState<DateData | null>(null);
   const [expense, setexpense] = useState<DailyExpense | null>(null);
   const [action, setaction] = useState<ACTIONS>(ACTIONS.none);
@@ -64,12 +63,16 @@ export default function MonthlyCalendar({
     useState<boolean>(false);
   const [deleteExpenseIndex, setdeleteExpenseIndex] = useState<number>(-1);
 
-  const month = moment(monthYearReference, "MM/YYYY").format("MMMM");
-  const year = moment(monthYearReference, "MM/YYYY").format("YYYY");
+  const { month, year, disabledFuture } = useMemo(() => {
+    const month = moment(monthYearReference, "MM/YYYY").format("MMMM");
+    const year = moment(monthYearReference, "MM/YYYY").format("YYYY");
+    const disabledFuture = moment(monthYearReference, "MM/YYYY").isSameOrAfter(
+      moment(todayMYRef, "MM/YYYY")
+    );
+    return { month, year, disabledFuture };
+  }, [monthYearReference]);
+
   const todayMYRef = moment(new Date()).format("MM/YYYY");
-  const disabledFuture = moment(monthYearReference, "MM/YYYY").isSameOrAfter(
-    moment(todayMYRef, "MM/YYYY")
-  );
 
   return (
     <>

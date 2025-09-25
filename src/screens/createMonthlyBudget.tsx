@@ -25,30 +25,18 @@ import { FIREBASE_ERROR } from "@enums/firebase";
 import * as utils from "@utils/index";
 
 export default function CreateMonthlyBudget({ navigation }) {
+  const { user } = useUserStore();
+  const {
+    loadingMonthlyBudget,
+    setSelectedMonthlyBudget,
+    monthYearReference,
+    setMonthYearReference,
+  } = useMonthlyBudgetStore();
+
   const [createLoading, setcreateLoading] = useState<boolean>(false);
   const [openPrevModal, setopenPrevModal] = useState<boolean>(false);
   const [openEconomyModal, setopenEconomyModal] = useState<boolean>(false);
   const [previousMb, setpreviousMb] = useState<MonthlyBudget | null>(null);
-
-  const previousMonthYear = moment(new Date(), "MM/YYYY")
-    .subtract(1, "month")
-    .format("MM/YYYY");
-  const [user] = useUserStore((state) => [state.user]);
-  const [
-    loading,
-    monthlyBudgets,
-    setSelectedMonthlyBudget,
-    getBudgetByMonthYear,
-    monthYearReference,
-    setMonthYearReference,
-  ] = useMonthlyBudgetStore((state) => [
-    state.loadingMonthlyBudget,
-    state.monthlyBudgets,
-    state.setSelectedMonthlyBudget,
-    state.getBudgetByMonthYear,
-    state.monthYearReference,
-    state.setMonthYearReference,
-  ]);
   const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget>({
     creatorID: user.uid,
     monthYear: monthYearReference,
@@ -66,33 +54,37 @@ export default function CreateMonthlyBudget({ navigation }) {
   });
 
   const { totalAvaliableToSpend } = useBudgetDetails(previousMb);
+  const previousMonthYear = moment(new Date(), "MM/YYYY")
+    .subtract(1, "month")
+    .format("MM/YYYY");
 
-  const checkPreviousMonthBudget = () => {
-    const prev = monthlyBudgets.find(
-      (mb) => mb?.monthYear === previousMonthYear
-    );
-    if (prev) {
-      setpreviousMb(prev);
-      setmonthlyBudget({
-        ...monthlyBudget,
-        hasPreviousMonthBudget: true,
-        totalAccumulatedReserve: prev.totalAccumulatedReserve,
-      });
-      setopenPrevModal(true);
-    }
-  };
+  //TODO: refactor
+  // const checkPreviousMonthBudget = () => {
+  //   const prev = monthlyBudgets.find(
+  //     (mb) => mb?.monthYear === previousMonthYear
+  //   );
+  //   if (prev) {
+  //     setpreviousMb(prev);
+  //     setmonthlyBudget({
+  //       ...monthlyBudget,
+  //       hasPreviousMonthBudget: true,
+  //       totalAccumulatedReserve: prev.totalAccumulatedReserve,
+  //     });
+  //     setopenPrevModal(true);
+  //   }
+  // };
 
-  useEffect(() => {
-    checkPreviousMonthBudget();
+  // useEffect(() => {
+  //   checkPreviousMonthBudget();
 
-    if (!previousMb) {
-      getBudgetByMonthYear(previousMonthYear);
-    }
-  }, []);
+  //   if (!previousMb) {
+  //     getBudgetByMonthYear(previousMonthYear);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    checkPreviousMonthBudget();
-  }, [monthlyBudgets]);
+  // useEffect(() => {
+  //   checkPreviousMonthBudget();
+  // }, [monthlyBudgets]);
 
   useEffect(() => {
     if (!openPrevModal && totalAvaliableToSpend) setopenEconomyModal(true);
@@ -100,7 +92,7 @@ export default function CreateMonthlyBudget({ navigation }) {
 
   return (
     <View className="flex-1 items-center p-4 bg-white w-screen">
-      {loading ? (
+      {loadingMonthlyBudget ? (
         <View className="h-full justify-center">
           <Loading size={80} />
         </View>

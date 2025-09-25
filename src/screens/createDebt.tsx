@@ -27,19 +27,10 @@ import { COLOR } from "@enums/colors";
 import * as utils from "@utils/index";
 
 export default function CreateDebt({ navigation, route }) {
-  const [user] = useUserStore((state) => [state.user]);
-  const [category] = useCategoryStore((state) => [state.category]);
-  const [getDebtsToPay, getDebtsToReceive] = useDebtStore((state) => [
-    state.getDebtsToPay,
-    state.getDebtsToReceive,
-  ]);
-  const [persons, selectedPersonID, getPersonsByCreator] = usePersonStore(
-    (state) => [
-      state.persons,
-      state.selectedPersonID,
-      state.getPersonsByCreator,
-    ]
-  );
+  const { user } = useUserStore();
+  const { category } = useCategoryStore();
+  const { getDebtsToPay, getDebtsToReceive } = useDebtStore();
+  const { persons, selectedPersonID, getPersonsByCreator } = usePersonStore();
 
   const [createPersonModalOpen, setcreatePersonModalOpen] =
     useState<boolean>(false);

@@ -8,7 +8,7 @@ import NonAuthStack from "@routes/nonAuthStack";
 import { useUserStore } from "@store/user";
 
 export default function Routes() {
-  const [user, setUser] = useUserStore((state) => [state.user, state.setUser]);
+  const { user, setUser } = useUserStore();
 
   useEffect(() => {
     const subscribe = auth().onUserChanged(setUser);

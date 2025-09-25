@@ -28,24 +28,15 @@ import { COLOR } from "@enums/colors";
 import { ACTIONS } from "@enums/actions";
 
 export default function EditPersons() {
-  const [user] = useUserStore((state) => [state.user]);
-  const [getDebtsToPay, getDebtsToReceive] = useDebtStore((state) => [
-    state.getDebtsToPay,
-    state.getDebtsToReceive,
-  ]);
-  const [
+  const { user } = useUserStore();
+  const { getDebtsToPay, getDebtsToReceive } = useDebtStore();
+  const {
     persons,
-    loading,
+    loadingPersons,
     selectedPersonID,
     getPersonsByCreator,
     setSelectedPersonID,
-  ] = usePersonStore((state) => [
-    state.persons,
-    state.loadingPersons,
-    state.selectedPersonID,
-    state.getPersonsByCreator,
-    state.setSelectedPersonID,
-  ]);
+  } = usePersonStore();
 
   const [index, setindex] = useState<number>();
   const [action, setaction] = useState<ACTIONS>();
@@ -195,7 +186,7 @@ export default function EditPersons() {
               keyExtractor={(item) => item.id}
               refreshControl={
                 <RefreshControl
-                  refreshing={loading}
+                  refreshing={loadingPersons}
                   onRefresh={() => {
                     getPersonsByCreator();
                   }}
@@ -213,17 +204,19 @@ export default function EditPersons() {
       </View>
       <View className="w-full items-center">
         <Button
-          disabled={loading}
+          disabled={loadingPersons}
           text={"Adicionar devedor/recebedor"}
           onPress={() => {
             setaction(ACTIONS.add);
             setpersonModalOpen(true);
           }}
-          icon={loading ? <Loading color={COLOR.white} size={20} /> : null}
+          icon={
+            loadingPersons ? <Loading color={COLOR.white} size={20} /> : null
+          }
         />
       </View>
       <ActionModal
-        type={action === ACTIONS.remove ? "alert" : ""}
+        type={action === ACTIONS.remove ? "alert" : "default"}
         title={`${action === ACTIONS.remove ? "Excluir" : action === ACTIONS.edit ? "Editar" : "Adicionar"} devedor/recebedor`}
         actionText={
           action === ACTIONS.remove

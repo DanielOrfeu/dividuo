@@ -29,22 +29,15 @@ enum EditAction {
 }
 
 export default function DebtDetail({ navigation }) {
-  const [user] = useUserStore((state) => [state.user]);
-  const [
+  const { user } = useUserStore();
+  const {
     debt,
     setDebt,
     loadDebt,
     getDebtByID,
     getDebtsToPay,
     getDebtsToReceive,
-  ] = useDebtStore((state) => [
-    state.debt,
-    state.setDebt,
-    state.loadDebt,
-    state.getDebtByID,
-    state.getDebtsToPay,
-    state.getDebtsToReceive,
-  ]);
+  } = useDebtStore();
 
   const [payValue, setpayValue] = useState<number>(0);
   const [paymentModalOpen, setpaymentModalOpen] = useState<boolean>(false);
@@ -337,7 +330,7 @@ export default function DebtDetail({ navigation }) {
             </Text>
           )}
           <ActionModal
-            type={action === EditAction.remove ? "alert" : ""}
+            type={action === EditAction.remove ? "alert" : "default"}
             title={`${action === EditAction.remove ? "Excluir" : action === EditAction.edit ? "Editar" : "Adicionar"} pagamento`}
             actionText={
               action === EditAction.remove

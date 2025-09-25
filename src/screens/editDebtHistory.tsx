@@ -11,8 +11,8 @@ import { COLOR } from "@enums/colors";
 import * as utils from "@utils/index";
 
 export default function EditDebtHistory() {
-  const [debt] = useDebtStore((state) => [state.debt]);
-  const [user] = useUserStore((state) => [state.user]);
+  const { debt } = useDebtStore();
+  const { user } = useUserStore();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formatInfo = (prop: string, item: any): string => {

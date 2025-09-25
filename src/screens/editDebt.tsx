@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Text, View, Image } from "react-native";
 import moment from "moment";
 
@@ -19,35 +19,27 @@ import { EditHistory, HistoryItem } from "@interfaces/debt";
 import * as utils from "@utils/index";
 
 export default function EditDebt({ navigation }) {
-  const [user] = useUserStore((state) => [state.user]);
-  const [debt, setDebt, getDebtByID, getDebtsToPay, getDebtsToReceive] =
-    useDebtStore((state) => [
-      state.debt,
-      state.setDebt,
-      state.getDebtByID,
-      state.getDebtsToPay,
-      state.getDebtsToReceive,
-    ]);
+  const { user } = useUserStore();
+  const { debt, setDebt, getDebtByID, getDebtsToPay, getDebtsToReceive } =
+    useDebtStore();
 
   const [loading, setloading] = useState<boolean>(false);
-  const [oldInfo, setoldInfo] = useState<HistoryItem>();
-  const [sameInfos, setsameInfos] = useState<boolean>(true);
 
-  useEffect(() => {
-    setoldInfo({
-      description: debt.description,
-      dueDate: debt.dueDate,
-      value: debt.value,
-    });
-  }, []);
+  const oldInfo: HistoryItem = {
+    description: debt?.description || "",
+    dueDate: debt?.dueDate || "",
+    value: debt?.value || 0,
+  };
 
-  useEffect(() => {
-    setsameInfos(() => {
-      if (!oldInfo) return true;
-      return Object.entries(oldInfo).every(([key, value]) => {
-        return debt[key] === value;
-      });
-    });
+  const { sameInfos = true } = useMemo(() => {
+    const sameInfos =
+      !oldInfo.description || !oldInfo.value || !oldInfo.dueDate
+        ? true
+        : Object.entries(oldInfo).every(([key, value]) => {
+            return debt[key] === value;
+          });
+
+    return { sameInfos };
   }, [debt]);
 
   return (

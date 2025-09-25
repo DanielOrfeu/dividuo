@@ -19,30 +19,20 @@ import * as utils from "@utils/index";
 import { useBudgetDetails } from "@hooks/useMonthyBudgetDetails";
 
 export default function MyMonthlyBudget({ navigation }) {
-  const [
+  const {
     monthYearReference,
     setMonthYearReference,
     getMonthyBudgetByMonthYear,
-    selectedMonthlyBudget,
     setSelectedMonthlyBudget,
     loadingMonthlyBudget,
     setLoadingMonthlyBudget,
-  ] = useMonthlyBudgetStore((state) => [
-    state.monthYearReference,
-    state.setMonthYearReference,
-    state.getMonthyBudgetByMonthYear,
-    state.selectedMonthlyBudget,
-    state.setSelectedMonthlyBudget,
-    state.loadingMonthlyBudget,
-    state.setLoadingMonthlyBudget,
-  ]);
-  const [userLastBudget, getUserLastBudgetByCreator] = useUserLastBudgetStore(
-    (state) => [state.userLastBudget, state.getUserLastBudgetByCreator]
-  );
+  } = useMonthlyBudgetStore();
+  const { userLastBudget, getUserLastBudgetByCreator } =
+    useUserLastBudgetStore();
+
   const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget | null>(
     null
   );
-
   const [isError, setisError] = useState<boolean>(false);
   const [isAbleToCreate, setisAbleToCreate] = useState<boolean>(false);
   const [isAbleToEdit, setisAbleToEdit] = useState<boolean>(false);

@@ -5,7 +5,7 @@ import { useCategoryStore } from "@store/category";
 import { DebtCategory } from "@interfaces/debt";
 
 export default function SelectCategory({ navigation }) {
-  const [setCategory] = useCategoryStore((state) => [state.setCategory]);
+  const { setCategory } = useCategoryStore();
 
   return (
     <View className="flex-1 items-center justify-center w-full p-8 bg-primary">

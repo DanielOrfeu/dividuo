@@ -17,7 +17,7 @@ import { FIREBASE_ERROR } from "@enums/firebase";
 import { COLOR } from "@enums/colors";
 
 export default function Profile() {
-  const [user] = useUserStore((state) => [state.user]);
+  const { user } = useUserStore();
 
   const [name, setname] = useState<string>(user.displayName || "");
   const [email, setemail] = useState<string>(user.email || "");

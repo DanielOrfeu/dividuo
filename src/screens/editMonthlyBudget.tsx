@@ -19,26 +19,21 @@ import { FIREBASE_ERROR } from "@enums/firebase";
 import * as utils from "@utils/index";
 
 export default function EditMonthlyBudget({ navigation }) {
-  const [editLoading, seteditLoading] = useState<boolean>(false);
-
-  const [
-    loading,
+  const {
+    loadingMonthlyBudget,
     setSelectedMonthlyBudget,
     selectedMonthlyBudget,
     setMonthYearReference,
-  ] = useMonthlyBudgetStore((state) => [
-    state.loadingMonthlyBudget,
-    state.setSelectedMonthlyBudget,
-    state.selectedMonthlyBudget,
-    state.setMonthYearReference,
-  ]);
+  } = useMonthlyBudgetStore();
+
+  const [editLoading, seteditLoading] = useState<boolean>(false);
   const [monthlyBudget, setmonthlyBudget] = useState<MonthlyBudget>(
     selectedMonthlyBudget
   );
 
   return (
     <View className="flex-1 items-center p-4 bg-white w-screen">
-      {loading ? (
+      {loadingMonthlyBudget ? (
         <View className="h-full justify-center">
           <Loading size={80} />
         </View>

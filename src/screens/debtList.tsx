@@ -1,6 +1,6 @@
 import moment from "moment";
 import Checkbox from "expo-checkbox";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Text,
   View,
@@ -24,72 +24,50 @@ import { COLOR } from "@enums/colors";
 import * as utils from "@utils/index";
 
 export default function Home({ navigation, route }) {
-  const [getDebtsToPay, getDebtsToReceive] = useDebtStore((state) => [
-    state.getDebtsToPay,
-    state.getDebtsToReceive,
-  ]);
-  const [debtsToPay, debtsToReceive] = useDebtStore((state) => [
-    state.debtsToPay,
-    state.debtsToReceive,
-  ]);
-  const [
+  const { getDebtsToPay, getDebtsToReceive } = useDebtStore();
+  const { debtsToPay, debtsToReceive } = useDebtStore();
+  const {
     getDebtByID,
     loadDebtToPay,
     loadDebtToReceive,
     showPaidDebts,
     setShowPaidDebts,
-  ] = useDebtStore((state) => [
-    state.getDebtByID,
-    state.loadDebtToPay,
-    state.loadDebtToReceive,
-    state.showPaidDebts,
-    state.setShowPaidDebts,
-  ]);
-  const [persons, selectedPersonID, getPersonsByCreator, setSelectedPersonID] =
-    usePersonStore((state) => [
-      state.persons,
-      state.selectedPersonID,
-      state.getPersonsByCreator,
-      state.setSelectedPersonID,
-    ]);
-  const [totalToReceive, settotalToReceive] = useState<number>(0);
-  const [totalToPay, settotalToPay] = useState<number>(0);
+  } = useDebtStore();
+  const {
+    persons,
+    selectedPersonID,
+    getPersonsByCreator,
+    setSelectedPersonID,
+  } = usePersonStore();
 
-  const [totalPaid, settotalPaid] = useState<number>(0);
-  const [totalReceived, settotalReceived] = useState<number>(0);
+  const { totalToPay = 0, totalPaid = 0 } = useMemo(() => {
+    const totalToPay = debtsToPay.reduce((acc, crr) => {
+      return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
+    }, 0);
+
+    const totalPaid = debtsToPay.reduce((acc, crr) => {
+      return acc + crr.valuePaid;
+    }, 0);
+
+    return { totalToPay, totalPaid };
+  }, [debtsToPay]);
+
+  const { totalToReceive = 0, totalReceived = 0 } = useMemo(() => {
+    const totalToReceive = debtsToReceive.reduce((acc, crr) => {
+      return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
+    }, 0);
+
+    const totalReceived = debtsToReceive.reduce((acc, crr) => {
+      return acc + crr.valuePaid;
+    }, 0);
+
+    return { totalToReceive, totalReceived };
+  }, [debtsToReceive]);
 
   const getDebts = async () => {
     getDebtsToPay();
     getDebtsToReceive();
   };
-
-  useEffect(() => {
-    settotalToPay(
-      debtsToPay.reduce((acc, crr) => {
-        return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
-      }, 0)
-    );
-
-    settotalPaid(
-      debtsToPay.reduce((acc, crr) => {
-        return acc + crr.valuePaid;
-      }, 0)
-    );
-  }, [debtsToPay]);
-
-  useEffect(() => {
-    settotalToReceive(
-      debtsToReceive.reduce((acc, crr) => {
-        return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
-      }, 0)
-    );
-
-    settotalReceived(
-      debtsToReceive.reduce((acc, crr) => {
-        return acc + crr.valuePaid;
-      }, 0)
-    );
-  }, [debtsToReceive]);
 
   useEffect(() => {
     getDebts();
