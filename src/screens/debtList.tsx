@@ -40,29 +40,30 @@ export default function Home({ navigation, route }) {
     setSelectedPersonID,
   } = usePersonStore();
 
-  const { totalToPay = 0, totalPaid = 0 } = useMemo(() => {
-    const totalToPay = debtsToPay.reduce((acc, crr) => {
-      return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
-    }, 0);
+  const { totalToPay = 0, totalPaid = 0 } = useMemo(
+    () => ({
+      totalToPay: debtsToPay.reduce((acc, crr) => {
+        return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
+      }, 0),
+      totalPaid: debtsToPay.reduce((acc, crr) => {
+        return acc + crr.valuePaid;
+      }, 0),
+    }),
+    [debtsToPay]
+  );
 
-    const totalPaid = debtsToPay.reduce((acc, crr) => {
-      return acc + crr.valuePaid;
-    }, 0);
+  const { totalToReceive = 0, totalReceived = 0 } = useMemo(
+    () => ({
+      totalToReceive: debtsToReceive.reduce((acc, crr) => {
+        return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
+      }, 0),
 
-    return { totalToPay, totalPaid };
-  }, [debtsToPay]);
-
-  const { totalToReceive = 0, totalReceived = 0 } = useMemo(() => {
-    const totalToReceive = debtsToReceive.reduce((acc, crr) => {
-      return crr.valueRemaning > 0 ? acc + crr.valueRemaning : acc;
-    }, 0);
-
-    const totalReceived = debtsToReceive.reduce((acc, crr) => {
-      return acc + crr.valuePaid;
-    }, 0);
-
-    return { totalToReceive, totalReceived };
-  }, [debtsToReceive]);
+      totalReceived: debtsToReceive.reduce((acc, crr) => {
+        return acc + crr.valuePaid;
+      }, 0),
+    }),
+    [debtsToReceive]
+  );
 
   const getDebts = async () => {
     getDebtsToPay();

@@ -14,33 +14,45 @@ import { useUserStore } from "@store/user";
 
 import { FIREBASE_ERROR } from "@enums/firebase";
 
-import { EditHistory, HistoryItem } from "@interfaces/debt";
+import { Debt, EditHistory, HistoryItem } from "@interfaces/debt";
 
 import * as utils from "@utils/index";
 
 export default function EditDebt({ navigation }) {
   const { user } = useUserStore();
-  const { debt, setDebt, getDebtByID, getDebtsToPay, getDebtsToReceive } =
-    useDebtStore();
+  const {
+    debt: debtCopy,
+    getDebtByID,
+    getDebtsToPay,
+    getDebtsToReceive,
+  } = useDebtStore();
 
   const [loading, setloading] = useState<boolean>(false);
 
-  const oldInfo: HistoryItem = {
-    description: debt?.description || "",
-    dueDate: debt?.dueDate || "",
-    value: debt?.value || 0,
-  };
+  const [debt, setDebt] = useState<Debt | null>(debtCopy);
 
-  const { sameInfos = true } = useMemo(() => {
-    const sameInfos =
-      !oldInfo.description || !oldInfo.value || !oldInfo.dueDate
-        ? true
-        : Object.entries(oldInfo).every(([key, value]) => {
-            return debt[key] === value;
-          });
+  const oldInfo = useMemo(
+    () => ({
+      description: debtCopy?.description || "",
+      dueDate: debtCopy?.dueDate || "",
+      value: debtCopy?.value || 0,
+    }),
+    [debtCopy]
+  );
 
-    return { sameInfos };
-  }, [debt]);
+  const sameInfos = useMemo(() => {
+    if (!debt) return true;
+
+    return (
+      oldInfo.description === debt.description &&
+      oldInfo.dueDate === debt.dueDate &&
+      oldInfo.value === debt.value
+    );
+  }, [debt, oldInfo]);
+
+  useEffect(() => {
+    setDebt(debtCopy);
+  }, [debtCopy]);
 
   return (
     <View className="flex-1 items-center p-4 bg-white w-screen justify-center">

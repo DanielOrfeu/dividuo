@@ -36,7 +36,6 @@ export default class DebtService {
       .doc(debtID)
       .get()
       .then(res => {
-        console.log("🚀 ~ DebtService ~ GetDebtByID ~ res:", res)
         if (!res.exists) return {}
         return {
           id: res.id,

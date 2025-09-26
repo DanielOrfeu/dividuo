@@ -33,6 +33,10 @@ export default function EditDebtHistory() {
       return item.newInfo[prop] != item.oldInfo[prop];
     });
 
+    if (ajustedItems.length == 0) {
+      return null;
+    }
+
     return (
       <View className="w-full bg-gray-200 rounded-3xl p-4 my-1 flex-row">
         <View className="w-full items-center justify-center">

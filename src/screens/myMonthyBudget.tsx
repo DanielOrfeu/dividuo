@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import moment from "moment";
@@ -34,50 +34,50 @@ export default function MyMonthlyBudget({ navigation }) {
     null
   );
   const [isError, setisError] = useState<boolean>(false);
-  const [isAbleToCreate, setisAbleToCreate] = useState<boolean>(false);
-  const [isAbleToEdit, setisAbleToEdit] = useState<boolean>(false);
   const { reserveAmount, remainingDaysAverageSpending, totalAvaliableToSpend } =
     useBudgetDetails(monthlyBudget);
 
-  const checkAvailability = (budget: MonthlyBudget | null) => {
-    let ableToCreate = false;
-    let ableToEdit = false;
+  const { isAbleToCreate = false, isAbleToEdit = false } = useMemo(() => {
+    if (isError) {
+      return {
+        isAbleToCreate: false,
+        isAbleToEdit: false,
+      };
+    }
 
-    const today = moment(new Date());
+    const today = moment().format("MM/YYYY");
     const selectedMonthYear = moment(monthYearReference, "MM/YYYY");
     const lastBudgetCreated = userLastBudget?.reference
       ? moment(userLastBudget.reference, "MM/YYYY")
-      : today;
+      : null;
 
-    if (!budget) {
-      ableToCreate =
-        !userLastBudget?.reference ||
+    let isAbleToCreate =
+      !monthlyBudget &&
+      (!userLastBudget?.reference ||
         (selectedMonthYear.isAfter(lastBudgetCreated) &&
-          selectedMonthYear.isSameOrBefore(today));
-    } else {
-      ableToEdit = selectedMonthYear.isSame(lastBudgetCreated);
-    }
+          selectedMonthYear.isSameOrBefore(today)));
 
-    setisAbleToEdit(ableToEdit);
-    setisAbleToCreate(ableToCreate);
-  };
+    let isAbleToEdit =
+      monthlyBudget && selectedMonthYear.isSame(lastBudgetCreated);
+
+    return {
+      isAbleToCreate,
+      isAbleToEdit,
+    };
+  }, [monthlyBudget, monthYearReference, userLastBudget, isError]);
 
   const getBudget = () => {
     setLoadingMonthlyBudget(true);
     getMonthyBudgetByMonthYear(monthYearReference)
       .then((budget) => {
-        checkAvailability(budget);
         setisError(false);
         setmonthlyBudget(budget);
         setSelectedMonthlyBudget(budget);
       })
       .catch((err) => {
-        setisAbleToCreate(false);
         setisError(true);
         setmonthlyBudget(null);
         setSelectedMonthlyBudget(null);
-        setisAbleToEdit(false);
-        setisAbleToCreate(false);
       })
       .finally(() => {
         setLoadingMonthlyBudget(false);

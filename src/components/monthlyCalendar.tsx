@@ -62,17 +62,27 @@ export default function MonthlyCalendar({
   const [expenseDetailModalOpen, setexpenseDetailModalOpen] =
     useState<boolean>(false);
   const [deleteExpenseIndex, setdeleteExpenseIndex] = useState<number>(-1);
-
-  const { month, year, disabledFuture } = useMemo(() => {
-    const month = moment(monthYearReference, "MM/YYYY").format("MMMM");
-    const year = moment(monthYearReference, "MM/YYYY").format("YYYY");
-    const disabledFuture = moment(monthYearReference, "MM/YYYY").isSameOrAfter(
-      moment(todayMYRef, "MM/YYYY")
-    );
-    return { month, year, disabledFuture };
-  }, [monthYearReference]);
-
+  const [disabledFuture, setdisabledFuture] = useState<boolean>(false);
   const todayMYRef = moment(new Date()).format("MM/YYYY");
+
+  const { month, year } = useMemo(
+    () => ({
+      month: moment(monthYearReference, "MM/YYYY").format("MMMM"),
+      year: moment(monthYearReference, "MM/YYYY").format("YYYY"),
+      disabledFuture: moment(monthYearReference, "MM/YYYY").isSameOrAfter(
+        moment(todayMYRef, "MM/YYYY")
+      ),
+    }),
+    [monthYearReference]
+  );
+
+  useEffect(() => {
+    setdisabledFuture(
+      moment(monthYearReference, "MM/YYYY").isSameOrAfter(
+        moment(todayMYRef, "MM/YYYY")
+      )
+    );
+  }, [monthYearReference]);
 
   return (
     <>
